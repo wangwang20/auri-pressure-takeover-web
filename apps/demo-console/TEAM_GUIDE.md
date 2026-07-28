@@ -27,6 +27,18 @@ Demo 控制台是现场演示导演台，用于模拟本轮不接入真实系统
 
 ## 启动页面
 
+### 公网直接访问
+
+不需要拉代码或启动静态服务器，打开：
+
+```text
+https://wangwang20.github.io/auri-pressure-takeover-web/apps/demo-console/
+```
+
+第一次使用需填写团队 Agent API 和负责人单独提供的 Team Token。公网静态页面不包含 Token、OpenAI API Key 或后端环境变量。
+
+### 本机访问
+
 从仓库根目录启动静态服务：
 
 ```bash
@@ -38,6 +50,22 @@ python -m http.server 5174
 ```text
 http://127.0.0.1:5174/apps/demo-console/
 ```
+
+### 局域网访问
+
+开发机启动：
+
+```bash
+python -m http.server 5174 --bind 0.0.0.0
+```
+
+同一网络中的其他设备打开：
+
+```text
+http://<开发机局域网IP>:5174/apps/demo-console/
+```
+
+公网、本机和局域网页面均可连接本地或公网 Agent；局域网设备若要连接开发机上的本地 Agent，需要后端监听 `0.0.0.0` 并配置允许该页面 Origin 的 CORS。
 
 ## 连接本地 Agent
 

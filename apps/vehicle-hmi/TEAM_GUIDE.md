@@ -53,6 +53,18 @@
 
 ## 启动页面
 
+### 公网直接访问
+
+不需要拉代码或启动静态服务器，横屏打开：
+
+```text
+https://wangwang20.github.io/auri-pressure-takeover-web/apps/vehicle-hmi/
+```
+
+第一次使用仍需点击左侧 `连接`，填写团队 Agent API 和负责人单独提供的 Team Token。公网静态页面不包含 Token、OpenAI API Key 或后端环境变量。
+
+### 本机访问
+
 从仓库根目录启动静态服务：
 
 ```bash
@@ -65,7 +77,21 @@ python -m http.server 5174
 http://127.0.0.1:5174/apps/vehicle-hmi/
 ```
 
-如果页面部署到局域网或公网，访问地址会变成部署后的页面地址，但 Agent API 仍需在页面内单独配置。
+### 局域网访问
+
+让同一网络中的手机、平板或其他电脑访问开发机：
+
+```bash
+python -m http.server 5174 --bind 0.0.0.0
+```
+
+查询开发机局域网 IP 后，其他设备打开：
+
+```text
+http://<开发机局域网IP>:5174/apps/vehicle-hmi/
+```
+
+三种访问方式共用同一套前端代码。页面地址可以是公网、`127.0.0.1` 或局域网 IP，但 Agent API 仍需在页面内单独配置。
 
 ## 连接本地 Agent
 
