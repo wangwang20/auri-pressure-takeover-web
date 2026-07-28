@@ -121,6 +121,7 @@ const ui = {
 
 let worldState = null;
 let activeDraft = "teacher";
+let activeTaskDetail = "pickup";
 let lastRevision = -1;
 let eventSeq = 0;
 let pollTimer = null;
@@ -650,6 +651,17 @@ function fanLabel(speed) {
   return { low: "低", medium: "中", high: "高" }[speed] || "中";
 }
 
+function hapticLabel(haptic) {
+  return {
+    none: "保持静默",
+    single_short: "一次短震",
+    double_short: "双短震",
+    three_beat: "三拍提示",
+    clear: "明确提示",
+    soft_short: "柔和短震"
+  }[haptic] || (haptic ? "触觉提醒" : "保持静默");
+}
+
 function sceneLabel(scene) {
   return {
     off_vehicle: "车外待机",
@@ -783,6 +795,53 @@ function detailItem(label, value, cls = "") {
   return `<div class="detail-item ${cls}"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`;
 }
 
+function actionStatusLabel(status) {
+  return {
+    awaiting_confirmation: "待确认",
+    completed: "已完成",
+    blocked: "已阻断",
+    failed: "失败",
+    planned: "已规划",
+    ready: "已准备"
+  }[status] || status || "等待";
+}
+
+function taskFlowCard({
+  id,
+  icon,
+  type,
+  title,
+  status,
+  meta,
+  detail,
+  selected,
+  tone
+}) {
+  return `
+    <button class="task-flow-card ${tone} ${selected ? "selected" : ""}" type="button"
+      data-task-detail="${escapeHtml(id)}" aria-expanded="${selected ? "true" : "false"}">
+      <span class="task-flow-icon" aria-hidden="true">${escapeHtml(icon)}</span>
+      <span class="task-flow-copy">
+        <span class="task-flow-label">${escapeHtml(type)}<b>${escapeHtml(status)}</b></span>
+        <strong>${escapeHtml(title)}</strong>
+        <em>${escapeHtml(meta)}</em>
+        <span class="task-flow-detail">${escapeHtml(detail)}</span>
+      </span>
+      <i aria-hidden="true">${selected ? "−" : "+"}</i>
+    </button>
+  `;
+}
+
+function deviceSyncCard({ icon, name, state, detail, active, tone }) {
+  return `
+    <article class="device-sync-card ${tone} ${active ? "active" : ""}">
+      <span class="device-sync-icon" aria-hidden="true">${escapeHtml(icon)}</span>
+      <span><strong>${escapeHtml(name)}</strong><em>${escapeHtml(detail)}</em></span>
+      <b>${escapeHtml(state)}</b>
+    </article>
+  `;
+}
+
 function setActiveLauncher(kind = "home") {
   document.querySelectorAll(".launch[data-detail], .launch[data-home]").forEach((button) => {
     button.classList.toggle("active", kind === "home" ? button.hasAttribute("data-home") : button.dataset.detail === kind);
@@ -814,22 +873,70 @@ function openDetail(kind) {
       : messageActions.find((action) => action.target?.includes("老师")) || messageActions[0];
     ui.detailTitle.textContent = "消息";
     ui.detailBody.innerHTML = `
-      <div class="detail-tabs">
-        <button type="button" data-detail-draft="teacher" class="${activeDraft === "teacher" ? "active" : ""}">老师</button>
-        <button type="button" data-detail-draft="family" class="${activeDraft === "family" ? "active" : ""}">家人</button>
+      <section class="message-overview">
+        <span>消息协助</span>
+        <strong>${messageActions.length ? `${messageActions.length} 条草稿已准备` : "等待风险成立"}</strong>
+        <p>${messageActions.length ? "确认后统一发送，驾驶中无需编辑长文本。" : "风险成立后，AURI 会准备必要联系人消息。"}</p>
+      </section>
+      <div class="detail-tabs contact-tabs">
+        <button type="button" data-detail-draft="teacher" class="${activeDraft === "teacher" ? "active" : ""}">
+          <span class="contact-avatar">师</span><span><strong>王老师</strong><em>${messageActions[0] ? actionStatusLabel(messageActions[0].status) : "未生成"}</em></span>
+        </button>
+        <button type="button" data-detail-draft="family" class="${activeDraft === "family" ? "active" : ""}">
+          <span class="contact-avatar">家</span><span><strong>家人</strong><em>${messageActions[1] ? actionStatusLabel(messageActions[1].status) : "未生成"}</em></span>
+        </button>
       </div>
       ${draftMarkup(currentAction, activeDraft)}
+      <div class="message-state-strip">
+        <span class="${messageActions.length ? "done" : ""}"><i></i>生成草稿</span>
+        <b></b>
+        <span class="${currentAction?.status === "completed" ? "done" : "current"}"><i></i>${currentAction?.status === "completed" ? "已模拟发送" : "等待确认"}</span>
+      </div>
     `;
   } else if (kind === "plan") {
     ui.detailTitle.textContent = "接管方案";
+    const completedActions = actions.filter((action) => action.status === "completed").length;
+    const taskRisk = risk.late_minutes > 0;
     ui.detailBody.innerHTML = `
-      <div class="detail-list">
-        ${detailCopyItem("处理结果", planResultSummary(order), risk.late_minutes > 0 ? "warning" : "")}
-        ${detailItem("刚性责任", pickup ? "18:10 接孩子 · 不可后置" : "等待手机端创建任务")}
-        ${detailItem("弹性任务", grocery ? `${grocery.status === "rescheduled" ? "已后置" : "可调整"} · 之后去超市` : "等待识别弹性任务")}
-        ${detailItem("动作组", actions.length ? `${actions.length} 个动作 · ${worldState?.confirmation?.status === "pending" ? "等待确认" : "已同步"}` : "尚未生成动作组")}
-        ${detailItem("服务方案", order ? `${orderStatusLabel(order.status)} · ${order.total || 0} 元 · ${order.delivery_window || "待定"}` : "未生成模拟配送方案")}
+      <section class="task-overview ${taskRisk ? "warning" : ""}">
+        <span class="task-overview-kicker">今日关键责任</span>
+        <strong>${pickup ? "18:10 接孩子" : "等待手机创建任务"}</strong>
+        <p>${taskRisk ? `当前预计晚到 ${risk.late_minutes} 分钟，AURI 已优先保护刚性责任。` : "接孩子保持最高优先级，弹性事项可自动调整。"}</p>
+        <div class="task-overview-meta">
+          <span><b>${actions.length}</b> 个动作</span>
+          <span><b>${completedActions}</b> 已完成</span>
+          <span class="${worldState?.confirmation?.status === "pending" ? "warning" : ""}">${worldState?.confirmation?.status === "pending" ? "等待确认" : "状态同步"}</span>
+        </div>
+      </section>
+      <div class="task-flow-list">
+        ${taskFlowCard({
+          id: "pickup",
+          icon: "◷",
+          type: "刚性责任",
+          title: pickup ? "18:10 接孩子" : "等待创建",
+          status: "不可后置",
+          meta: pickup?.location || "阳光小学",
+          detail: taskRisk ? `预计晚到 ${risk.late_minutes} 分钟，老师消息已准备。` : "系统持续计算最晚出发时间和 ETA。",
+          selected: activeTaskDetail === "pickup",
+          tone: "rigid"
+        })}
+        ${taskFlowCard({
+          id: "grocery",
+          icon: "↻",
+          type: "弹性任务",
+          title: grocery ? "之后去超市" : "等待识别",
+          status: grocery?.status === "rescheduled" ? "已后置" : "可调整",
+          meta: order ? `${(order.items || []).length} 件 · ${order.total || 0} 元` : "不影响接孩子",
+          detail: order ? `${orderStatusLabel(order.status)}，预计 ${order.delivery_window || "配送时间待定"} 送达。` : "风险成立后可切换为模拟配送方案。",
+          selected: activeTaskDetail === "grocery",
+          tone: "flexible"
+        })}
       </div>
+      <section class="task-action-summary">
+        <header><span>处理进度</span><strong>${actions.length ? `${completedActions}/${actions.length}` : "0/0"}</strong></header>
+        <div class="task-action-track"><i style="--task-progress:${actions.length ? Math.round((completedActions / actions.length) * 100) : 0}%"></i></div>
+        <p>${escapeHtml(planResultSummary(order))}</p>
+      </section>
     `;
   } else if (kind === "vehicle") {
     ui.detailTitle.textContent = "座舱状态";
@@ -872,7 +979,7 @@ function openDetail(kind) {
         <article class="${worldState?.wearable?.mode === "warning" ? "warning" : worldState?.wearable?.mode === "completed" ? "done" : ""}">
           <span>腕上反馈</span>
           <strong>${escapeHtml(worldState?.wearable?.text || "AURI 就绪")}</strong>
-          <em>${escapeHtml(worldState?.wearable?.haptic === "none" || !worldState?.wearable?.haptic ? "保持静默" : worldState.wearable.haptic)}</em>
+          <em>${escapeHtml(hapticLabel(worldState?.wearable?.haptic))}</em>
         </article>
       </div>
       <div class="cabin-sync-note"><i></i><span>座舱状态已同步至手机、腕上与车机</span></div>
@@ -890,11 +997,33 @@ function openDetail(kind) {
     `;
   } else {
     ui.detailTitle.textContent = "设备同步";
+    const surface = worldState?.primary_surface || "mobile";
+    const phoneActive = surface === "mobile";
+    const watchActive = surface === "wearable";
+    const carActive = surface === "vehicle_hmi";
     ui.detailBody.innerHTML = `
-      <div class="detail-sync"><span>手机</span><strong>${escapeHtml(ui.syncPhone.textContent)}</strong></div>
-      <div class="detail-sync"><span>腕上</span><strong>${escapeHtml(ui.syncWatch.textContent)}</strong></div>
-      <div class="detail-sync"><span>车机</span><strong>${escapeHtml(ui.syncCar.textContent)}</strong></div>
-      ${detailCopyItem("同步进度", ui.handoffSummary.textContent)}
+      <section class="sync-overview">
+        <header><span>多端状态</span><b>revision ${escapeHtml(worldState?.revision ?? "--")}</b></header>
+        <strong>${escapeHtml(surfaceLabel(surface))}正在响应</strong>
+        <p>${escapeHtml(ui.handoffSummary.textContent)}</p>
+        <div class="sync-flow" aria-label="手机、腕上设备与车机状态流">
+          <span class="${phoneActive ? "active" : ""}"><i>▯</i><b>手机</b></span>
+          <em class="${!phoneActive ? "passed" : ""}">›</em>
+          <span class="${watchActive ? "active" : ""}"><i>◉</i><b>腕上</b></span>
+          <em class="${carActive ? "passed" : ""}">›</em>
+          <span class="${carActive ? "active" : ""}"><i>◇</i><b>车机</b></span>
+        </div>
+      </section>
+      <div class="device-sync-list">
+        ${deviceSyncCard({ icon: "▯", name: "手机", state: ui.syncPhone.textContent, detail: phoneActive ? "当前主交互端" : "任务与权限中心", active: phoneActive, tone: "phone" })}
+        ${deviceSyncCard({ icon: "◉", name: "腕上", state: ui.syncWatch.textContent, detail: hapticLabel(worldState?.wearable?.haptic), active: watchActive, tone: "watch" })}
+        ${deviceSyncCard({ icon: "◇", name: "车机", state: ui.syncCar.textContent, detail: carActive ? "驾驶中主交互端" : "导航与安全确认", active: carActive, tone: "car" })}
+      </div>
+      <section class="sync-context">
+        <span><em>当前场景</em><strong>${escapeHtml(sceneLabel(worldState?.scene))}</strong></span>
+        <span><em>压力等级</em><strong>${escapeHtml(risk.pressure_level)}</strong></span>
+        <span><em>同步状态</em><strong>${worldState ? "已连接" : "等待连接"}</strong></span>
+      </section>
     `;
   }
   activeDetail = kind;
@@ -1095,8 +1224,14 @@ ui.openVehicle.addEventListener("click", () => openDetail("vehicle"));
 ui.openSync.addEventListener("click", () => openDetail("sync"));
 ui.openRoute.addEventListener("click", () => openDetail("route"));
 ui.openRouteSummary?.addEventListener("click", () => openDetail("route"));
-ui.kidTask.addEventListener("click", () => openDetail("plan"));
-ui.shopTask.addEventListener("click", () => openDetail("plan"));
+ui.kidTask.addEventListener("click", () => {
+  activeTaskDetail = "pickup";
+  openDetail("plan");
+});
+ui.shopTask.addEventListener("click", () => {
+  activeTaskDetail = "grocery";
+  openDetail("plan");
+});
 document.querySelectorAll("[data-detail]").forEach((button) => {
   button.addEventListener("click", () => openDetail(button.dataset.detail));
 });
@@ -1118,9 +1253,16 @@ ui.closeDetail.addEventListener("click", closeDetail);
 ui.detailPanel.addEventListener("click", (event) => {
   if (event.target === ui.detailPanel) closeDetail();
   const draftButton = event.target.closest("button[data-detail-draft]");
-  if (!draftButton) return;
-  activeDraft = draftButton.dataset.detailDraft;
-  openDetail("drafts");
+  if (draftButton) {
+    activeDraft = draftButton.dataset.detailDraft;
+    openDetail("drafts");
+    return;
+  }
+  const taskButton = event.target.closest("button[data-task-detail]");
+  if (taskButton) {
+    activeTaskDetail = taskButton.dataset.taskDetail;
+    openDetail("plan");
+  }
 });
 
 ui.configBtn.addEventListener("click", openConfig);
