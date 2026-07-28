@@ -2,7 +2,12 @@ const DEFAULT_CONFIG = {
   apiBase: "https://auri-langchain-agent-api.onrender.com",
   token: "",
   stream: true,
-  pollIntervalMs: 3000
+  pollIntervalMs: 3000,
+  mapProvider: "auto",
+  amapKey: "",
+  amapSecurityJsCode: "",
+  amapServiceHost: "",
+  amapStyle: "amap://styles/whitesmoke"
 };
 
 const PUBLIC_AGENT_API = "https://auri-langchain-agent-api.onrender.com";
@@ -102,6 +107,9 @@ const ui = {
   amapRemain: $("#amapRemain"), amapDuration: $("#amapDuration"), amapArrival: $("#amapArrival"), configBtn: $("#configBtn"),
   configPanel: $("#configPanel"), configForm: $("#configForm"), closeConfig: $("#closeConfig"), configApiBase: $("#configApiBase"),
   configToken: $("#configToken"), usePublicAgent: $("#usePublicAgent"), useLegacyAgent: $("#useLegacyAgent"), useLocalAgent: $("#useLocalAgent"),
+  configMapProvider: $("#configMapProvider"), configAmapKey: $("#configAmapKey"),
+  configAmapSecurityCode: $("#configAmapSecurityCode"), configAmapServiceHost: $("#configAmapServiceHost"),
+  mapConfigStatus: $("#mapConfigStatus"), amapCanvas: $("#amapCanvas"),
   connectionState: $("#connectionState"), connectionDetail: $("#connectionDetail"), acState: $("#acState"), acTemp: $("#acTemp"),
   acMode: $("#acMode"), acFan: $("#acFan"), climateTemp: $("#climateTemp"), climateMode: $("#climateMode"),
   quickAskBtn: $("#quickAskBtn"), openPlan: $("#openPlan"), openVehicle: $("#openVehicle"), openSync: $("#openSync"),
@@ -125,16 +133,39 @@ let currentRouteProgress = null;
 let confirmInFlight = false;
 let lastSignalToastKey = null;
 let signalToastTimer = null;
+let amapRouteMeta = null;
+let mapRuntimeStatus = { mode: "offline", message: "离线演示地图" };
 const timeline = [];
+const mapAdapter = window.AuriAmapAdapter?.create({
+  container: ui.amapCanvas,
+  mapWrap: ui.mapWrap,
+  onStatus(status) {
+    mapRuntimeStatus = status;
+    if (ui.mapConfigStatus) ui.mapConfigStatus.textContent = status.message;
+    log("map", status.message);
+  },
+  onRouteMeta(meta) {
+    amapRouteMeta = meta;
+    render();
+  }
+});
 
 function normalizeConfig(config, useProvidedStreamUrl = false) {
   const apiBase = (config.apiBase || DEFAULT_CONFIG.apiBase).replace(/\/$/, "");
+  const mapProvider = ["auto", "amap", "offline"].includes(config.mapProvider)
+    ? config.mapProvider
+    : DEFAULT_CONFIG.mapProvider;
   return {
     ...config,
     apiBase,
     streamUrl: useProvidedStreamUrl && config.streamUrl ? config.streamUrl : `${apiBase}/v1/stream`,
     token: config.token || "",
-    pollIntervalMs: Number(config.pollIntervalMs || DEFAULT_CONFIG.pollIntervalMs)
+    pollIntervalMs: Number(config.pollIntervalMs || DEFAULT_CONFIG.pollIntervalMs),
+    mapProvider,
+    amapKey: String(config.amapKey || "").trim(),
+    amapSecurityJsCode: String(config.amapSecurityJsCode || "").trim(),
+    amapServiceHost: String(config.amapServiceHost || "").trim(),
+    amapStyle: config.amapStyle || DEFAULT_CONFIG.amapStyle
   };
 }
 
@@ -162,6 +193,11 @@ function setConnection(text) {
 function initConfigPanel() {
   ui.configApiBase.value = CONFIG.apiBase;
   ui.configToken.value = CONFIG.token;
+  ui.configMapProvider.value = CONFIG.mapProvider;
+  ui.configAmapKey.value = CONFIG.amapKey;
+  ui.configAmapSecurityCode.value = CONFIG.amapSecurityJsCode;
+  ui.configAmapServiceHost.value = CONFIG.amapServiceHost;
+  ui.mapConfigStatus.textContent = mapRuntimeStatus.message;
 }
 
 function openConfig() {
@@ -173,13 +209,26 @@ function closeConfig() {
   ui.configPanel.hidden = true;
 }
 
-function saveConfig(apiBase, token) {
-  const next = normalizeConfig({ apiBase: apiBase.trim(), token: token.trim(), stream: true });
+function saveConfig() {
+  const next = normalizeConfig({
+    apiBase: ui.configApiBase.value,
+    token: ui.configToken.value,
+    stream: true,
+    mapProvider: ui.configMapProvider.value,
+    amapKey: ui.configAmapKey.value,
+    amapSecurityJsCode: ui.configAmapSecurityCode.value,
+    amapServiceHost: ui.configAmapServiceHost.value
+  });
   localStorage.setItem("auri-hmi-config", JSON.stringify({
     apiBase: next.apiBase,
     token: next.token,
     stream: true,
-    pollIntervalMs: next.pollIntervalMs
+    pollIntervalMs: next.pollIntervalMs,
+    mapProvider: next.mapProvider,
+    amapKey: next.amapKey,
+    amapSecurityJsCode: next.amapSecurityJsCode,
+    amapServiceHost: next.amapServiceHost,
+    amapStyle: next.amapStyle
   }));
   CONFIG = next;
   log("config", `saved ${CONFIG.apiBase}`);
@@ -315,7 +364,7 @@ async function connectStream() {
       headers: authHeaders({ Accept: "text/event-stream" })
     });
     if (!response.ok || !response.body) throw new Error(`stream ${response.status}`);
-    setConnection("状态流已连接");
+    setConnection("已连接");
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
@@ -328,7 +377,8 @@ async function connectStream() {
       chunks.forEach(parseStreamChunk);
     }
   } catch (error) {
-    setConnection(`状态流断开：${friendlyError(error)}`);
+    setConnection("连接异常");
+    log("stream-error", friendlyError(error));
     setTimeout(connectStream, 2500);
   }
 }
@@ -915,9 +965,12 @@ function render() {
   ui.climateMode.textContent = `${acOn ? "AC 开启" : "AC 关闭"} · ${acMode} · 风量${acFan}`;
   ui.speedLimit.textContent = driving ? "40" : "--";
   ui.lightCountdown.textContent = risk.late_minutes > 0 ? "21" : "65";
-  ui.turnDistance.textContent = mapDistance;
-  ui.turnUnit.textContent = mapUnit;
-  ui.turnInstruction.textContent = mapInstruction;
+  const useAmapInstruction = mapRuntimeStatus.mode === "online"
+    && amapRouteMeta?.instruction
+    && ["guidance", "alert", "takeover", "recovery"].includes(mapStage);
+  ui.turnDistance.textContent = useAmapInstruction ? amapRouteMeta.nextDistance.value : mapDistance;
+  ui.turnUnit.textContent = useAmapInstruction ? amapRouteMeta.nextDistance.unit : mapUnit;
+  ui.turnInstruction.textContent = useAmapInstruction ? amapRouteMeta.instruction : mapInstruction;
   ui.laneGuidance.textContent = mapStage === "overview"
     ? "等待车辆导航信号"
     : mapStage === "preview"
@@ -932,6 +985,15 @@ function render() {
   renderSignalToast(worldState?.stage);
   const routeProgress = routeProgressForStage(worldState?.stage || "connecting");
   const showVehicleMarker = driving || ["planning", "service_prepared", "waiting_confirmation", "executing", "action_completed", "cooldown"].includes(worldState?.stage);
+  mapAdapter?.update({
+    stage: worldState?.stage || "connecting",
+    mapStage,
+    progress: routeProgress,
+    showVehicle: showVehicleMarker,
+    driving,
+    riskLevel: risk.pressure_level,
+    lateMinutes: risk.late_minutes
+  });
   ui.carPin.classList.toggle("is-hidden", !showVehicleMarker);
   if (showVehicleMarker) {
     animateVehicleTo(routeProgress);
@@ -1048,7 +1110,27 @@ ui.useLocalAgent.addEventListener("click", () => {
 });
 ui.configForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  saveConfig(ui.configApiBase.value, ui.configToken.value);
+  saveConfig();
+});
+ui.configMapProvider.addEventListener("change", () => {
+  if (ui.configMapProvider.value === "offline") {
+    ui.mapConfigStatus.textContent = "将使用离线演示地图，不调用外部地图服务。";
+  } else if (!ui.configAmapKey.value.trim()) {
+    ui.mapConfigStatus.textContent = "需要填写高德 Web JS API Key；未配置时自动回退离线地图。";
+  } else if (ui.configAmapServiceHost.value.trim()) {
+    ui.mapConfigStatus.textContent = "将通过安全代理加载高德在线地图。";
+  } else {
+    ui.mapConfigStatus.textContent = "将使用 Security JS Code 明文 Demo 方式加载高德地图。";
+  }
+});
+document.querySelector(".map-tools")?.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-map-action]");
+  if (!button) return;
+  if (!mapAdapter?.control(button.dataset.mapAction)) {
+    ui.mapWrap.classList.remove("is-map-tool-active");
+    void ui.mapWrap.offsetWidth;
+    ui.mapWrap.classList.add("is-map-tool-active");
+  }
 });
 
 window.AURI_HMI = {
@@ -1057,10 +1139,12 @@ window.AURI_HMI = {
   confirm: confirmAction,
   reset: resetSession,
   consumeWorldState,
-  getState: () => structuredClone(worldState)
+  getState: () => structuredClone(worldState),
+  getMapStatus: () => ({ ...mapRuntimeStatus })
 };
 
 render();
+mapAdapter?.init(CONFIG);
 const initialDetail = queryParams.get("detail");
 if (["plan", "drafts", "route", "sync", "vehicle"].includes(initialDetail)) openDetail(initialDetail);
 loadHealth("health").catch((error) => log("health-error", friendlyError(error)));

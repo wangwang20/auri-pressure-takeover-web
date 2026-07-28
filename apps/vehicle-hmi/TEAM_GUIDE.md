@@ -142,6 +142,31 @@ https://auri-agent-api.onrender.com
 - HMI 不直接调用 LangChain 工具，只消费 Agent 返回的 `WorldState`。
 - 旧版回退地址只在新版 LangChain 服务不可用时使用。
 
+## 可选高德在线地图
+
+HMI 默认使用 SVG 离线演示地图，不依赖外部地图服务。需要真实道路、驾车路线和交通图层时，在左侧 `连接` 的“导航地图”区域配置：
+
+```text
+地图来源：高德在线地图
+高德 Web JS API Key：Web端（JS API）Key
+Security JS Code：本地 Demo 使用
+安全代理地址：正式公网部署优先使用
+```
+
+约束：
+
+- 不把 Key 或 Security JS Code 写入代码和团队文档。
+- 高德 Key 缺失或调用失败时自动回退离线地图。
+- 高德只负责地图上下文；Agent 的 ETA、晚到判断、任务和确认仍是唯一业务事实。
+- 公网 Key 必须允许当前 HMI 域名。
+- 正式环境使用服务端代理保存 Security JS Code。
+
+完整说明见：
+
+```text
+docs/amap-hmi-integration.md
+```
+
 ## 车载状态和空调联动
 
 Agent 新增 `vehicle_state` 字段后，HMI 会只读展示空调状态：

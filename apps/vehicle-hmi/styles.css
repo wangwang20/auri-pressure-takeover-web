@@ -2468,3 +2468,164 @@ svg { display: block; }
     font-size: 24px;
   }
 }
+
+/* Optional AMap JS API layer. Agent state remains authoritative; the map is visual context. */
+
+.amap-canvas {
+  position: absolute;
+  z-index: 1;
+  inset: 0 0 140px;
+  overflow: hidden;
+  background: #e8efed;
+}
+.amap-canvas[hidden] {
+  display: none;
+}
+.nav-map {
+  position: relative;
+  z-index: 2;
+}
+.amap-turn-card,
+.map-stage-chip,
+.map-status-cluster,
+.signal-countdown,
+.map-tools,
+.right-progress,
+.map-bottom-sheet {
+  z-index: 6;
+}
+.is-amap-online .nav-map {
+  opacity: 0;
+  pointer-events: none;
+}
+.is-amap-online .map-grid,
+.is-amap-online .buildings,
+.is-amap-online .poi-labels {
+  opacity: 0;
+}
+.amap-vehicle-marker {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border: 5px solid var(--state-processing);
+  box-shadow: 0 10px 24px rgba(11, 27, 51, .24);
+  pointer-events: none;
+}
+.amap-vehicle-marker i {
+  width: 19px;
+  height: 27px;
+  display: block;
+  background: var(--auri-navy);
+  clip-path: polygon(50% 0, 100% 100%, 50% 73%, 0 100%);
+}
+.amap-destination-marker {
+  min-width: 112px;
+  min-height: 42px;
+  padding: 8px 12px 8px 10px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--auri-navy);
+  background: rgba(255, 253, 249, .98);
+  border: 1px solid rgba(11, 27, 51, .11);
+  box-shadow: 0 10px 24px rgba(11, 27, 51, .16);
+  white-space: nowrap;
+}
+.amap-destination-marker i {
+  width: 13px;
+  height: 13px;
+  border-radius: 50% 50% 50% 0;
+  display: block;
+  background: var(--state-critical);
+  transform: rotate(-45deg);
+}
+.amap-destination-marker span {
+  font-size: 13px;
+  font-weight: 850;
+}
+.amap-incident-marker {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: var(--auri-navy);
+  background: var(--state-warning);
+  border: 2px solid rgba(255, 255, 255, .9);
+  box-shadow: 0 10px 22px rgba(11, 27, 51, .2);
+  font-size: 13px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.config-card {
+  max-height: min(820px, calc(100vh - 36px));
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+}
+.config-scroll {
+  min-height: 0;
+  overflow: auto;
+  padding-right: 4px;
+  display: grid;
+  gap: 14px;
+  scrollbar-width: thin;
+}
+.config-card fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 15px;
+  border-radius: 17px;
+  display: grid;
+  gap: 13px;
+  border: 1px solid rgba(11, 27, 51, .1);
+  background: #f8f7f4;
+}
+.config-card legend {
+  padding: 0 7px;
+  color: var(--auri-navy);
+  font-size: 13px;
+  font-weight: 850;
+}
+.config-card input,
+.config-card select {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 13px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  color: var(--auri-navy);
+  background: white;
+  font: inherit;
+}
+.config-card select {
+  cursor: pointer;
+}
+.agent-presets {
+  grid-template-columns: repeat(3, 1fr);
+}
+.agent-presets button {
+  min-height: 42px;
+  padding-inline: 8px;
+  font-size: 12px;
+}
+#mapConfigStatus {
+  padding: 9px 11px;
+  border-radius: 11px;
+  color: #647083;
+  background: #eeece7;
+}
+
+@media (max-height: 760px) {
+  .amap-canvas {
+    bottom: 122px;
+  }
+  .config-card {
+    max-height: calc(100vh - 24px);
+    padding: 16px;
+    gap: 11px;
+  }
+}

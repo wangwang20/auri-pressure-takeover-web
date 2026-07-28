@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>AURI 车机 HMI | 随行压力接管 Agent</title>
-  <link rel="stylesheet" href="./styles.css?v=auri-cockpit-20260728c" />
+  <link rel="stylesheet" href="./styles.css?v=auri-cockpit-20260728d" />
 </head>
 <body>
   <main class="screen" aria-label="AURI 车机 HMI">
@@ -158,6 +158,7 @@
       </header>
 
       <section class="map-wrap amap daynav" aria-label="高德风格车机导航">
+        <div id="amapCanvas" class="amap-canvas" aria-label="高德在线导航地图" hidden></div>
         <svg class="map nav-map" viewBox="0 0 1200 720" role="img" aria-label="车机导航地图">
           <defs>
             <linearGradient id="mapSurface" x1="0" y1="0" x2="0" y2="1">
@@ -379,9 +380,9 @@
         </div>
 
         <div class="map-tools" aria-label="地图快捷工具">
-          <button type="button" aria-label="放大地图">+</button>
-          <button type="button" aria-label="缩小地图">−</button>
-          <button type="button" aria-label="地图朝向">北</button>
+          <button type="button" data-map-action="zoom-in" aria-label="放大地图">+</button>
+          <button type="button" data-map-action="zoom-out" aria-label="缩小地图">−</button>
+          <button type="button" data-map-action="reset" aria-label="回到路线总览">北</button>
         </div>
 
         <div class="right-progress" aria-label="路线进度">
@@ -451,27 +452,59 @@
     </section>
   </main>
 
-  <section class="config-panel" id="configPanel" aria-label="Agent 连接配置" hidden>
+  <section class="config-panel" id="configPanel" aria-label="Agent 与导航地图配置" hidden>
     <form class="config-card" id="configForm">
       <header>
-        <div><span>Agent Connection</span><strong>连接配置</strong></div>
+        <div><span>AURI CONNECTION</span><strong>连接与地图</strong></div>
         <button id="closeConfig" type="button" aria-label="关闭">×</button>
       </header>
-      <label>
-        <span>Agent API</span>
-        <input id="configApiBase" autocomplete="off" placeholder="https://auri-langchain-agent-api.onrender.com" />
-      </label>
-      <label>
-        <span>Team Token</span>
-        <input id="configToken" type="password" autocomplete="off" placeholder="仅保存在本浏览器，不写入仓库" />
-      </label>
+      <div class="config-scroll">
+        <fieldset>
+          <legend>Agent</legend>
+          <label>
+            <span>Agent API</span>
+            <input id="configApiBase" autocomplete="off" placeholder="https://auri-langchain-agent-api.onrender.com" />
+          </label>
+          <label>
+            <span>Team Token</span>
+            <input id="configToken" type="password" autocomplete="off" placeholder="仅保存在本浏览器，不写入仓库" />
+          </label>
+          <div class="config-actions agent-presets">
+            <button id="usePublicAgent" type="button">LangChain 公网</button>
+            <button id="useLegacyAgent" type="button">旧版回退</button>
+            <button id="useLocalAgent" type="button">本地 Agent</button>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>导航地图</legend>
+          <label>
+            <span>地图来源</span>
+            <select id="configMapProvider">
+              <option value="auto">自动：有 Key 使用高德</option>
+              <option value="amap">高德在线地图</option>
+              <option value="offline">离线演示地图</option>
+            </select>
+          </label>
+          <label>
+            <span>高德 Web JS API Key</span>
+            <input id="configAmapKey" type="password" autocomplete="off" placeholder="Web端（JS API）Key" />
+          </label>
+          <label>
+            <span>Security JS Code</span>
+            <input id="configAmapSecurityCode" type="password" autocomplete="off" placeholder="仅 Demo 明文方式使用" />
+          </label>
+          <label>
+            <span>安全代理地址（推荐）</span>
+            <input id="configAmapServiceHost" autocomplete="off" placeholder="https://example.com/_AMapService" />
+          </label>
+          <p id="mapConfigStatus">未配置高德 Key，将使用离线演示地图。</p>
+        </fieldset>
+      </div>
       <div class="config-actions">
-        <button id="usePublicAgent" type="button">LangChain 公网</button>
-        <button id="useLegacyAgent" type="button">旧版回退</button>
-        <button id="useLocalAgent" type="button">本地 Agent</button>
         <button class="primary" type="submit">保存并重连</button>
       </div>
-      <p>默认使用统一 LangChain Agent；Team Token 只保存在当前浏览器。</p>
+      <p>Team Token 与地图配置只保存在当前浏览器，不写入仓库。</p>
     </form>
   </section>
 
@@ -490,6 +523,7 @@
     <span>推荐 16:9 大屏或平板横屏。</span>
   </div>
 
-  <script src="./app.js?v=auri-cockpit-20260728c"></script>
+  <script src="./amap-adapter.js?v=auri-cockpit-20260728d"></script>
+  <script src="./app.js?v=auri-cockpit-20260728d"></script>
 </body>
 </html>
