@@ -7,7 +7,7 @@ const DEFAULT_CONFIG = {
   amapKey: "",
   amapSecurityJsCode: "",
   amapServiceHost: "",
-  amapStyle: "amap://styles/whitesmoke"
+  amapStyle: "amap://styles/normal"
 };
 
 const PUBLIC_AGENT_API = "https://auri-langchain-agent-api.onrender.com";
@@ -177,6 +177,32 @@ function normalizeConfig(config, useProvidedStreamUrl = false) {
 
 function authHeaders(extra = {}) {
   return CONFIG.token ? { ...extra, "X-Agent-Token": CONFIG.token } : extra;
+}
+
+async function hydrateMapConfig() {
+  if (CONFIG.mapProvider === "offline" || CONFIG.amapKey) return;
+  try {
+    const response = await fetch(`${CONFIG.apiBase}/v1/map-config`, {
+      headers: authHeaders({ Accept: "application/json" })
+    });
+    const data = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(`${response.status}: ${data?.detail?.message || response.statusText}`);
+    if (!data?.enabled || !data.key || !data.service_host) {
+      log("map-config", "Agent 未配置高德安全代理");
+      return;
+    }
+    CONFIG = normalizeConfig({
+      ...CONFIG,
+      mapProvider: "amap",
+      amapKey: data.key,
+      amapSecurityJsCode: "",
+      amapServiceHost: data.service_host,
+      amapStyle: data.style || "amap://styles/normal"
+    });
+    log("map-config", "已从 Agent 获取高德在线地图配置");
+  } catch (error) {
+    log("map-config-error", friendlyError(error));
+  }
 }
 
 function eventId(type) {
@@ -906,7 +932,7 @@ function render() {
   ui.root.className = `screen state-${className} map-stage-${mapStage}${showDebugDemo ? " debug-demo" : ""}`;
   animateMapStage(mapStage);
   ui.speed.textContent = driving ? "42" : "--";
-  ui.headline.textContent = text;
+  ui.headline.textContent = "博世苏州 · 星龙街455号 → 阳光小学";
   ui.eta.textContent = eta;
   ui.etaNote.textContent = risk.late_minutes > 0 ? `晚到 ${risk.late_minutes} 分钟` : eta === "--:--" ? "等待路线" : "准时";
   ui.windowState.textContent = risk.late_minutes > 0 ? "突破" : worldState?.stage === "pre_departure_warning" ? "压缩" : pickup ? "已建立" : "未建立";
@@ -1153,16 +1179,21 @@ window.AURI_HMI = {
   getMapUsage: () => mapAdapter?.getUsage?.() || null
 };
 
-render();
-mapAdapter?.init(CONFIG);
-const initialDetail = queryParams.get("detail");
-if (["plan", "drafts", "route", "sync", "vehicle"].includes(initialDetail)) openDetail(initialDetail);
-loadHealth("health").catch((error) => log("health-error", friendlyError(error)));
-loadState("load").then(() => {
-  connectStream();
-  startPolling();
-}).catch((error) => {
-  setConnection(`连接失败：${friendlyError(error)}`);
-  startPolling();
+async function bootstrap() {
   render();
-});
+  await hydrateMapConfig();
+  await mapAdapter?.init(CONFIG);
+  const initialDetail = queryParams.get("detail");
+  if (["plan", "drafts", "route", "sync", "vehicle"].includes(initialDetail)) openDetail(initialDetail);
+  loadHealth("health").catch((error) => log("health-error", friendlyError(error)));
+  loadState("load").then(() => {
+    connectStream();
+    startPolling();
+  }).catch((error) => {
+    setConnection(`连接失败：${friendlyError(error)}`);
+    startPolling();
+    render();
+  });
+}
+
+void bootstrap();

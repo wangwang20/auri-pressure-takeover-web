@@ -2,8 +2,9 @@
   "use strict";
 
   const DEFAULT_ROUTE = {
-    start: [121.5758, 31.2169],
-    end: [121.6098, 31.2356],
+    start: [120.791879, 31.334680],
+    end: [120.7359, 31.3048],
+    originName: "博世苏州 · 星龙街455号",
     destinationName: "阳光小学"
   };
   const AMAP_USAGE_KEY = "auri-amap-usage";
@@ -266,10 +267,10 @@
       this.map = new AMap.Map(this.container, {
         center: routeConfig.start,
         zoom: 15,
-        viewMode: "3D",
-        pitch: 30,
-        mapStyle: config.amapStyle || "amap://styles/whitesmoke",
-        features: ["bg", "road", "building"],
+        viewMode: "2D",
+        pitch: 0,
+        mapStyle: config.amapStyle || "amap://styles/normal",
+        features: ["bg", "road", "building", "point"],
         showLabel: true,
         resizeEnable: true,
         rotateEnable: false,
@@ -280,7 +281,7 @@
       this.overlays.trafficLayer = new AMap.TileLayer.Traffic({
         autoRefresh: true,
         interval: 180,
-        opacity: 0.28,
+        opacity: 0.42,
         zIndex: 8
       });
       this.map.add(this.overlays.trafficLayer);
@@ -387,6 +388,16 @@
         zIndex: 110
       });
 
+      const origin = document.createElement("div");
+      origin.className = "amap-origin-marker";
+      origin.innerHTML = `<i></i><span>${routeConfig.originName || "出发地"}</span>`;
+      this.overlays.originMarker = new AMap.Marker({
+        position: this.routePath[0],
+        content: origin,
+        anchor: "bottom-left",
+        zIndex: 109
+      });
+
       const incident = document.createElement("div");
       incident.className = "amap-incident-marker";
       incident.textContent = "前方拥堵";
@@ -406,11 +417,12 @@
         this.overlays.routePassed,
         this.overlays.routeIncident,
         this.overlays.vehicleMarker,
+        this.overlays.originMarker,
         this.overlays.destinationMarker,
         this.overlays.incidentMarker
       ]);
       this.map.setFitView(
-        [this.overlays.routeShadow, this.overlays.destinationMarker],
+        [this.overlays.originMarker, this.overlays.routeShadow, this.overlays.destinationMarker],
         false,
         [90, 120, 150, 90],
         16
@@ -471,11 +483,13 @@
       } else {
         this.overlays.vehicleMarker.hide();
       }
+      if (["overview", "preview"].includes(snapshot.mapStage)) this.overlays.originMarker.show();
+      else this.overlays.originMarker.hide();
 
       if (snapshot.mapStage !== this.lastStage || Math.abs(progress - (this.lastProgress ?? progress)) > 0.08) {
         if (["overview", "preview"].includes(snapshot.mapStage)) {
           this.map.setFitView(
-            [this.overlays.routeShadow, this.overlays.destinationMarker],
+            [this.overlays.originMarker, this.overlays.routeShadow, this.overlays.destinationMarker],
             false,
             [90, 120, 150, 90],
             16
@@ -497,7 +511,7 @@
       else if (action === "zoom-out") this.map.zoomOut();
       else if (action === "reset") {
         this.map.setFitView(
-          [this.overlays.routeShadow, this.overlays.destinationMarker],
+          [this.overlays.originMarker, this.overlays.routeShadow, this.overlays.destinationMarker],
           false,
           [90, 120, 150, 90],
           16

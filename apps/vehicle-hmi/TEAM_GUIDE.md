@@ -49,7 +49,7 @@
 | `planning/waiting_confirmation/executing` | Agent 接管 | 地图保持驾驶上下文，提示无需额外操作或等待确认。 |
 | `action_completed/cooldown` | 恢复 | 路段恢复绿态，显示已处理提示并降低打扰。 |
 
-阶段变化应使用短时过渡动画，不使用循环闪烁。必须支持 `prefers-reduced-motion`。当前地图是 HMI 模拟图层，不接真实地图 SDK；不要在前端伪造实时导航数据，地图文本和 ETA 必须来自当前 Demo 状态或冻结演示数据。
+阶段变化应使用短时过渡动画，不使用循环闪烁。必须支持 `prefers-reduced-motion`。当前版本默认接入高德 JS API 2.0 真实 2D 底图、道路 POI、驾车路线和实时交通图层；高德不可用时才显示离线模拟图层。地图路线几何可来自高德，但 ETA、晚到判断、压力等级和任务状态必须来自当前 Agent World State。
 
 ## 启动页面
 
@@ -142,24 +142,31 @@ https://auri-agent-api.onrender.com
 - HMI 不直接调用 LangChain 工具，只消费 Agent 返回的 `WorldState`。
 - 旧版回退地址只在新版 LangChain 服务不可用时使用。
 
-## 可选高德在线地图
+## 默认高德在线地图
 
-HMI 默认使用 SVG 离线演示地图，不依赖外部地图服务。需要真实道路、驾车路线和交通图层时，在左侧 `连接` 的“导航地图”区域配置：
+HMI 页面启动时会携带已保存的 Team Token 请求 Agent：
 
-```text
-地图来源：高德在线地图
-高德 Web JS API Key：Web端（JS API）Key
-Security JS Code：本地 Demo 使用
-安全代理地址：正式公网部署优先使用
+```http
+GET /v1/map-config
+X-Agent-Token: <团队令牌>
 ```
 
-约束：
+Agent 配置完整时，HMI 自动加载高德真实 2D 地图，不需要协作同事填写地图 Key。自动配置失败时，可在左侧 `连接` 的“导航地图”区域查看状态或切换离线地图；仅地图负责人本机调试时才手动填写 Key。
+
+默认路线：
+
+```text
+起点：博世苏州・星龙街455号
+终点：阳光小学（Demo 冻结坐标）
+```
+
+安全和额度约束：
 
 - 不把 Key 或 Security JS Code 写入代码和团队文档。
 - 高德 Key 缺失或调用失败时自动回退离线地图。
 - 高德只负责地图上下文；Agent 的 ETA、晚到判断、任务和确认仍是唯一业务事实。
 - 公网 Key 必须允许当前 HMI 域名。
-- 正式环境使用服务端代理保存 Security JS Code。
+- 公网环境必须使用 Agent `/_AMapService` 代理保存 Security JS Code。
 - 当前浏览器每月最多初始化地图 200 次、规划路线 200 次；达到后自动回退离线地图。
 - 重跑故事线使用 Console 的 `重置 Demo`，不要通过反复刷新 HMI 重置。
 - Console 事件、SSE 和轮询不会重新调用高德路线规划。

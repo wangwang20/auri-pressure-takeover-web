@@ -2547,6 +2547,32 @@ svg { display: block; }
   font-size: 13px;
   font-weight: 850;
 }
+.amap-origin-marker {
+  min-width: 176px;
+  min-height: 42px;
+  padding: 8px 12px 8px 10px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  background: rgba(11, 27, 51, .94);
+  border: 1px solid rgba(255, 255, 255, .72);
+  box-shadow: 0 10px 24px rgba(11, 27, 51, .2);
+  white-space: nowrap;
+}
+.amap-origin-marker i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: block;
+  background: var(--auri-gold);
+  box-shadow: 0 0 0 4px rgba(212, 175, 122, .2);
+}
+.amap-origin-marker span {
+  font-size: 13px;
+  font-weight: 850;
+}
 .amap-incident-marker {
   min-height: 40px;
   padding: 0 14px;

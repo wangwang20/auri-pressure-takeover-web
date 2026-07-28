@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>AURI 车机 HMI | 随行压力接管 Agent</title>
-  <link rel="stylesheet" href="./styles.css?v=auri-cockpit-20260728d" />
+  <link rel="stylesheet" href="./styles.css?v=auri-cockpit-20260728f" />
 </head>
 <body>
   <main class="screen" aria-label="AURI 车机 HMI">
@@ -481,7 +481,7 @@
           <label>
             <span>地图来源</span>
             <select id="configMapProvider">
-              <option value="auto">自动：有 Key 使用高德</option>
+              <option value="auto">自动：从 Agent 获取高德配置</option>
               <option value="amap">高德在线地图</option>
               <option value="offline">离线演示地图</option>
             </select>
@@ -498,7 +498,7 @@
             <span>安全代理地址（推荐）</span>
             <input id="configAmapServiceHost" autocomplete="off" placeholder="https://example.com/_AMapService" />
           </label>
-          <p id="mapConfigStatus">未配置高德 Key，将使用离线演示地图。</p>
+          <p id="mapConfigStatus">页面启动后将从 Agent 自动获取高德地图配置。</p>
         </fieldset>
       </div>
       <div class="config-actions">
@@ -523,7 +523,7 @@
     <span>推荐 16:9 大屏或平板横屏。</span>
   </div>
 
-  <script src="./amap-adapter.js?v=auri-cockpit-20260728e"></script>
-  <script src="./app.js?v=auri-cockpit-20260728e"></script>
+  <script src="./amap-adapter.js?v=auri-cockpit-20260728f"></script>
+  <script src="./app.js?v=auri-cockpit-20260728f"></script>
 </body>
 </html>
