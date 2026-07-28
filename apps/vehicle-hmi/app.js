@@ -46,7 +46,7 @@ const STAGE_VIEW = {
   pre_departure_warning: ["delayed", "最晚出发窗口被压缩", "会议延迟 20 分钟，腕上设备已发出黄色提醒。", "仍可能准时，但可用时间明显减少。", "腕上已提醒，车机保持低干扰", "无需确认", "继续观察 ETA", "监控中"],
   handover_to_vehicle: ["warning", "路线正在接续", "接近车辆后，学校路线自动流转到车机。", "手机即将进入只读状态。", "准备进入车辆", "无需确认", "等待车辆状态", "交接中"],
   vehicle_observation: ["vehicle", "导航已接续", "阳光小学路线已经准备，当前按路线正常行驶。", "当前预计可以按时到达。", "可语音询问：“我还来得及吗？”", "无需确认", "保持当前路线", "观察中"],
-  takeover_L2: ["risk", "预计晚到 18 分钟", "刚性责任窗口被突破，等待用户明确求助后生成方案。", "继续加速无法明显缩短时间。", "你可以说：“我还来得及吗？”", "等待方案", "Agent 尚未生成确认项", "分析中"],
+  takeover_L2: ["risk", "预计晚到 18 分钟", "接孩子任务预计晚到，等待用户明确求助后生成方案。", "继续加速无法明显缩短时间。", "你可以说：“我还来得及吗？”", "等待方案", "Agent 尚未生成确认项", "分析中"],
   takeover_L3: ["risk", "高负荷保护", "多源辅助信号显示驾驶负荷升高，非必要内容已暂停。", "车机只保留必要判断和安全确认。", "保持驾驶，AURI 正在处理", "等待方案", "高负荷保护中", "保护中"],
   planning: ["takeover", "压力源接管中", "Agent 正在保护接孩子任务，并准备消息与服务方案。", "继续加速无法明显缩短时间，正在处理现实后果。", "AURI 正在准备方案", "准备中", "等待确认项生成", "规划中"],
   service_prepared: ["takeover", "方案已准备", "消息和生活服务方案已准备，等待确认。", "消息与服务方案已备好。", "可说：“确认处理”", "确认处理", "等待车机确认", "待确认"],
@@ -90,9 +90,10 @@ const EVENT_BUTTONS = {
 const $ = (id) => document.querySelector(id);
 const ui = {
   root: $(".screen"), speed: $("#speed"), headline: $("#headline"), eta: $("#eta"), etaNote: $("#etaNote"),
-  windowState: $("#windowState"), modeChip: $("#modeChip"), phoneStatus: $("#phoneStatus"), watchStatus: $("#watchStatus"),
+  windowState: $("#windowState"), windowLabel: $("#windowLabel"), windowDetail: $("#windowDetail"),
+  modeChip: $("#modeChip"), phoneStatus: $("#phoneStatus"), watchStatus: $("#watchStatus"),
   carStatus: $("#carStatus"), phoneNode: $("#phoneNode"), watchNode: $("#watchNode"), carNode: $("#carNode"),
-  handoffSummary: $("#handoffSummary"), kidTask: $("#kidTask"),
+  handoffSummary: $("#handoffSummary"), kidTask: $("#kidTask"), agentState: $("#agentState"),
   shopTask: $("#shopTask"), kidTaskState: $("#kidTaskState"), shopTaskState: $("#shopTaskState"), agentTitle: $("#agentTitle"),
   agentText: $("#agentText"), realConclusion: $("#realConclusion"), riskBadge: $("#riskBadge"), actionState: $("#actionState"),
   actionList: $("#actionList"), draftState: $("#draftState") || $("#draftStateHidden"), draftBody: $("#draftBody"), tabs: $(".tabs"), syncPhone: $("#syncPhone"),
@@ -116,7 +117,9 @@ const ui = {
   quickAskMode: $("#quickAskMode"), quickAskLabel: $("#quickAskLabel"),
   openDrafts: $("#openDrafts"), openRoute: $("#openRoute"), routeSummary: $("#routeSummary"), detailPanel: $("#detailPanel"),
   closeDetail: $("#closeDetail"), detailTitle: $("#detailTitle"), detailBody: $("#detailBody"),
-  syncSummary: $("#syncSummary"), openRouteSummary: $("#openRouteSummary")
+  syncSummary: $("#syncSummary"), openRouteSummary: $("#openRouteSummary"),
+  decisionStage: $("#decisionStage"), decisionIcon: $("#decisionIcon"), decisionSurface: $("#decisionSurface"),
+  decisionProgress: $("#decisionProgress"), conclusionStage: $("#conclusionStage"), reviewLinks: $("#reviewLinks")
 };
 
 let worldState = null;
@@ -690,6 +693,26 @@ function orderStatusLabel(status) {
   }[status] || status || "待准备";
 }
 
+function decisionMeta(stage) {
+  if (stage === "error") return { icon: "!", label: "连接异常", tone: "critical" };
+  if (stage === "takeover_L3") return { icon: "!", label: "高负荷保护", tone: "critical" };
+  if (["pre_departure_warning", "takeover_L2"].includes(stage)) {
+    return { icon: "◷", label: "需要注意", tone: "warning" };
+  }
+  if (["planning", "executing", "handover_to_vehicle", "connecting"].includes(stage)) {
+    return { icon: "↻", label: "正在处理", tone: "processing" };
+  }
+  if (["service_prepared", "waiting_confirmation"].includes(stage)) {
+    return { icon: "✓", label: "方案已准备", tone: "warning" };
+  }
+  if (stage === "parked_review") return { icon: "▯", label: "手机接续", tone: "success" };
+  if (["action_completed", "cooldown"].includes(stage)) {
+    return { icon: "✓", label: "已处理", tone: "success" };
+  }
+  if (stage === "vehicle_observation") return { icon: "⌖", label: "行程正常", tone: "success" };
+  return { icon: "○", label: "低干扰", tone: "idle" };
+}
+
 function actionText(action) {
   const prefix = action.type === "message"
     ? `${action.target || "联系人"}消息`
@@ -1058,13 +1081,23 @@ function render() {
   const acFan = fanLabel(vehicleState.fan_speed);
   const showDebugDemo = queryParams.get("debug") === "1" || queryParams.get("demo") === "1";
 
-  ui.root.className = `screen state-${className} map-stage-${mapStage}${showDebugDemo ? " debug-demo" : ""}`;
+  const stage = worldState?.stage || "connecting";
+  const decision = decisionMeta(stage);
+  ui.root.className = `screen state-${className} stage-${stage} map-stage-${mapStage}${showDebugDemo ? " debug-demo" : ""}`;
   animateMapStage(mapStage);
   ui.speed.textContent = driving ? "42" : "--";
   ui.headline.textContent = "博世苏州 · 星龙街455号 → 阳光小学";
   ui.eta.textContent = eta;
   ui.etaNote.textContent = risk.late_minutes > 0 ? `晚到 ${risk.late_minutes} 分钟` : eta === "--:--" ? "等待路线" : "准时";
-  ui.windowState.textContent = risk.late_minutes > 0 ? "突破" : worldState?.stage === "pre_departure_warning" ? "压缩" : pickup ? "已建立" : "未建立";
+  ui.windowLabel.textContent = "接送任务";
+  ui.windowState.textContent = risk.late_minutes > 0
+    ? `晚到 ${risk.late_minutes} 分钟`
+    : stage === "pre_departure_warning"
+      ? "出发时间紧张"
+      : pickup
+        ? "可按时到达"
+        : "等待创建";
+  ui.windowDetail.textContent = pickup ? "原定 18:10" : "手机端创建任务";
   ui.modeChip.textContent = worldState?.primary_surface === "vehicle_hmi" ? "驾驶模式" : "手机为主端";
   ui.phoneStatus.textContent = worldState?.primary_surface === "mobile"
     ? "主端"
@@ -1089,6 +1122,19 @@ function render() {
   ui.agentTitle.textContent = title;
   ui.agentText.textContent = text;
   ui.realConclusion.textContent = driverConclusion(conclusion, risk, order);
+  ui.agentState.dataset.tone = decision.tone;
+  ui.decisionStage.textContent = decision.label;
+  ui.decisionIcon.textContent = decision.icon;
+  ui.decisionSurface.textContent = surfaceLabel(worldState?.primary_surface);
+  ui.decisionProgress.textContent = actionState;
+  ui.conclusionStage.textContent = stage === "parked_review"
+    ? "停车后继续"
+    : ["action_completed", "cooldown"].includes(stage)
+      ? "保持低干扰"
+      : risk.late_minutes > 0
+        ? "当前建议"
+        : "行程建议";
+  ui.reviewLinks.hidden = stage !== "parked_review";
   ui.riskBadge.textContent = riskLabel(worldState?.stage, risk);
   ui.actionState.textContent = actionState;
   renderActions();

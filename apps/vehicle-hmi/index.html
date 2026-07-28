@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>AURI 车机 HMI | 随行压力接管 Agent</title>
-  <link rel="stylesheet" href="./styles.css?v=auri-cockpit-20260728g" />
+  <link rel="stylesheet" href="./styles.css?v=auri-cockpit-20260728h" />
 </head>
 <body>
   <main class="screen" aria-label="AURI 车机 HMI">
@@ -47,14 +47,36 @@
       </header>
 
       <section class="agent-state" id="agentState">
-        <span class="eyebrow">AURI 当前判断</span>
-        <h1 id="agentTitle">等待任务创建</h1>
-        <p id="agentText">创建任务后，AURI 会识别刚性责任和弹性任务。</p>
+        <div class="decision-head">
+          <span class="eyebrow">AURI 当前判断</span>
+          <span class="decision-chip"><i></i><b id="decisionStage">待机</b></span>
+        </div>
+        <div class="decision-main">
+          <span class="decision-icon" id="decisionIcon" aria-hidden="true">○</span>
+          <div>
+            <h1 id="agentTitle">等待任务创建</h1>
+            <p id="agentText">创建任务后，AURI 会识别刚性责任和弹性任务。</p>
+          </div>
+        </div>
+        <div class="decision-context">
+          <span><em>当前主端</em><strong id="decisionSurface">手机主端</strong></span>
+          <span><em>处理阶段</em><strong id="decisionProgress">待机</strong></span>
+        </div>
       </section>
 
       <section class="conclusion" aria-label="现实结论">
-        <span class="eyebrow">现实结论</span>
-        <p id="realConclusion">暂无风险结论。</p>
+        <div class="conclusion-head">
+          <span class="eyebrow">现实结论</span>
+          <span id="conclusionStage">当前建议</span>
+        </div>
+        <div class="conclusion-main">
+          <span class="conclusion-icon" aria-hidden="true">✓</span>
+          <p id="realConclusion">暂无风险结论。</p>
+        </div>
+        <div class="review-links" id="reviewLinks" hidden>
+          <button type="button" data-detail="drafts"><span aria-hidden="true">✉</span><strong>消息记录</strong><em>老师与家人</em></button>
+          <button type="button" data-detail="plan"><span aria-hidden="true">✓</span><strong>处理结果</strong><em>任务与订单</em></button>
+        </div>
       </section>
 
       <section class="agent-controls" aria-label="Agent 快捷交互">
@@ -144,10 +166,10 @@
             <strong id="eta">--:--</strong>
             <em id="etaNote">等待路线</em>
           </div>
-          <div>
-            <span>责任窗口</span>
+          <div class="responsibility-metric">
+            <span id="windowLabel">接送任务</span>
             <strong id="windowState">未建立</strong>
-            <em>18:10 接孩子</em>
+            <em id="windowDetail">等待任务创建</em>
           </div>
           <div class="connection-metric">
             <span class="connection-dot"></span>
@@ -523,7 +545,7 @@
     <span>推荐 16:9 大屏或平板横屏。</span>
   </div>
 
-  <script src="./amap-adapter.js?v=auri-cockpit-20260728g"></script>
-  <script src="./app.js?v=auri-cockpit-20260728g"></script>
+  <script src="./amap-adapter.js?v=auri-cockpit-20260728h"></script>
+  <script src="./app.js?v=auri-cockpit-20260728h"></script>
 </body>
 </html>
