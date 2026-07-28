@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>AURI Demo 控制台</title>
+  <link rel="stylesheet" href="./styles.css?v=auri-p0-console-20260728b" />
+</head>
+<body>
+  <main class="console-shell">
+    <header class="hero">
+      <div>
+        <div class="auri-logo hero-logo" aria-label="AURI">
+          <span class="logo-icon"><img src="../../icon.png" alt="AURI" /></span>
+          <span class="logo-word">AURI</span>
+        </div>
+        <span class="eyebrow">AURI Pressure Takeover Agent</span>
+        <h1>演示控制台</h1>
+        <p><strong>你只管开，我来处理</strong>。只注入外部事件和确认请求，不直接改写 Agent World State。</p>
+      </div>
+      <section class="connection-card" aria-label="连接配置">
+        <label>
+          <span>Agent API</span>
+          <input id="apiBase" value="https://auri-langchain-agent-api.onrender.com" autocomplete="off" />
+        </label>
+        <label>
+          <span>Team Token</span>
+          <input id="token" type="password" placeholder="仅本地运行时填写，不提交仓库" autocomplete="off" />
+        </label>
+        <div class="connection-actions">
+          <button id="usePublicAgent" type="button">LangChain 公网</button>
+          <button id="useLegacyAgent" type="button">旧版回退</button>
+          <button id="useLocalAgent" type="button">本地 Agent</button>
+          <button id="saveConfig" type="button">保存配置</button>
+          <button id="preflightBtn" type="button">一键预检</button>
+          <button id="connectBtn" class="primary" type="button">连接 Agent</button>
+        </div>
+      </section>
+    </header>
+
+    <section class="status-grid" aria-label="World State 摘要">
+      <article>
+        <span>Session</span>
+        <strong id="sessionId">未连接</strong>
+        <em id="revision">revision --</em>
+      </article>
+      <article>
+        <span>Stage</span>
+        <strong id="stage">--</strong>
+        <em id="scene">scene --</em>
+      </article>
+      <article>
+        <span>Pressure</span>
+        <strong id="pressure">L0</strong>
+        <em id="late">late 0 min</em>
+      </article>
+      <article>
+        <span>Primary Surface</span>
+        <strong id="surface">--</strong>
+        <em id="confirmOwner">confirm --</em>
+      </article>
+      <article>
+        <span>Agent Health</span>
+        <strong id="agentHealth">未检查</strong>
+        <em id="agentTools">tools --</em>
+      </article>
+      <article>
+        <span>State Sync</span>
+        <strong id="syncMode">未连接</strong>
+        <em id="syncDetail">SSE --</em>
+      </article>
+    </section>
+
+    <section class="main-grid">
+      <section class="panel script-panel" aria-label="三到五分钟演示脚本">
+        <div class="panel-head">
+          <div>
+            <span>3-5 分钟主线</span>
+            <h2>标准事件推进</h2>
+          </div>
+          <div class="head-actions">
+            <button id="runCurrentStep" class="primary" type="button">执行下一步</button>
+            <button id="resetBtn" class="ghost danger" type="button">重置 Demo</button>
+          </div>
+        </div>
+        <section class="director-card" aria-label="导演模式">
+          <span id="directorStage">阶段 0 / 10</span>
+          <strong id="nextStepHint">先连接 Agent 并执行预检。</strong>
+          <em id="hostCue">主持提示：确认三端连接同一个 session 后再开始。</em>
+        </section>
+        <div class="script-list">
+          <button data-action="task" type="button"><b>1</b><span>创建任务</span><em>手机语音：18:10 接孩子，之后去超市</em></button>
+          <button data-action="meeting" type="button"><b>2</b><span>会议延迟</span><em>会议延迟 20 分钟，最晚出发窗口压缩</em></button>
+          <button data-action="approach" type="button"><b>3</b><span>接近车辆</span><em>腕上提醒后准备交接到车机</em></button>
+          <button data-action="vehicle" type="button"><b>4</b><span>进入车辆</span><em>车机成为主展示端</em></button>
+          <button data-action="traffic" type="button"><b>5</b><span>拥堵加剧</span><em>ETA 18:28，预计晚到 18 分钟</em></button>
+          <button data-action="stress" type="button"><b>6</b><span>压力辅助信号</span><em>腕上心率升高，辅助判断高负荷</em></button>
+          <button data-action="utterance" type="button"><b>7</b><span>用户求助</span><em>“我还来得及吗？帮我处理”</em></button>
+          <button data-action="confirm" class="confirm-action" type="button"><b>8</b><span>确认发送</span><em>模拟车机大按钮确认，触发幂等执行</em></button>
+          <button data-action="cooldown" type="button"><b>9</b><span>低干扰恢复</span><em>已处理，按当前速度驾驶即可</em></button>
+          <button data-action="parked" type="button"><b>10</b><span>停车复盘</span><em>主交互端回到手机</em></button>
+        </div>
+      </section>
+
+      <aside class="panel side-panel" aria-label="模拟配置">
+        <div class="panel-head">
+          <div>
+            <span>外部依赖模拟</span>
+            <h2>服务与车辆信号</h2>
+          </div>
+        </div>
+        <div class="technical-box">
+          <button id="toggleTech" class="ghost" type="button">展开技术验证</button>
+          <div id="technicalActions" hidden>
+            <div class="button-row">
+              <button data-action="serviceSuccess" type="button">服务成功</button>
+              <button data-action="serviceStock" type="button">缺货降级</button>
+              <button data-action="serviceBudget" type="button">超预算降级</button>
+            </div>
+            <div class="button-row">
+              <button data-action="hardBrake" type="button">急刹信号</button>
+              <button data-action="voiceConfirm" type="button">语音确认</button>
+              <button data-action="refresh" type="button">刷新状态</button>
+            </div>
+          </div>
+        </div>
+
+        <section class="mini-state">
+          <h3>任务</h3>
+          <ul id="tasks"></ul>
+        </section>
+        <section class="mini-state">
+          <h3>待确认动作</h3>
+          <ul id="actions"></ul>
+        </section>
+        <section class="mini-state">
+          <h3>车载状态</h3>
+          <ul id="vehicleState"></ul>
+        </section>
+        <section class="mini-state">
+          <h3>Ledger 摘要</h3>
+          <ul id="ledger"></ul>
+        </section>
+      </aside>
+    </section>
+
+    <section class="panel log-panel" aria-label="事件日志">
+      <div class="panel-head">
+        <div>
+          <span>Event Log</span>
+          <h2>请求、revision 与错误</h2>
+        </div>
+        <div class="head-actions">
+          <button id="copyLog" class="ghost" type="button">复制脱敏日志</button>
+          <button id="clearLog" class="ghost" type="button">清空日志</button>
+        </div>
+      </div>
+      <div id="eventLog" class="event-log"></div>
+    </section>
+  </main>
+
+  <script src="./app.js?v=auri-p0-console-20260728b"></script>
+</body>
+</html>

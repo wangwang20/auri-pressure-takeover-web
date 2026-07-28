@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AURI Web 协作入口</title>
+  <style>
+    :root {
+      --navy: #0b1b33;
+      --gold: #d4af7a;
+      --ivory: #f5f2ec;
+      --line: rgba(11, 27, 51, .12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 40px;
+      display: grid;
+      place-items: center;
+      color: var(--navy);
+      background: var(--ivory);
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    main {
+      width: min(880px, 100%);
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 34px;
+    }
+    header img {
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      object-fit: cover;
+    }
+    h1, p { margin: 0; }
+    h1 { font-size: 30px; letter-spacing: 0; }
+    header p { margin-top: 5px; color: #687588; }
+    section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    a {
+      min-height: 190px;
+      padding: 25px;
+      border-radius: 20px;
+      display: grid;
+      align-content: space-between;
+      color: inherit;
+      text-decoration: none;
+      background: rgba(255, 255, 255, .8);
+      border: 1px solid var(--line);
+      box-shadow: 0 16px 44px rgba(11, 27, 51, .08);
+    }
+    a:hover, a:focus-visible {
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+    a span {
+      color: #8b6a2f;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    a strong {
+      display: block;
+      margin-top: 10px;
+      font-size: 25px;
+    }
+    a em {
+      color: #647083;
+      font-size: 14px;
+      font-style: normal;
+      line-height: 1.55;
+    }
+    @media (max-width: 680px) {
+      body { padding: 24px; }
+      section { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <img src="../../icon.png" alt="AURI" />
+      <div>
+        <h1>AURI Web 协作入口</h1>
+        <p>车机 HMI 与 Demo 导演台</p>
+      </div>
+    </header>
+    <section>
+      <a href="../vehicle-hmi/">
+        <div><span>驾驶展示端</span><strong>车机 HMI</strong></div>
+        <em>横屏打开，展示导航、压力接管、确认闭环与多端状态。</em>
+      </a>
+      <a href="../demo-console/">
+        <div><span>演示导演台</span><strong>Demo 控制台</strong></div>
+        <em>注入会议延迟、进入车辆、拥堵与压力信号，推进完整演示。</em>
+      </a>
+    </section>
+  </main>
+</body>
+</html>
