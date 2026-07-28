@@ -136,12 +136,18 @@ let signalToastTimer = null;
 let amapRouteMeta = null;
 let mapRuntimeStatus = { mode: "offline", message: "离线演示地图" };
 const timeline = [];
+
+function mapStatusText(status = mapRuntimeStatus) {
+  if (!status.usage) return status.message;
+  return `${status.message} · 本浏览器本月地图 ${status.usage.mapLoads} 次 / 路线 ${status.usage.routePlans} 次`;
+}
+
 const mapAdapter = window.AuriAmapAdapter?.create({
   container: ui.amapCanvas,
   mapWrap: ui.mapWrap,
   onStatus(status) {
     mapRuntimeStatus = status;
-    if (ui.mapConfigStatus) ui.mapConfigStatus.textContent = status.message;
+    if (ui.mapConfigStatus) ui.mapConfigStatus.textContent = mapStatusText(status);
     log("map", status.message);
   },
   onRouteMeta(meta) {
@@ -197,7 +203,7 @@ function initConfigPanel() {
   ui.configAmapKey.value = CONFIG.amapKey;
   ui.configAmapSecurityCode.value = CONFIG.amapSecurityJsCode;
   ui.configAmapServiceHost.value = CONFIG.amapServiceHost;
-  ui.mapConfigStatus.textContent = mapRuntimeStatus.message;
+  ui.mapConfigStatus.textContent = mapStatusText();
 }
 
 function openConfig() {
@@ -1002,7 +1008,10 @@ function render() {
     ui.routePassed.setAttribute("stroke-dasharray", `${(routeProgress * 100).toFixed(2)} 100`);
     ui.routeProgress.style.height = `${Math.round(routeProgress * 100)}%`;
   }
-  const remainingKm = Math.max(0, 7.8 * (1 - routeProgress));
+  const routeDistanceKm = mapRuntimeStatus.mode === "online" && amapRouteMeta?.totalDistanceMeters
+    ? amapRouteMeta.totalDistanceMeters / 1000
+    : 7.8;
+  const remainingKm = Math.max(0, routeDistanceKm * (1 - routeProgress));
   const remainingMinutes = Math.max(1, Math.round(18 * (1 - routeProgress)));
   renderTripValue(ui.amapRemain, driving ? remainingKm.toFixed(1) : "--", driving ? "公里" : "");
   const duration = risk.late_minutes > 0 && !["action_completed", "cooldown", "parked_review"].includes(worldState?.stage)
@@ -1140,7 +1149,8 @@ window.AURI_HMI = {
   reset: resetSession,
   consumeWorldState,
   getState: () => structuredClone(worldState),
-  getMapStatus: () => ({ ...mapRuntimeStatus })
+  getMapStatus: () => ({ ...mapRuntimeStatus }),
+  getMapUsage: () => mapAdapter?.getUsage?.() || null
 };
 
 render();

@@ -2,9 +2,14 @@
   "use strict";
 
   const DEFAULT_ROUTE = {
-    start: [121.4382, 31.218],
-    end: [121.5054, 31.2396],
+    start: [121.5758, 31.2169],
+    end: [121.6098, 31.2356],
     destinationName: "阳光小学"
+  };
+  const AMAP_USAGE_KEY = "auri-amap-usage";
+  const DEFAULT_MONTHLY_LIMITS = {
+    mapLoads: 200,
+    routePlans: 200
   };
 
   let loaderPromise = null;
@@ -67,6 +72,117 @@
     return Math.atan2(east, north) * 180 / Math.PI;
   }
 
+  function distanceMeters(from, to) {
+    const radius = 6371008.8;
+    const lat1 = from[1] * Math.PI / 180;
+    const lat2 = to[1] * Math.PI / 180;
+    const deltaLat = (to[1] - from[1]) * Math.PI / 180;
+    const deltaLng = (to[0] - from[0]) * Math.PI / 180;
+    const sinLat = Math.sin(deltaLat / 2);
+    const sinLng = Math.sin(deltaLng / 2);
+    const value = sinLat * sinLat + Math.cos(lat1) * Math.cos(lat2) * sinLng * sinLng;
+    return radius * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
+  }
+
+  function buildRouteGeometry(path) {
+    const cumulative = [0];
+    for (let index = 1; index < path.length; index += 1) {
+      cumulative.push(cumulative[index - 1] + distanceMeters(path[index - 1], path[index]));
+    }
+    return {
+      path,
+      cumulative,
+      totalDistance: cumulative[cumulative.length - 1] || 0
+    };
+  }
+
+  function appendUnique(path, point) {
+    const previous = path[path.length - 1];
+    if (!previous || previous[0] !== point[0] || previous[1] !== point[1]) path.push(point);
+  }
+
+  function locationAtProgress(geometry, progress) {
+    const normalized = Math.max(0, Math.min(1, Number(progress || 0)));
+    const targetDistance = geometry.totalDistance * normalized;
+    let afterIndex = geometry.cumulative.findIndex((distance) => distance >= targetDistance);
+    if (afterIndex < 0) afterIndex = geometry.path.length - 1;
+    const beforeIndex = Math.max(0, afterIndex - 1);
+    const from = geometry.path[beforeIndex];
+    const to = geometry.path[afterIndex] || from;
+    const segmentStart = geometry.cumulative[beforeIndex] || 0;
+    const segmentLength = Math.max(0, (geometry.cumulative[afterIndex] || segmentStart) - segmentStart);
+    const ratio = segmentLength > 0 ? (targetDistance - segmentStart) / segmentLength : 0;
+    const point = [
+      from[0] + (to[0] - from[0]) * ratio,
+      from[1] + (to[1] - from[1]) * ratio
+    ];
+    const passed = geometry.path.slice(0, beforeIndex + 1);
+    appendUnique(passed, point);
+    const remaining = [point];
+    geometry.path.slice(afterIndex).forEach((pathPoint) => appendUnique(remaining, pathPoint));
+    return {
+      point,
+      passed,
+      remaining,
+      heading: bearing(from, to),
+      beforeIndex,
+      afterIndex
+    };
+  }
+
+  function pathBetweenProgress(geometry, startProgress, endProgress) {
+    const start = locationAtProgress(geometry, startProgress);
+    const end = locationAtProgress(geometry, endProgress);
+    const path = [start.point];
+    for (let index = start.afterIndex; index <= end.beforeIndex; index += 1) {
+      appendUnique(path, geometry.path[index]);
+    }
+    appendUnique(path, end.point);
+    return path;
+  }
+
+  function currentMonth() {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  }
+
+  function readUsage() {
+    const empty = { month: currentMonth(), mapLoads: 0, routePlans: 0 };
+    try {
+      const stored = JSON.parse(window.localStorage?.getItem(AMAP_USAGE_KEY) || "null");
+      if (!stored || stored.month !== empty.month) return empty;
+      return {
+        month: empty.month,
+        mapLoads: Math.max(0, Number(stored.mapLoads || 0)),
+        routePlans: Math.max(0, Number(stored.routePlans || 0))
+      };
+    } catch {
+      return empty;
+    }
+  }
+
+  function writeUsage(usage) {
+    try {
+      window.localStorage?.setItem(AMAP_USAGE_KEY, JSON.stringify(usage));
+    } catch {
+      // Storage can be unavailable in private browser contexts; map usage still works.
+    }
+  }
+
+  function usageLimits(config) {
+    return {
+      mapLoads: Math.max(1, Number(config.amapMonthlyMapLimit || DEFAULT_MONTHLY_LIMITS.mapLoads)),
+      routePlans: Math.max(1, Number(config.amapMonthlyRouteLimit || DEFAULT_MONTHLY_LIMITS.routePlans))
+    };
+  }
+
+  function recordUsage(type) {
+    const usage = readUsage();
+    usage[type] += 1;
+    writeUsage(usage);
+    return usage;
+  }
+
   function routeMeta(route, progress = 0) {
     const steps = (route?.steps || []).filter((step) => step?.instruction);
     const totalDistance = Number(route?.distance || 0)
@@ -84,7 +200,7 @@
     const stepDistance = Number(step?.distance || 0);
     const remainingDistance = Math.max(0, stepDistance - Math.max(0, targetDistance - coveredDistance));
     return {
-      instruction: step?.instruction || "",
+      instruction: String(step?.instruction || "").replace(/行驶\s*\d+(?:\.\d+)?\s*(?:米|千米|公里)/g, "").trim(),
       nextDistance: remainingDistance >= 1000
         ? { value: (remainingDistance / 1000).toFixed(1), unit: "公里" }
         : { value: String(Math.max(50, Math.round(remainingDistance / 10) * 10)), unit: "米" },
@@ -103,6 +219,7 @@
       this.status = "offline";
       this.map = null;
       this.routePath = [];
+      this.routeGeometry = null;
       this.lastSnapshot = null;
       this.lastProgress = null;
       this.lastStage = null;
@@ -118,16 +235,25 @@
         this.fallback(message);
         return { mode: "offline", reason: message };
       }
+      const usage = readUsage();
+      const limits = usageLimits(config);
+      if (usage.mapLoads >= limits.mapLoads || usage.routePlans >= limits.routePlans) {
+        const message = `本浏览器 ${usage.month} 高德 Demo 调用保护已触发`;
+        this.fallback(message);
+        return { mode: "offline", reason: message };
+      }
 
-      this.onStatus({ mode: "loading", message: "正在加载高德在线地图" });
+      this.onStatus({ mode: "loading", message: "正在加载高德在线地图", usage });
       try {
         const AMap = await loadAmap(config);
+        const routeConfig = config.amapRoute || DEFAULT_ROUTE;
         this.container.hidden = false;
-        this.createMap(AMap, config);
-        await this.planRoute(AMap, config.amapRoute || DEFAULT_ROUTE);
+        recordUsage("mapLoads");
+        this.createMap(AMap, config, routeConfig);
+        await this.planRoute(AMap, routeConfig, config);
         this.status = "online";
         this.mapWrap.classList.add("is-amap-online");
-        this.onStatus({ mode: "online", message: "高德在线地图已连接" });
+        this.onStatus({ mode: "online", message: "高德在线地图已连接", usage: readUsage() });
         if (this.lastSnapshot) this.update(this.lastSnapshot);
         return { mode: "online" };
       } catch (error) {
@@ -136,14 +262,14 @@
       }
     }
 
-    createMap(AMap, config) {
+    createMap(AMap, config, routeConfig) {
       this.map = new AMap.Map(this.container, {
-        center: DEFAULT_ROUTE.start,
+        center: routeConfig.start,
         zoom: 15,
         viewMode: "3D",
-        pitch: 36,
+        pitch: 30,
         mapStyle: config.amapStyle || "amap://styles/whitesmoke",
-        features: ["bg", "road", "building", "point"],
+        features: ["bg", "road", "building"],
         showLabel: true,
         resizeEnable: true,
         rotateEnable: false,
@@ -154,20 +280,26 @@
       this.overlays.trafficLayer = new AMap.TileLayer.Traffic({
         autoRefresh: true,
         interval: 180,
-        opacity: 0.42,
+        opacity: 0.28,
         zIndex: 8
       });
       this.map.add(this.overlays.trafficLayer);
     }
 
-    planRoute(AMap, routeConfig) {
+    planRoute(AMap, routeConfig, config) {
       return new Promise((resolve, reject) => {
+        const usage = readUsage();
+        if (usage.routePlans >= usageLimits(config).routePlans) {
+          reject(new Error(`本浏览器 ${usage.month} 驾车路线调用保护已触发`));
+          return;
+        }
         const driving = new AMap.Driving({
           policy: AMap.DrivingPolicy?.LEAST_TIME ?? 0,
           extensions: "all",
           hideMarkers: true,
           showTraffic: true
         });
+        recordUsage("routePlans");
         driving.search(routeConfig.start, routeConfig.end, (status, result) => {
           const route = result?.routes?.[0];
           const path = flattenDrivingPath(route);
@@ -177,6 +309,7 @@
           }
           this.drivingRoute = route;
           this.routePath = path;
+          this.routeGeometry = buildRouteGeometry(path);
           this.drawRoute(AMap, routeConfig);
           const meta = routeMeta(route);
           this.lastRouteMetaKey = `${meta.stepIndex}:${meta.nextDistance.value}:${meta.nextDistance.unit}`;
@@ -210,6 +343,8 @@
       });
       this.overlays.routeRemaining = new AMap.Polyline({
         ...common,
+        showDir: true,
+        dirColor: "#ffffff",
         strokeColor: "#2f6bff",
         strokeOpacity: 1,
         strokeWeight: 11,
@@ -259,7 +394,7 @@
       this.overlays.incidentMarker = new AMap.Marker({
         position: this.routePath[Math.floor(this.routePath.length * 0.72)],
         content: incident,
-        anchor: "bottom-center",
+        anchor: "top-center",
         zIndex: 120
       });
       this.overlays.incidentMarker.hide();
@@ -293,19 +428,17 @@
         this.lastRouteMetaKey = routeMetaKey;
         this.onRouteMeta(meta);
       }
-      const lastIndex = this.routePath.length - 1;
-      const index = Math.max(0, Math.min(lastIndex, Math.round(lastIndex * progress)));
-      const passed = this.routePath.slice(0, Math.max(1, index + 1));
-      const remaining = this.routePath.slice(index);
-      this.overlays.routePassed.setPath(passed.length > 1 ? passed : []);
-      this.overlays.routeRemaining.setPath(remaining.length > 1 ? remaining : []);
+      const location = locationAtProgress(this.routeGeometry, progress);
+      this.overlays.routePassed.setPath(location.passed.length > 1 ? location.passed : []);
+      this.overlays.routeRemaining.setPath(location.remaining.length > 1 ? location.remaining : []);
 
       const riskActive = snapshot.riskLevel === "L2"
         || snapshot.riskLevel === "L3"
         || ["alert", "takeover"].includes(snapshot.mapStage);
       const completed = ["action_completed", "cooldown", "parked_review"].includes(snapshot.stage);
-      const incidentEnd = Math.min(lastIndex, index + Math.max(2, Math.round(lastIndex * 0.18)));
-      const incidentPath = this.routePath.slice(index, incidentEnd + 1);
+      const incidentEndProgress = Math.min(1, progress + 0.18);
+      const incidentEnd = locationAtProgress(this.routeGeometry, incidentEndProgress);
+      const incidentPath = pathBetweenProgress(this.routeGeometry, progress, incidentEndProgress);
       this.overlays.routeIncident.setOptions({
         strokeColor: completed ? "#2e9d6f" : "#e6a700",
         strokeOpacity: riskActive || completed ? 1 : 0
@@ -314,19 +447,22 @@
 
       if (riskActive) {
         this.overlays.incidentContent.textContent = `拥堵 · 晚到 ${snapshot.lateMinutes || 18} 分钟`;
-        this.overlays.incidentMarker.setPosition(this.routePath[incidentEnd]);
+        const incidentLabel = locationAtProgress(
+          this.routeGeometry,
+          Math.min(1, progress + (incidentEndProgress - progress) * 0.52)
+        );
+        this.overlays.incidentMarker.setPosition(incidentLabel.point);
         this.overlays.incidentMarker.show();
-        this.overlays.trafficLayer.setOpacity(0.7);
+        this.overlays.trafficLayer.setOpacity(0.48);
       } else {
         this.overlays.incidentMarker.hide();
-        this.overlays.trafficLayer.setOpacity(snapshot.driving ? 0.42 : 0.2);
+        this.overlays.trafficLayer.setOpacity(snapshot.driving ? 0.28 : 0.16);
       }
 
       if (snapshot.showVehicle) {
         this.overlays.vehicleMarker.show();
-        const target = this.routePath[index];
-        const ahead = this.routePath[Math.min(lastIndex, index + 1)] || target;
-        this.overlays.vehicleMarker.setAngle(bearing(target, ahead));
+        const target = location.point;
+        this.overlays.vehicleMarker.setAngle(location.heading);
         if (this.lastProgress !== null && typeof this.overlays.vehicleMarker.moveTo === "function") {
           this.overlays.vehicleMarker.moveTo(target, { duration: 850, autoRotation: false });
         } else {
@@ -337,13 +473,18 @@
       }
 
       if (snapshot.mapStage !== this.lastStage || Math.abs(progress - (this.lastProgress ?? progress)) > 0.08) {
-        const zoom = snapshot.mapStage === "overview"
-          ? 14.5
-          : ["alert", "takeover"].includes(snapshot.mapStage)
-            ? 16.4
-            : 15.8;
-        const center = this.routePath[Math.min(lastIndex, index + Math.round(lastIndex * 0.08))];
-        this.map.setZoomAndCenter(zoom, center, false, 650);
+        if (["overview", "preview"].includes(snapshot.mapStage)) {
+          this.map.setFitView(
+            [this.overlays.routeShadow, this.overlays.destinationMarker],
+            false,
+            [90, 120, 150, 90],
+            16
+          );
+        } else {
+          const zoom = ["alert", "takeover"].includes(snapshot.mapStage) ? 15.8 : 15.5;
+          const center = locationAtProgress(this.routeGeometry, Math.min(1, progress + 0.055)).point;
+          this.map.setZoomAndCenter(zoom, center, false, 650);
+        }
       }
 
       this.lastProgress = progress;
@@ -369,11 +510,15 @@
       this.status = "offline";
       this.container.hidden = true;
       this.mapWrap.classList.remove("is-amap-online");
-      this.onStatus({ mode: "offline", message });
+      this.onStatus({ mode: "offline", message, usage: readUsage() });
     }
 
     getStatus() {
       return this.status;
+    }
+
+    getUsage() {
+      return readUsage();
     }
   }
 

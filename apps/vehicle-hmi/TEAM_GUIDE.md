@@ -160,6 +160,16 @@ Security JS Code：本地 Demo 使用
 - 高德只负责地图上下文；Agent 的 ETA、晚到判断、任务和确认仍是唯一业务事实。
 - 公网 Key 必须允许当前 HMI 域名。
 - 正式环境使用服务端代理保存 Security JS Code。
+- 当前浏览器每月最多初始化地图 200 次、规划路线 200 次；达到后自动回退离线地图。
+- 重跑故事线使用 Console 的 `重置 Demo`，不要通过反复刷新 HMI 重置。
+- Console 事件、SSE 和轮询不会重新调用高德路线规划。
+
+检查本浏览器地图状态和调用计数：
+
+```js
+window.AURI_HMI.getMapStatus()
+window.AURI_HMI.getMapUsage()
+```
 
 完整说明见：
 
