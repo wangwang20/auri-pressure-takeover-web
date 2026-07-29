@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>AURI 车机 HMI | 随行压力接管 Agent</title>
-  <link rel="stylesheet" href="./styles.css?v=auri-cockpit-20260729a" />
+  <link rel="stylesheet" href="./styles.css?v=auri-cockpit-20260729c" />
 </head>
 <body>
   <main class="screen" aria-label="AURI 车机 HMI">
@@ -80,11 +80,11 @@
       </section>
 
       <section class="agent-controls" aria-label="Agent 快捷交互">
-        <button id="quickAskBtn" class="voice-action" type="button">
+        <div id="quickAskBtn" class="voice-action voice-transcript" role="status" aria-live="polite">
           <span class="voice-orb" aria-hidden="true"></span>
-          <span><em id="quickAskMode">语音求助</em><strong id="quickAskLabel">我还来得及吗？</strong></span>
-          <b aria-hidden="true">›</b>
-        </button>
+          <span><em id="quickAskMode">手机语音同步</em><strong id="quickAskLabel">等待用户在手机端求助</strong></span>
+          <b aria-hidden="true">手机</b>
+        </div>
         <div class="control-row">
           <button id="openPlan" type="button"><span aria-hidden="true">☷</span><em>方案</em></button>
           <button id="openDrafts" type="button"><span aria-hidden="true">✉</span><em>消息</em></button>
@@ -460,7 +460,7 @@
         <button data-event="enter_vehicle">进入车辆</button>
         <button data-event="traffic_jam">拥堵加剧</button>
         <button data-event="stress_signal">压力辅助信号</button>
-        <button data-event="agent_takeover">Agent 接管</button>
+        <button data-event="agent_takeover">同步手机求助</button>
         <button data-event="confirm_send">确认发送</button>
         <button data-event="restore">状态恢复</button>
         <button data-event="reset">重置 Demo</button>
@@ -540,8 +540,8 @@
     <span>推荐 16:9 大屏或平板横屏。</span>
   </div>
 
-  <script src="./world-state-view.js?v=auri-cockpit-20260729a"></script>
+  <script src="./world-state-view.js?v=auri-cockpit-20260729c"></script>
   <script src="./amap-adapter.js?v=auri-cockpit-20260729a"></script>
-  <script src="./app.js?v=auri-cockpit-20260729b"></script>
+  <script src="./app.js?v=auri-cockpit-20260729c"></script>
 </body>
 </html>

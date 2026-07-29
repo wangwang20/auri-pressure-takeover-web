@@ -228,22 +228,17 @@ HMI 不读取工具调用细节，不从聊天回复反推状态，也不直接�
 
 ## 主驾驶侧交互规则
 
-左侧 `我还来得及吗？` 是驾驶中主动求助入口，不是静态展示按钮。启用条件：
-
-```text
-primary_surface = vehicle_hmi
-stage in [vehicle_observation, takeover_L2, takeover_L3, planning]
-confirmation.status != pending
-```
-
-点击后页面提交标准事件：
+左侧手机语音卡是只读的跨端转写展示，不是车机输入按钮。手机提交：
 
 ```text
 POST /v1/event
 type = user.utterance
-source = vehicle_hmi
+source = mobile
 payload.text = 我还来得及吗？帮我处理
+payload.input_mode = voice
 ```
+
+Agent 将转写写入 `WorldState.last_utterance`；HMI 收到更高 revision 后展示原文。HMI 禁止自行提交 `user.utterance`。
 
 `方案`、`车况`、`同步`、`消息草稿`、`行程详情`均为二级信息入口，只读展示当前 `WorldState` 摘要，不直接改写状态。二级信息在主驾驶侧原位替换 AURI 面板，保持地图和底部确认入口可见，不做网页式全屏遮罩。二级页打开期间收到新 revision 时，内容必须同步刷新。
 
@@ -251,13 +246,13 @@ payload.text = 我还来得及吗？帮我处理
 
 - 主屏现实结论最多两句，优先呈现“继续加速无法明显缩短时间”等现实判断。
 - 动作组最多显示三条短摘要。
-- 待确认时只保留一个底部主要 CTA；语音求助入口进入不可操作提示态。
+- 待确认时只保留一个底部主要 CTA；手机语音卡保持只读。
 - 完成后显示“需要时再叫我”并降低视觉强调。
 
 二级页视觉与交互要求：
 
 - `任务`页使用一个责任总览、两张可展开任务卡和一个处理进度，不回退到键值表。
-- `消息`页使用联系人分段控件；切换老师/家人后在原位更新消息预览，不打开新的整屏页面。
+- `消息`页使用联系人分段控件；联系人来自 Agent `actions[]`，老师、孩子妈妈、爷爷或奶奶变化时原位更新消息预览。
 - `同步`页必须同时显示三端流转关系、当前主交互端、设备状态和 World State revision。
 - 任务展开、联系人切换均需保持地图和底部唯一确认 CTA 可见。
 - 状态必须同时使用图形、颜色和文字，后端枚举不得直接暴露给用户。

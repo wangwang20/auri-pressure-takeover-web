@@ -221,6 +221,28 @@
     return `${prefix}。${summaries.join("；")}`;
   }
 
+  function utterance(state) {
+    const item = state?.last_utterance;
+    const text = String(item?.text || "").trim();
+    if (!text) {
+      return { available: false, text: "", source: null, inputMode: null, sourceLabel: "等待手机语音" };
+    }
+    const sourceLabel = {
+      mobile: "手机",
+      vehicle_hmi: "车机",
+      wearable: "腕上设备",
+      demo_console: "演示控制台",
+      agent_api: "Agent"
+    }[item.source] || "外部设备";
+    return {
+      available: true,
+      text,
+      source: item.source,
+      inputMode: item.input_mode || "voice",
+      sourceLabel
+    };
+  }
+
   return {
     actions,
     actionProgress,
@@ -238,6 +260,7 @@
     taskStatusLabel,
     taskTitle,
     taskView,
-    tasks
+    tasks,
+    utterance
   };
 });

@@ -35,8 +35,8 @@ const STAGE_VIEW = {
   off_vehicle_idle: ["idle", "等待任务创建", "手机端创建任务后，AURI 会识别刚性责任和弹性任务。", "暂无风险结论。", "手机端可语音创建任务", "无需确认", "等待风险成立", "待机"],
   pre_departure_warning: ["delayed", "最晚出发窗口被压缩", "会议延迟 20 分钟，腕上设备已发出黄色提醒。", "仍可能准时，但可用时间明显减少。", "腕上已提醒，车机保持低干扰", "无需确认", "继续观察 ETA", "监控中"],
   handover_to_vehicle: ["warning", "路线正在接续", "接近车辆后，当前路线自动流转到车机。", "手机即将进入只读状态。", "准备进入车辆", "无需确认", "等待车辆状态", "交接中"],
-  vehicle_observation: ["vehicle", "导航已接续", "当前目的地路线已经准备，正在持续计算 ETA。", "当前预计可以按时到达。", "可语音询问：“我还来得及吗？”", "无需确认", "保持当前路线", "观察中"],
-  takeover_L2: ["risk", "行程风险成立", "关键任务受到影响，等待用户明确求助后生成方案。", "继续加速无法明显缩短时间。", "你可以说：“我还来得及吗？”", "等待方案", "Agent 尚未生成确认项", "分析中"],
+  vehicle_observation: ["vehicle", "导航已接续", "当前目的地路线已经准备，正在持续计算 ETA。", "当前预计可以按时到达。", "可在手机端语音询问：“我还来得及吗？”", "无需确认", "保持当前路线", "观察中"],
+  takeover_L2: ["risk", "行程风险成立", "关键任务受到影响，等待手机端用户求助后生成方案。", "继续加速无法明显缩短时间。", "等待手机语音求助", "等待方案", "Agent 尚未生成确认项", "分析中"],
   takeover_L3: ["risk", "高负荷保护", "多源辅助信号显示驾驶负荷升高，非必要内容已暂停。", "车机只保留必要判断和安全确认。", "保持驾驶，AURI 正在处理", "等待方案", "高负荷保护中", "保护中"],
   planning: ["takeover", "压力源接管中", "Agent 正在分析任务冲突，并准备消息与服务方案。", "继续加速无法明显缩短时间，正在处理现实后果。", "AURI 正在准备方案", "准备中", "等待确认项生成", "规划中"],
   service_prepared: ["takeover", "方案已准备", "消息和生活服务方案已准备，等待确认。", "消息与服务方案已备好。", "可说：“确认处理”", "确认处理", "等待车机确认", "待确认"],
@@ -73,7 +73,7 @@ const EVENT_BUTTONS = {
   enter_vehicle: ["scene.vehicle_entered", "demo_console", {}],
   traffic_jam: ["traffic.updated", "demo_console", null],
   stress_signal: ["wearable.signal", "wearable", { heart_rate: 120, confidence: 0.9 }],
-  agent_takeover: ["user.utterance", "vehicle_hmi", { text: "我还来得及吗？帮我处理" }],
+  agent_takeover: ["user.utterance", "mobile", { text: "我还来得及吗？帮我处理", input_mode: "voice" }],
   restore: ["cooldown.elapsed", "demo_console", {}]
 };
 
@@ -854,13 +854,6 @@ function renderDraft() {
   ui.draftBody.textContent = current.summary || `${current.target || "联系人"}消息已生成`;
 }
 
-function canQuickAsk() {
-  if (!worldState) return false;
-  if (worldState.primary_surface !== "vehicle_hmi") return false;
-  if (worldState.confirmation?.status === "pending") return false;
-  return ["vehicle_observation", "takeover_L2", "takeover_L3", "planning"].includes(worldState.stage);
-}
-
 function detailItem(label, value, cls = "") {
   return `<div class="detail-item ${cls}"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`;
 }
@@ -1210,18 +1203,15 @@ function render() {
   if (ui.routeSummary) {
     ui.routeSummary.textContent = risk.late_minutes > 0 ? `晚到 ${risk.late_minutes} 分钟` : eta === "--:--" ? "等待路线" : `${eta} 到达`;
   }
-  ui.quickAskBtn.disabled = !canQuickAsk();
-  ui.quickAskBtn.classList.toggle("enabled", canQuickAsk());
-  if (["action_completed", "cooldown", "parked_review"].includes(worldState?.stage)) {
-    ui.quickAskMode.textContent = "低干扰";
-    ui.quickAskLabel.textContent = "需要时再叫我";
-  } else if (worldState?.confirmation?.status === "pending") {
-    ui.quickAskMode.textContent = "方案已准备";
-    ui.quickAskLabel.textContent = "请在下方确认处理";
-  } else {
-    ui.quickAskMode.textContent = "语音求助";
-    ui.quickAskLabel.textContent = "我还来得及吗？";
-  }
+  const utterance = stateView.utterance(worldState);
+  const hasMobileUtterance = utterance.available && utterance.source === "mobile";
+  ui.quickAskBtn.classList.toggle("enabled", hasMobileUtterance);
+  ui.quickAskMode.textContent = hasMobileUtterance
+    ? utterance.inputMode === "voice" ? "手机语音已同步" : "手机文本已同步"
+    : "手机语音同步";
+  ui.quickAskLabel.textContent = hasMobileUtterance
+    ? `“${utterance.text}”`
+    : "等待用户在手机端求助";
   ui.voiceHint.textContent = voice;
   ui.confirmBtn.disabled = !canConfirm || confirmInFlight;
   ui.confirmBtn.classList.toggle("enabled", canConfirm);
@@ -1354,17 +1344,6 @@ document.querySelectorAll("[data-detail]").forEach((button) => {
 });
 document.querySelectorAll("[data-home], .launch-brand").forEach((button) => {
   button.addEventListener("click", closeDetail);
-});
-ui.quickAskBtn.addEventListener("click", async () => {
-  if (!canQuickAsk()) return;
-  ui.quickAskBtn.disabled = true;
-  try {
-    await submitEvent(EVENT_BUTTONS.agent_takeover);
-  } catch (error) {
-    log("ask-error", friendlyError(error));
-  } finally {
-    render();
-  }
 });
 ui.closeDetail.addEventListener("click", closeDetail);
 ui.detailPanel.addEventListener("click", (event) => {

@@ -418,6 +418,50 @@ button:disabled {
   width: 100%;
 }
 
+.optional-preset {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 13px 14px;
+  border: 1px solid rgba(212, 175, 122, 0.42);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(255, 253, 249, 0.98), rgba(245, 242, 236, 0.94));
+}
+
+.optional-preset-copy,
+.optional-preset-copy em,
+.optional-preset-copy strong,
+.optional-preset-copy small {
+  display: block;
+}
+
+.optional-preset-copy em {
+  color: #8b6a2f;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.optional-preset-copy strong {
+  margin-top: 3px;
+  color: var(--auri-navy);
+  font-size: 15px;
+}
+
+.optional-preset-copy small {
+  margin-top: 4px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.optional-preset > button {
+  min-width: 72px;
+  color: var(--auri-navy);
+  background: rgba(212, 175, 122, 0.28);
+  border: 1px solid rgba(212, 175, 122, 0.48);
+}
+
 #technicalActions {
   display: grid;
   gap: 10px;

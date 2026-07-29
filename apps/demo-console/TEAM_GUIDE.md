@@ -193,14 +193,15 @@ service.mock.config
 
 | 按钮 | 接口 | 事件或操作 | 说明 |
 | --- | --- | --- | --- |
-| 载入演示预置任务 | `POST /v1/event` | `task.created` | 可选兜底：模拟手机创建“18:10 接孩子，之后去超市”；默认不自动创建。 |
+| 同步手机语音任务 | `GET /v1/state` | 状态刷新 | 主线第 1 步；初始为空任务，等待手机端创建后同步。 |
+| 载入演示预置任务 | `POST /v1/event` | `task.created` | 侧栏可选兜底：仅手机端不可用时模拟创建“18:10 接孩子，之后去超市”。 |
 | 会议延迟 | `POST /v1/event` | `meeting.overrun` | 会议延迟 20 分钟。 |
 | 接近车辆 | `POST /v1/event` | `scene.approaching` | 准备交接到车机。 |
 | 进入车辆 | `POST /v1/event` | `scene.vehicle_entered` | 主交互端切到车机。 |
 | 拥堵加剧 | `POST /v1/event` | `traffic.updated` | 根据当前刚性任务时间计算 ETA，并注入演示晚到分钟数。 |
 | 压力辅助信号 | `POST /v1/event` | `wearable.signal` | 注入心率等辅助信号。 |
 | 急刹信号 | `POST /v1/event` | `driving.signal` | 注入驾驶负荷辅助信号。 |
-| 用户求助 | `POST /v1/event` | `user.utterance` | 用户问“我还来得及吗？帮我处理”。 |
+| 手机语音求助 | `POST /v1/event` | `user.utterance` | `source=mobile`、`input_mode=voice`；转写通过 World State 同步到车机。 |
 | 服务成功 | `POST /v1/event` | `service.mock.config` | 模拟服务正常。 |
 | 缺货降级 | `POST /v1/event` | `service.mock.config` | 模拟缺货。 |
 | 超预算降级 | `POST /v1/event` | `service.mock.config` | 模拟超预算。 |
@@ -218,7 +219,8 @@ service.mock.config
 
 ```text
 重置 Demo
-创建任务
+同步手机语音任务
+手机端语音创建任务
 会议延迟
 接近车辆
 进入车辆
@@ -233,7 +235,7 @@ service.mock.config
 
 | 阶段 | 期望 Agent 状态 |
 | --- | --- |
-| 创建任务 | `off_vehicle_idle`，有刚性/弹性任务。 |
+| 同步手机语音任务 | 初始任务为空；手机创建后为 `off_vehicle_idle`，并出现实际任务。 |
 | 会议延迟 | `pre_departure_warning`，L1。 |
 | 接近车辆 | `handover_to_vehicle`。 |
 | 进入车辆 | `vehicle_observation`，`primary_surface=vehicle_hmi`。 |

@@ -16,14 +16,14 @@ const storedConfig = storedConfigRaw.apiBase === LEGACY_AGENT_API && storedConfi
 const CONFIG = { ...DEFAULT_CONFIG, ...storedConfig, ...(window.AURI_CONFIG || {}) };
 
 const ACTIONS = {
-  task: ["task.created", "mobile", { text: DEMO_PRESET_TASK_TEXT }],
+  presetTask: ["task.created", "mobile", { text: DEMO_PRESET_TASK_TEXT }],
   meeting: ["meeting.overrun", "demo_console", { delay_minutes: 20 }],
   approach: ["scene.approaching", "demo_console", {}],
   vehicle: ["scene.vehicle_entered", "demo_console", {}],
   traffic: ["traffic.updated", "demo_console", null],
   stress: ["wearable.signal", "wearable", { heart_rate: 120, confidence: 0.9 }],
   hardBrake: ["driving.signal", "vehicle_hmi", { harsh_brake: true, acceleration_variance: "high", confidence: 0.8 }],
-  utterance: ["user.utterance", "vehicle_hmi", { text: "我还来得及吗？帮我处理" }],
+  utterance: ["user.utterance", "mobile", { text: "我还来得及吗？帮我处理", input_mode: "voice" }],
   serviceSuccess: ["service.mock.config", "demo_console", { mode: "success" }],
   serviceStock: ["service.mock.config", "demo_console", { mode: "out_of_stock" }],
   serviceBudget: ["service.mock.config", "demo_console", { mode: "over_budget" }],
@@ -98,16 +98,17 @@ let streamRetryTimer = null;
 let pollTimer = null;
 let lastHealth = null;
 let syncMode = "disconnected";
+let mobileTaskSyncAcknowledged = false;
 const stableEventIds = new Map();
 
 const SCRIPT_STEPS = [
-  { key: "task", stage: "创建任务", cue: "手机语音创建任务，证明任务进入共享 World State。" },
+  { key: "waitTask", stage: "同步手机任务", cue: "先展示空任务状态，再由手机语音创建任务并同步到共享 World State。" },
   { key: "meeting", stage: "会议延迟", cue: "会议延迟压缩出发窗口，腕上进入黄色提醒。" },
   { key: "approach", stage: "接近车辆", cue: "用户离开办公室靠近车辆，准备交接到车机。" },
   { key: "vehicle", stage: "进入车辆", cue: "主交互端切到车机，手机进入只读 Companion。" },
-  { key: "traffic", stage: "拥堵加剧", cue: "ETA 变成 18:28，预计晚到 18 分钟。" },
+  { key: "traffic", stage: "拥堵加剧", cue: "按当前刚性任务时间计算 ETA，并展示预计晚到分钟数。" },
   { key: "stress", stage: "压力辅助信号", cue: "辅助信号只提升解释性，不直接决定情绪。" },
-  { key: "utterance", stage: "用户求助", cue: "用户问我还来得及吗，Agent 准备动作组。" },
+  { key: "utterance", stage: "手机语音求助", cue: "用户在手机端说我还来得及吗，转写同步到车机后 Agent 准备动作组。" },
   { key: "confirm", stage: "确认发送", cue: "车机一次确认，消息和模拟订单幂等执行。" },
   { key: "cooldown", stage: "低干扰恢复", cue: "处理完成后降低打扰。" },
   { key: "parked", stage: "停车复盘", cue: "停车后主端回到手机查看完整复盘。" }
@@ -292,6 +293,7 @@ async function reset() {
     return;
   }
   stableEventIds.clear();
+  mobileTaskSyncAcknowledged = false;
   const state = await apiFetch("/v1/session/reset", {
     method: "POST",
     body: JSON.stringify({ scenario_id: "happy-path" })
@@ -376,6 +378,7 @@ function renderLedger() {
 
 function nextStepIndex() {
   if (!worldState) return 0;
+  if (!mobileTaskSyncAcknowledged) return 0;
   if (worldState.stage === "off_vehicle_idle" && worldState.tasks?.length) return 1;
   if (worldState.stage === "pre_departure_warning") return 2;
   if (worldState.stage === "handover_to_vehicle") return 3;
@@ -392,9 +395,14 @@ function nextStepIndex() {
 function renderDirector() {
   const index = Math.min(nextStepIndex(), SCRIPT_STEPS.length);
   const step = SCRIPT_STEPS[index] || { stage: "主线完成", cue: "可进入技术证明或复盘。" };
-  ui.directorStage.textContent = `阶段 ${index} / ${SCRIPT_STEPS.length}`;
-  ui.nextStepHint.textContent = step.stage === "主线完成" ? "主线完成" : `下一步：${step.stage}`;
-  ui.hostCue.textContent = `主持提示：${step.cue}`;
+  const waitingForMobileTask = mobileTaskSyncAcknowledged && !worldState?.tasks?.length;
+  ui.directorStage.textContent = `阶段 ${waitingForMobileTask ? 1 : index} / ${SCRIPT_STEPS.length}`;
+  ui.nextStepHint.textContent = waitingForMobileTask
+    ? "等待手机语音创建任务"
+    : step.stage === "主线完成" ? "主线完成" : `下一步：${step.stage}`;
+  ui.hostCue.textContent = waitingForMobileTask
+    ? "主持提示：当前任务为空；手机语音创建后将自动进入会议延迟步骤。"
+    : `主持提示：${step.cue}`;
   document.querySelectorAll(".script-list button[data-action]").forEach((button) => {
     const action = button.dataset.action;
     const stepIndex = SCRIPT_STEPS.findIndex((item) => item.key === action);
@@ -407,7 +415,8 @@ function blockedReason(actionKey) {
   const stage = worldState?.stage;
   const hasTasks = Boolean(worldState?.tasks?.length);
   const hasConfirmation = worldState?.confirmation?.status === "pending";
-  if (!worldState && actionKey !== "refresh") return "未连接 Agent";
+  if (!worldState && !["refresh", "waitTask"].includes(actionKey)) return "未连接 Agent";
+  if (actionKey === "presetTask" && hasTasks) return "当前已有手机任务，无需载入演示预置";
   if (["serviceSuccess", "serviceStock", "serviceBudget"].includes(actionKey) && hasTasks) return "主故事已开始，服务模拟配置已锁定";
   if (["meeting", "approach", "vehicle", "traffic", "stress", "utterance"].includes(actionKey) && !hasTasks) return "需要先创建任务";
   if (actionKey === "traffic" && !["vehicle_observation", "handover_to_vehicle", "takeover_L2", "takeover_L3"].includes(stage)) return "需要先进入车辆或完成交接";
@@ -529,7 +538,13 @@ document.addEventListener("click", async (event) => {
     const action = actionButton.dataset.action;
     if (action === "confirm") await confirm("button");
     else if (action === "voiceConfirm") await confirm("voice");
-    else if (action === "refresh") await loadState("refresh");
+    else if (["refresh", "waitTask"].includes(action)) {
+      if (action === "waitTask") {
+        mobileTaskSyncAcknowledged = true;
+        render();
+      }
+      await loadState(action === "waitTask" ? "mobile-task-sync" : "refresh");
+    }
     else await submitEvent(action);
   } catch (error) {
     log("error", actionButton.dataset.action, friendlyError(error));
@@ -546,6 +561,11 @@ ui.runCurrentStep.addEventListener("click", async () => {
   if (!step) return;
   try {
     if (step.key === "confirm") await confirm("button");
+    else if (step.key === "waitTask") {
+      mobileTaskSyncAcknowledged = true;
+      render();
+      await loadState("mobile-task-sync");
+    }
     else await submitEvent(step.key);
   } catch (error) {
     log("error", step.key, friendlyError(error));
