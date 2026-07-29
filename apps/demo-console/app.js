@@ -6,6 +6,8 @@ const DEFAULT_CONFIG = {
 const PUBLIC_AGENT_API = "https://auri-agent-api.onrender.com";
 const LEGACY_AGENT_API = "https://auri-langchain-agent-api.onrender.com";
 const LOCAL_AGENT_API = "http://127.0.0.1:8000";
+const DEMO_PRESET_TASK_TEXT = "今天18:10接孩子，之后去超市";
+const DEMO_TRAFFIC_DELAY_MINUTES = 18;
 
 const storedConfigRaw = JSON.parse(localStorage.getItem("auri-demo-console-config") || "{}");
 const storedConfig = storedConfigRaw.apiBase === LEGACY_AGENT_API && storedConfigRaw.configVersion !== 2
@@ -14,11 +16,11 @@ const storedConfig = storedConfigRaw.apiBase === LEGACY_AGENT_API && storedConfi
 const CONFIG = { ...DEFAULT_CONFIG, ...storedConfig, ...(window.AURI_CONFIG || {}) };
 
 const ACTIONS = {
-  task: ["task.created", "mobile", { text: "今天18:10接孩子，之后去超市" }],
+  task: ["task.created", "mobile", { text: DEMO_PRESET_TASK_TEXT }],
   meeting: ["meeting.overrun", "demo_console", { delay_minutes: 20 }],
   approach: ["scene.approaching", "demo_console", {}],
   vehicle: ["scene.vehicle_entered", "demo_console", {}],
-  traffic: ["traffic.updated", "demo_console", { eta: "2026-07-15T18:28:00+08:00", late_minutes: 18 }],
+  traffic: ["traffic.updated", "demo_console", null],
   stress: ["wearable.signal", "wearable", { heart_rate: 120, confidence: 0.9 }],
   hardBrake: ["driving.signal", "vehicle_hmi", { harsh_brake: true, acceleration_variance: "high", confidence: 0.8 }],
   utterance: ["user.utterance", "vehicle_hmi", { text: "我还来得及吗？帮我处理" }],
@@ -28,6 +30,27 @@ const ACTIONS = {
   cooldown: ["cooldown.elapsed", "demo_console", {}],
   parked: ["scene.parked", "demo_console", {}]
 };
+
+function trafficPayload(state) {
+  const tasks = Array.isArray(state?.tasks) ? state.tasks : [];
+  const referenceTask = tasks.find((task) => task.task_type === "rigid" && task.scheduled_at)
+    || tasks.find((task) => task.scheduled_at);
+  const scheduledAt = Date.parse(referenceTask?.scheduled_at || "");
+
+  // ETA is anchored to the current Agent task, never a fixed demo clock value.
+  if (Number.isFinite(scheduledAt)) {
+    return {
+      eta: new Date(scheduledAt + DEMO_TRAFFIC_DELAY_MINUTES * 60_000).toISOString(),
+      late_minutes: DEMO_TRAFFIC_DELAY_MINUTES
+    };
+  }
+  return { late_minutes: DEMO_TRAFFIC_DELAY_MINUTES };
+}
+
+function eventDefinition(actionKey) {
+  const [type, source, payload] = ACTIONS[actionKey];
+  return [type, source, actionKey === "traffic" ? trafficPayload(worldState) : payload];
+}
 
 const $ = (selector) => document.querySelector(selector);
 const ui = {
@@ -206,7 +229,7 @@ async function submitEvent(actionKey) {
     log("blocked", actionKey, blockReason);
     return;
   }
-  const [type, source, payload] = ACTIONS[actionKey];
+  const [type, source, payload] = eventDefinition(actionKey);
   const stableId = stableEventId(actionKey, type);
   const response = await apiFetch("/v1/event", {
     method: "POST",

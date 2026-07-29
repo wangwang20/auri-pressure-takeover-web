@@ -4,7 +4,7 @@
 
 定位：模拟本轮未接入的外部世界并保证现场可复现，不替 Agent 做判断。
 
-P0 操作：创建标准任务、会议延迟、进入车辆、触发拥堵、注入辅助信号、用户求助、确认发送和重置 Demo。控制台还应展示事件日志、当前 World State、连接状态和错误。
+P0 操作：可选载入演示预置任务、会议延迟、进入车辆、触发拥堵、注入辅助信号、用户求助、确认发送和重置 Demo。默认没有任务；正常主线由手机语音创建任务。控制台还应展示事件日志、当前 World State、连接状态和错误。
 
 当前控制台还提供现场预检、下一步引导、前置条件禁用、Reset 二次确认、技术验证折叠区、车辆状态摘要、Ledger 摘要和脱敏日志复制。
 
@@ -59,11 +59,11 @@ http://127.0.0.1:5174/apps/demo-console/
 
 | 控制台按钮 | 接口 | 事件或操作 | 说明 |
 | --- | --- | --- | --- |
-| 创建任务 | `POST /v1/event` | `task.created` | 模拟手机语音创建“18:10 接孩子，之后去超市”。 |
+| 载入演示预置任务 | `POST /v1/event` | `task.created` | 可选兜底：模拟手机语音创建“18:10 接孩子，之后去超市”；默认不自动创建。 |
 | 会议延迟 | `POST /v1/event` | `meeting.overrun` | 延迟 20 分钟，触发最晚出发风险。 |
 | 接近车辆 | `POST /v1/event` | `scene.approaching` | 准备从随行/手机交接到车机。 |
 | 进入车辆 | `POST /v1/event` | `scene.vehicle_entered` | 车机成为主展示端。 |
-| 拥堵加剧 | `POST /v1/event` | `traffic.updated` | ETA 变为 18:28，晚到 18 分钟。 |
+| 拥堵加剧 | `POST /v1/event` | `traffic.updated` | 基于当前刚性任务的 `scheduled_at` 计算 ETA；演示默认注入晚到 18 分钟。 |
 | 压力辅助信号 | `POST /v1/event` | `wearable.signal` | 注入心率和置信度，只作辅助信号。 |
 | 急刹信号 | `POST /v1/event` | `driving.signal` | 模拟驾驶负荷升高。 |
 | 用户求助 | `POST /v1/event` | `user.utterance` | 用户说“我还来得及吗？帮我处理”。 |

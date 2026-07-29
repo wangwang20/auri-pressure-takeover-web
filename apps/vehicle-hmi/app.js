@@ -1,6 +1,8 @@
 const PUBLIC_AGENT_API = "https://auri-agent-api.onrender.com";
 const LEGACY_AGENT_API = "https://auri-langchain-agent-api.onrender.com";
 const LOCAL_AGENT_API = "http://127.0.0.1:8000";
+const DEMO_PRESET_TASK_TEXT = "今天18:10接孩子，之后去超市";
+const DEMO_TRAFFIC_DELAY_MINUTES = 18;
 
 const DEFAULT_CONFIG = {
   apiBase: PUBLIC_AGENT_API,
@@ -32,11 +34,11 @@ const STAGE_VIEW = {
   connecting: ["idle", "AURI 正在连接", "正在读取当前行程和座舱状态。", "正在同步当前状态。", "正在连接 Agent", "无需确认", "请稍候", "连接中"],
   off_vehicle_idle: ["idle", "等待任务创建", "手机端创建任务后，AURI 会识别刚性责任和弹性任务。", "暂无风险结论。", "手机端可语音创建任务", "无需确认", "等待风险成立", "待机"],
   pre_departure_warning: ["delayed", "最晚出发窗口被压缩", "会议延迟 20 分钟，腕上设备已发出黄色提醒。", "仍可能准时，但可用时间明显减少。", "腕上已提醒，车机保持低干扰", "无需确认", "继续观察 ETA", "监控中"],
-  handover_to_vehicle: ["warning", "路线正在接续", "接近车辆后，学校路线自动流转到车机。", "手机即将进入只读状态。", "准备进入车辆", "无需确认", "等待车辆状态", "交接中"],
+  handover_to_vehicle: ["warning", "路线正在接续", "接近车辆后，当前路线自动流转到车机。", "手机即将进入只读状态。", "准备进入车辆", "无需确认", "等待车辆状态", "交接中"],
   vehicle_observation: ["vehicle", "导航已接续", "当前目的地路线已经准备，正在持续计算 ETA。", "当前预计可以按时到达。", "可语音询问：“我还来得及吗？”", "无需确认", "保持当前路线", "观察中"],
-  takeover_L2: ["risk", "预计晚到 18 分钟", "接孩子任务预计晚到，等待用户明确求助后生成方案。", "继续加速无法明显缩短时间。", "你可以说：“我还来得及吗？”", "等待方案", "Agent 尚未生成确认项", "分析中"],
+  takeover_L2: ["risk", "行程风险成立", "关键任务受到影响，等待用户明确求助后生成方案。", "继续加速无法明显缩短时间。", "你可以说：“我还来得及吗？”", "等待方案", "Agent 尚未生成确认项", "分析中"],
   takeover_L3: ["risk", "高负荷保护", "多源辅助信号显示驾驶负荷升高，非必要内容已暂停。", "车机只保留必要判断和安全确认。", "保持驾驶，AURI 正在处理", "等待方案", "高负荷保护中", "保护中"],
-  planning: ["takeover", "压力源接管中", "Agent 正在保护接孩子任务，并准备消息与服务方案。", "继续加速无法明显缩短时间，正在处理现实后果。", "AURI 正在准备方案", "准备中", "等待确认项生成", "规划中"],
+  planning: ["takeover", "压力源接管中", "Agent 正在分析任务冲突，并准备消息与服务方案。", "继续加速无法明显缩短时间，正在处理现实后果。", "AURI 正在准备方案", "准备中", "等待确认项生成", "规划中"],
   service_prepared: ["takeover", "方案已准备", "消息和生活服务方案已准备，等待确认。", "消息与服务方案已备好。", "可说：“确认处理”", "确认处理", "等待车机确认", "待确认"],
   waiting_confirmation: ["takeover", "方案等待确认", "任务调整和必要协助已经准备。", "继续加速无法明显缩短时间；Agent 动作组已备好。", "可说：“确认处理”", "确认处理", "执行 Agent 动作组", "待确认"],
   executing: ["takeover", "正在执行", "AURI 正在执行已确认的动作组。", "请继续安全驾驶，动作正在处理。", "正在处理", "执行中", "请勿重复操作", "执行中"],
@@ -49,7 +51,7 @@ const STAGE_VIEW = {
 const MAP_STAGE_VIEW = {
   connecting: ["overview", "同步中", "", "正在读取路线和车辆状态", "等待 Agent", "◎"],
   off_vehicle_idle: ["overview", "路线", "预览", "手机创建任务后准备学校路线", "路线预览", "⌖"],
-  pre_departure_warning: ["preview", "17:38", "前出发", "最晚出发窗口已压缩", "出发窗口提醒", "◷"],
+  pre_departure_warning: ["preview", "出发", "窗口", "最晚出发窗口已压缩", "出发窗口提醒", "◷"],
   handover_to_vehicle: ["preview", "路线", "流转中", "手机路线正在交接到车机", "导航流转中", "⇢"],
   vehicle_observation: ["guidance", "1.5", "公里", "左转进入 学院路高架", "驾驶导航", "⌖"],
   takeover_L2: ["alert", "420", "米", "前方拥堵，保持当前车道", "拥堵风险成立", "!"],
@@ -65,15 +67,34 @@ const MAP_STAGE_VIEW = {
 };
 
 const EVENT_BUTTONS = {
-  create_task: ["task.created", "mobile", { text: "今天18:10接孩子，之后去超市" }],
+  create_task: ["task.created", "mobile", { text: DEMO_PRESET_TASK_TEXT }],
   meeting_delayed: ["meeting.overrun", "demo_console", { delay_minutes: 20 }],
   departure_warning: ["scene.approaching", "demo_console", {}],
   enter_vehicle: ["scene.vehicle_entered", "demo_console", {}],
-  traffic_jam: ["traffic.updated", "demo_console", { eta: "2026-07-15T18:28:00+08:00", late_minutes: 18 }],
+  traffic_jam: ["traffic.updated", "demo_console", null],
   stress_signal: ["wearable.signal", "wearable", { heart_rate: 120, confidence: 0.9 }],
   agent_takeover: ["user.utterance", "vehicle_hmi", { text: "我还来得及吗？帮我处理" }],
   restore: ["cooldown.elapsed", "demo_console", {}]
 };
+
+function trafficPayload(state) {
+  const tasks = stateView.sortedTasks(state);
+  const referenceTask = tasks.find((task) => task.task_type === "rigid" && task.scheduled_at)
+    || tasks.find((task) => task.scheduled_at);
+  const scheduledAt = Date.parse(referenceTask?.scheduled_at || "");
+  if (Number.isFinite(scheduledAt)) {
+    return {
+      eta: new Date(scheduledAt + DEMO_TRAFFIC_DELAY_MINUTES * 60_000).toISOString(),
+      late_minutes: DEMO_TRAFFIC_DELAY_MINUTES
+    };
+  }
+  return { late_minutes: DEMO_TRAFFIC_DELAY_MINUTES };
+}
+
+function eventDefinition(definition) {
+  const [type, source, payload] = definition;
+  return [type, source, type === "traffic.updated" ? trafficPayload(worldState) : payload];
+}
 
 const $ = (id) => document.querySelector(id);
 const ui = {
@@ -331,7 +352,7 @@ function consumeWorldState(next, reason = "state") {
 
 async function submitEvent(definition) {
   if (!worldState) await loadState("before-event");
-  const [type, source, payload] = definition;
+  const [type, source, payload] = eventDefinition(definition);
   const accepted = await apiFetch("/v1/event", {
     method: "POST",
     body: JSON.stringify({
@@ -626,6 +647,20 @@ function signalToastView(stage) {
   const primary = stateView.primaryTask(worldState);
   const taskTitle = primary?.title || "关键任务";
   const lateMinutes = Number(worldState?.risk?.late_minutes || 0);
+  const wearable = worldState?.wearable;
+  const haptic = hapticLabel(wearable?.haptic);
+  if (wearable?.mode === "warning" && wearable?.haptic && wearable.haptic !== "none") {
+    return [
+      "warning",
+      "腕上设备提醒",
+      wearable.text || `${taskTitle}需要关注`,
+      `黄色提示 · ${haptic}`,
+      "◉"
+    ];
+  }
+  if (wearable?.mode === "handover" && wearable?.haptic && wearable.haptic !== "none") {
+    return ["warning", "腕上设备", wearable.text || "驾驶已连接", `蓝色连接提示 · ${haptic}`, "↔"];
+  }
   if (stage === "pre_departure_warning") {
     return ["warning", "腕上提醒", `${taskTitle}出发时间临近`, "黄色提示 · 双短震", "◷"];
   }
@@ -665,11 +700,6 @@ function renderSignalToast(stage) {
   ui.signalToastIcon.textContent = icon;
   ui.signalToast.hidden = false;
   window.clearTimeout(signalToastTimer);
-  if (stage === "pre_departure_warning") {
-    signalToastTimer = window.setTimeout(() => {
-      ui.signalToast.hidden = true;
-    }, 6500);
-  }
 }
 
 function riskLabel(stage, risk) {
@@ -1246,16 +1276,24 @@ function render() {
   }
   const routeDistanceKm = mapRuntimeStatus.mode === "online" && amapRouteMeta?.totalDistanceMeters
     ? amapRouteMeta.totalDistanceMeters / 1000
-    : 7.8;
+    : navigation
+      ? 7.8
+      : 0;
   const remainingKm = Math.max(0, routeDistanceKm * (1 - routeProgress));
-  const remainingMinutes = Math.max(1, Math.round(18 * (1 - routeProgress)));
+  const mapRemainingMinutes = mapRuntimeStatus.mode === "online" && amapRouteMeta?.totalDurationSeconds
+    ? Math.max(1, Math.round((amapRouteMeta.totalDurationSeconds * (1 - routeProgress)) / 60))
+    : null;
+  const etaTime = Date.parse(worldState?.eta || "");
+  const etaRemainingMinutes = Number.isFinite(etaTime) && etaTime > Date.now()
+    ? Math.max(1, Math.ceil((etaTime - Date.now()) / 60_000))
+    : null;
+  const remainingMinutes = etaRemainingMinutes ?? mapRemainingMinutes;
   renderTripValue(ui.amapRemain, driving ? remainingKm.toFixed(1) : "--", driving ? "公里" : "");
-  const duration = risk.late_minutes > 0 && !["action_completed", "cooldown", "parked_review"].includes(worldState?.stage)
-    ? "36"
-    : driving
-      ? String(remainingMinutes)
-      : "--";
-  renderTripValue(ui.amapDuration, duration, driving ? "分钟" : "");
+  renderTripValue(
+    ui.amapDuration,
+    driving && remainingMinutes ? String(remainingMinutes) : "--",
+    driving && remainingMinutes ? "分钟" : ""
+  );
   ui.amapArrival.textContent = eta;
   if (activeDetail && !ui.detailPanel.hidden) openDetail(activeDetail);
 }

@@ -193,11 +193,11 @@ service.mock.config
 
 | 按钮 | 接口 | 事件或操作 | 说明 |
 | --- | --- | --- | --- |
-| 创建任务 | `POST /v1/event` | `task.created` | 模拟手机创建“18:10 接孩子，之后去超市”。 |
+| 载入演示预置任务 | `POST /v1/event` | `task.created` | 可选兜底：模拟手机创建“18:10 接孩子，之后去超市”；默认不自动创建。 |
 | 会议延迟 | `POST /v1/event` | `meeting.overrun` | 会议延迟 20 分钟。 |
 | 接近车辆 | `POST /v1/event` | `scene.approaching` | 准备交接到车机。 |
 | 进入车辆 | `POST /v1/event` | `scene.vehicle_entered` | 主交互端切到车机。 |
-| 拥堵加剧 | `POST /v1/event` | `traffic.updated` | ETA 变为 18:28，晚到 18 分钟。 |
+| 拥堵加剧 | `POST /v1/event` | `traffic.updated` | 根据当前刚性任务时间计算 ETA，并注入演示晚到分钟数。 |
 | 压力辅助信号 | `POST /v1/event` | `wearable.signal` | 注入心率等辅助信号。 |
 | 急刹信号 | `POST /v1/event` | `driving.signal` | 注入驾驶负荷辅助信号。 |
 | 用户求助 | `POST /v1/event` | `user.utterance` | 用户问“我还来得及吗？帮我处理”。 |
