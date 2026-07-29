@@ -1,5 +1,9 @@
+const PUBLIC_AGENT_API = "https://auri-agent-api.onrender.com";
+const LEGACY_AGENT_API = "https://auri-langchain-agent-api.onrender.com";
+const LOCAL_AGENT_API = "http://127.0.0.1:8000";
+
 const DEFAULT_CONFIG = {
-  apiBase: "https://auri-langchain-agent-api.onrender.com",
+  apiBase: PUBLIC_AGENT_API,
   token: "",
   stream: true,
   pollIntervalMs: 3000,
@@ -10,10 +14,10 @@ const DEFAULT_CONFIG = {
   amapStyle: "amap://styles/normal"
 };
 
-const PUBLIC_AGENT_API = "https://auri-langchain-agent-api.onrender.com";
-const LEGACY_AGENT_API = "https://auri-agent-api.onrender.com";
-const LOCAL_AGENT_API = "http://127.0.0.1:8000";
-const storedConfig = JSON.parse(localStorage.getItem("auri-hmi-config") || "{}");
+const storedConfigRaw = JSON.parse(localStorage.getItem("auri-hmi-config") || "{}");
+const storedConfig = storedConfigRaw.apiBase === LEGACY_AGENT_API && storedConfigRaw.configVersion !== 2
+  ? { ...storedConfigRaw, apiBase: PUBLIC_AGENT_API }
+  : storedConfigRaw;
 const queryParams = new URLSearchParams(window.location.search);
 const queryConfig = {
   ...(queryParams.get("apiBase") ? { apiBase: queryParams.get("apiBase") } : {}),
@@ -22,37 +26,21 @@ const queryConfig = {
 const windowConfig = window.AURI_CONFIG || {};
 const hasExplicitStreamUrl = Boolean(windowConfig.streamUrl || queryConfig.streamUrl);
 let CONFIG = normalizeConfig({ ...DEFAULT_CONFIG, ...storedConfig, ...windowConfig, ...queryConfig }, hasExplicitStreamUrl);
-
-const DRAFTS = {
-  teacher: {
-    target: "王老师",
-    lines: [
-      "老师您好，我这边路况拥堵，预计会晚到约 18 分钟。",
-      "请您帮忙照看一下孩子，我到达后会立即联系您。"
-    ]
-  },
-  family: {
-    target: "家人",
-    lines: [
-      "会议延迟加上路况拥堵，接孩子可能晚一点。",
-      "AURI 已将超市任务调整为配送方案，我会按当前路线安全驾驶。"
-    ]
-  }
-};
+const stateView = window.AuriWorldStateView;
 
 const STAGE_VIEW = {
   connecting: ["idle", "AURI 正在连接", "正在读取当前行程和座舱状态。", "正在同步当前状态。", "正在连接 Agent", "无需确认", "请稍候", "连接中"],
   off_vehicle_idle: ["idle", "等待任务创建", "手机端创建任务后，AURI 会识别刚性责任和弹性任务。", "暂无风险结论。", "手机端可语音创建任务", "无需确认", "等待风险成立", "待机"],
   pre_departure_warning: ["delayed", "最晚出发窗口被压缩", "会议延迟 20 分钟，腕上设备已发出黄色提醒。", "仍可能准时，但可用时间明显减少。", "腕上已提醒，车机保持低干扰", "无需确认", "继续观察 ETA", "监控中"],
   handover_to_vehicle: ["warning", "路线正在接续", "接近车辆后，学校路线自动流转到车机。", "手机即将进入只读状态。", "准备进入车辆", "无需确认", "等待车辆状态", "交接中"],
-  vehicle_observation: ["vehicle", "导航已接续", "阳光小学路线已经准备，当前按路线正常行驶。", "当前预计可以按时到达。", "可语音询问：“我还来得及吗？”", "无需确认", "保持当前路线", "观察中"],
+  vehicle_observation: ["vehicle", "导航已接续", "当前目的地路线已经准备，正在持续计算 ETA。", "当前预计可以按时到达。", "可语音询问：“我还来得及吗？”", "无需确认", "保持当前路线", "观察中"],
   takeover_L2: ["risk", "预计晚到 18 分钟", "接孩子任务预计晚到，等待用户明确求助后生成方案。", "继续加速无法明显缩短时间。", "你可以说：“我还来得及吗？”", "等待方案", "Agent 尚未生成确认项", "分析中"],
   takeover_L3: ["risk", "高负荷保护", "多源辅助信号显示驾驶负荷升高，非必要内容已暂停。", "车机只保留必要判断和安全确认。", "保持驾驶，AURI 正在处理", "等待方案", "高负荷保护中", "保护中"],
   planning: ["takeover", "压力源接管中", "Agent 正在保护接孩子任务，并准备消息与服务方案。", "继续加速无法明显缩短时间，正在处理现实后果。", "AURI 正在准备方案", "准备中", "等待确认项生成", "规划中"],
   service_prepared: ["takeover", "方案已准备", "消息和生活服务方案已准备，等待确认。", "消息与服务方案已备好。", "可说：“确认处理”", "确认处理", "等待车机确认", "待确认"],
-  waiting_confirmation: ["takeover", "方案等待确认", "已后置超市任务，并生成老师、家人消息和模拟配送方案。", "继续加速无法明显缩短时间；消息和采购方案已备好。", "可说：“确认处理”", "确认处理", "执行消息和模拟订单", "待确认"],
+  waiting_confirmation: ["takeover", "方案等待确认", "任务调整和必要协助已经准备。", "继续加速无法明显缩短时间；Agent 动作组已备好。", "可说：“确认处理”", "确认处理", "执行 Agent 动作组", "待确认"],
   executing: ["takeover", "正在执行", "AURI 正在执行已确认的动作组。", "请继续安全驾驶，动作正在处理。", "正在处理", "执行中", "请勿重复操作", "执行中"],
-  action_completed: ["done", "问题已处理", "消息已模拟发送，服务订单已模拟提交，三端同步已处理。", "已处理，按当前速度驾驶即可。", "AURI 已降低打扰", "已完成", "三端绿态同步", "完成"],
+  action_completed: ["done", "问题已处理", "Agent 动作组已执行，最新结果已同步到各端。", "已处理，按当前速度驾驶即可。", "AURI 已降低打扰", "已完成", "多端状态已同步", "完成"],
   cooldown: ["done", "低干扰恢复", "压力源已处理，AURI 进入冷却状态。", "后续详情停车后在手机端复盘。", "AURI 保持安静", "已完成", "等待停车复盘", "恢复"],
   parked_review: ["done", "停车后复盘", "主交互端回到手机，车机结束本次处理。", "请在手机端查看消息、订单和 Action Ledger。", "手机端复盘", "车机结束", "手机为主端", "复盘"],
   error: ["risk", "连接暂时中断", "AURI 正在重新连接，当前不会执行新的动作。", "请保持当前路线，稍后再试。", "连接异常", "不可确认", "等待状态恢复", "错误"]
@@ -68,7 +56,7 @@ const MAP_STAGE_VIEW = {
   takeover_L3: ["alert", "420", "米", "高负荷保护，减少非必要提示", "高负荷保护", "!"],
   planning: ["takeover", "420", "米", "继续当前路线，AURI 正在处理", "Agent 接管中", "●"],
   service_prepared: ["takeover", "420", "米", "方案已准备，保持当前路线", "方案等待确认", "●"],
-  waiting_confirmation: ["takeover", "420", "米", "方案已准备，保持当前路线", "3 项动作待确认", "●"],
+  waiting_confirmation: ["takeover", "420", "米", "方案已准备，保持当前路线", "动作等待确认", "●"],
   executing: ["takeover", "420", "米", "正在执行动作，继续安全驾驶", "动作执行中", "●"],
   action_completed: ["recovery", "1.3", "公里", "方案已处理，继续安全驾驶", "压力源已处理", "✓"],
   cooldown: ["recovery", "1.3", "公里", "保持当前路线，AURI 已降低打扰", "低干扰恢复", "✓"],
@@ -89,12 +77,12 @@ const EVENT_BUTTONS = {
 
 const $ = (id) => document.querySelector(id);
 const ui = {
-  root: $(".screen"), speed: $("#speed"), headline: $("#headline"), eta: $("#eta"), etaNote: $("#etaNote"),
+  root: $(".screen"), speed: $("#speed"), headline: $("#headline"), destination: $("#destination"),
+  mapDestinationLabel: $("#mapDestinationLabel"), eta: $("#eta"), etaNote: $("#etaNote"),
   windowState: $("#windowState"), windowLabel: $("#windowLabel"), windowDetail: $("#windowDetail"),
   modeChip: $("#modeChip"), phoneStatus: $("#phoneStatus"), watchStatus: $("#watchStatus"),
   carStatus: $("#carStatus"), phoneNode: $("#phoneNode"), watchNode: $("#watchNode"), carNode: $("#carNode"),
-  handoffSummary: $("#handoffSummary"), kidTask: $("#kidTask"), agentState: $("#agentState"),
-  shopTask: $("#shopTask"), kidTaskState: $("#kidTaskState"), shopTaskState: $("#shopTaskState"), agentTitle: $("#agentTitle"),
+  handoffSummary: $("#handoffSummary"), taskBoard: $("#taskBoard"), agentState: $("#agentState"), agentTitle: $("#agentTitle"),
   agentText: $("#agentText"), realConclusion: $("#realConclusion"), riskBadge: $("#riskBadge"), actionState: $("#actionState"),
   actionList: $("#actionList"), draftState: $("#draftState") || $("#draftStateHidden"), draftBody: $("#draftBody"), tabs: $(".tabs"), syncPhone: $("#syncPhone"),
   syncWatch: $("#syncWatch"), syncWatchDot: $("#syncWatchDot"), syncCar: $("#syncCar"), voiceHint: $("#voiceHint"),
@@ -123,8 +111,8 @@ const ui = {
 };
 
 let worldState = null;
-let activeDraft = "teacher";
-let activeTaskDetail = "pickup";
+let activeDraft = null;
+let activeTaskDetail = null;
 let lastRevision = -1;
 let eventSeq = 0;
 let pollTimer = null;
@@ -185,28 +173,29 @@ function authHeaders(extra = {}) {
 
 async function hydrateMapConfig() {
   if (CONFIG.mapProvider === "offline" || CONFIG.amapKey) return;
-  try {
-    const response = await fetch(`${CONFIG.apiBase}/v1/map-config`, {
-      headers: authHeaders({ Accept: "application/json" })
-    });
-    const data = await response.json().catch(() => null);
-    if (!response.ok) throw new Error(`${response.status}: ${data?.detail?.message || response.statusText}`);
-    if (!data?.enabled || !data.key || !data.service_host) {
-      log("map-config", "Agent 未配置高德安全代理");
+  const candidates = [...new Set([CONFIG.apiBase, LEGACY_AGENT_API])];
+  for (const apiBase of candidates) {
+    try {
+      const response = await fetch(`${apiBase}/v1/map-config`, {
+        headers: authHeaders({ Accept: "application/json" })
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data?.enabled || !data.key || !data.service_host) continue;
+      CONFIG = normalizeConfig({
+        ...CONFIG,
+        mapProvider: "amap",
+        amapKey: data.key,
+        amapSecurityJsCode: "",
+        amapServiceHost: data.service_host,
+        amapStyle: data.style || "amap://styles/normal"
+      });
+      log("map-config", apiBase === CONFIG.apiBase ? "已从 Agent 获取高德在线地图配置" : "已从备用地图服务获取高德配置");
       return;
+    } catch (error) {
+      log("map-config-retry", `${apiBase} · ${friendlyError(error)}`);
     }
-    CONFIG = normalizeConfig({
-      ...CONFIG,
-      mapProvider: "amap",
-      amapKey: data.key,
-      amapSecurityJsCode: "",
-      amapServiceHost: data.service_host,
-      amapStyle: data.style || "amap://styles/normal"
-    });
-    log("map-config", "已从 Agent 获取高德在线地图配置");
-  } catch (error) {
-    log("map-config-error", friendlyError(error));
   }
+  log("map-config", "未获取高德配置，使用离线演示地图");
 }
 
 function eventId(type) {
@@ -256,6 +245,7 @@ function saveConfig() {
     amapServiceHost: ui.configAmapServiceHost.value
   });
   localStorage.setItem("auri-hmi-config", JSON.stringify({
+    configVersion: 2,
     apiBase: next.apiBase,
     token: next.token,
     stream: true,
@@ -328,7 +318,8 @@ function consumeWorldState(next, reason = "state") {
   if (!next || next.schema_version !== "0.2.0") return;
   if (worldState && next.session_id === worldState.session_id && next.revision <= lastRevision) return;
   if (worldState && next.session_id !== worldState.session_id) {
-    activeDraft = "teacher";
+    activeDraft = null;
+    activeTaskDetail = null;
     closeDetail();
     currentRouteProgress = null;
   }
@@ -438,12 +429,71 @@ function parseStreamChunk(chunk) {
 
 function stageView() {
   if (!worldState) return STAGE_VIEW.connecting;
-  return STAGE_VIEW[worldState?.stage] || STAGE_VIEW.error;
+  const view = [...(STAGE_VIEW[worldState.stage] || STAGE_VIEW.error)];
+  const counts = stateView.taskCounts(worldState);
+  const primary = stateView.primaryTask(worldState);
+  const navigation = stateView.navigationTask(worldState);
+  const progress = stateView.actionProgress(worldState);
+  const lateMinutes = Number(worldState.risk?.late_minutes || 0);
+  const primaryTitle = primary?.title || "关键任务";
+  const destination = navigation?.location || navigation?.title || "目的地";
+
+  if (worldState.stage === "off_vehicle_idle" && counts.total) {
+    view[1] = `${counts.total} 项任务已同步`;
+    view[2] = `${counts.rigid} 项刚性、${counts.flexible} 项弹性任务，AURI 将持续检查时间冲突。`;
+    view[3] = lateMinutes > 0 ? `当前预计晚到 ${lateMinutes} 分钟。` : "当前任务暂无行程风险。";
+  } else if (worldState.stage === "pre_departure_warning") {
+    view[1] = `${primaryTitle}出发时间紧张`;
+    view[2] = lateMinutes > 0
+      ? `${primaryTitle}当前预计晚到 ${lateMinutes} 分钟，腕上设备已提醒。`
+      : `${primaryTitle}的可用出发时间正在减少，腕上设备已提醒。`;
+  } else if (worldState.stage === "handover_to_vehicle") {
+    view[1] = `${destination}路线正在接续`;
+    view[2] = `${counts.total} 项任务和当前路线正在从手机同步到车机。`;
+  } else if (worldState.stage === "vehicle_observation") {
+    view[1] = `${destination}导航已接续`;
+    view[2] = `${primaryTitle}保持当前计划，AURI 正在持续计算 ETA。`;
+  } else if (["takeover_L2", "takeover_L3"].includes(worldState.stage)) {
+    view[1] = lateMinutes > 0 ? `预计晚到 ${lateMinutes} 分钟` : `${primaryTitle}存在风险`;
+    view[2] = `${primaryTitle}受到影响，等待用户求助或 Agent 生成处理方案。`;
+  } else if (worldState.stage === "planning") {
+    view[2] = `Agent 正在分析 ${counts.total} 项任务，并准备可执行的调整方案。`;
+  } else if (["service_prepared", "waiting_confirmation"].includes(worldState.stage)) {
+    view[1] = progress.total ? `${progress.total} 项动作已准备` : "等待 Agent 方案";
+    view[2] = progress.total
+      ? `方案基于当前 ${counts.total} 项任务生成，等待确认后统一执行。`
+      : "当前 World State 中没有可确认动作。";
+    view[3] = progress.total ? view[3] : "Agent 尚未生成可执行方案。";
+    view[5] = progress.total ? view[5] : "无需确认";
+    view[6] = progress.total ? `执行 ${progress.total} 项 Agent 动作` : "等待确认内容";
+    view[7] = progress.total ? view[7] : "等待";
+  } else if (["executing", "action_completed", "cooldown"].includes(worldState.stage)) {
+    view[2] = progress.total
+      ? `${progress.completed}/${progress.total} 项动作已完成，状态正在同步到各端。`
+      : view[2];
+  } else if (worldState.stage === "parked_review") {
+    view[2] = `本次共处理 ${counts.total} 项任务，完整结果已同步到手机。`;
+  }
+
+  if (progress.total) view[7] = `${progress.completed}/${progress.total}`;
+  return view;
 }
 
 function mapStageView() {
   if (!worldState) return MAP_STAGE_VIEW.connecting;
-  return MAP_STAGE_VIEW[worldState?.stage] || MAP_STAGE_VIEW.error;
+  const view = [...(MAP_STAGE_VIEW[worldState.stage] || MAP_STAGE_VIEW.error)];
+  const navigation = stateView.navigationTask(worldState);
+  const progress = stateView.actionProgress(worldState);
+  if (worldState.stage === "off_vehicle_idle" && navigation) {
+    view[3] = `${navigation.location || navigation.title}路线等待接续`;
+  }
+  if (worldState.stage === "handover_to_vehicle" && navigation) {
+    view[3] = `${navigation.location || navigation.title}路线正在交接到车机`;
+  }
+  if (["service_prepared", "waiting_confirmation"].includes(worldState.stage)) {
+    view[4] = progress.total ? `${progress.total} 项动作待确认` : "方案等待确认";
+  }
+  return view;
 }
 
 function animateMapStage(nextStage) {
@@ -573,8 +623,11 @@ function handoffText(stage) {
 }
 
 function signalToastView(stage) {
+  const primary = stateView.primaryTask(worldState);
+  const taskTitle = primary?.title || "关键任务";
+  const lateMinutes = Number(worldState?.risk?.late_minutes || 0);
   if (stage === "pre_departure_warning") {
-    return ["warning", "腕上提醒", "最晚出发窗口已压缩", "黄色提示 · 双短震", "◷"];
+    return ["warning", "腕上提醒", `${taskTitle}出发时间临近`, "黄色提示 · 双短震", "◷"];
   }
   if (stage === "takeover_L3") {
     return ["critical", "腕上压力信号", "驾驶负荷升高", "红色保护提示 · 一次组合振动", "!"];
@@ -583,7 +636,13 @@ function signalToastView(stage) {
     if (worldState?.wearable?.text === "压力信号升高") {
       return ["warning", "腕上压力信号", "压力趋势升高", "黄色提示 · 双短震", "◉"];
     }
-    return ["warning", "AURI 风险提醒", "预计晚到 18 分钟", "车机进入低干扰 · 腕上保持驾驶连接", "◉"];
+    return [
+      "warning",
+      "AURI 风险提醒",
+      lateMinutes > 0 ? `${taskTitle}预计晚到 ${lateMinutes} 分钟` : `${taskTitle}存在时间风险`,
+      "车机进入低干扰 · 腕上保持驾驶连接",
+      "◉"
+    ];
   }
   return null;
 }
@@ -622,13 +681,8 @@ function riskLabel(stage, risk) {
   return "○ L0 低干扰";
 }
 
-function driverConclusion(viewConclusion, risk, order) {
-  if (order?.error_code) return `服务暂不可用，已保留消息方案。`;
-  if (risk.late_minutes > 0 && worldState?.confirmation?.status === "pending") {
-    return "继续加速无法明显缩短时间。方案已准备，确认后执行。";
-  }
-  const output = worldState?.output?.conclusion?.trim();
-  return output && output.length <= 42 ? output : viewConclusion;
+function driverConclusion(viewConclusion) {
+  return stateView.driverConclusion(worldState, viewConclusion);
 }
 
 function formatTime(value) {
@@ -636,22 +690,6 @@ function formatTime(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "--:--";
   return date.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false });
-}
-
-function pickupTask() {
-  return (worldState?.tasks || []).find((task) => task.task_type === "rigid" || task.task_id.includes("pickup"));
-}
-
-function groceryTask() {
-  return (worldState?.tasks || []).find((task) => task.capability_tags?.includes("grocery_delivery") || task.task_type === "flexible");
-}
-
-function acModeLabel(mode) {
-  return { auto: "自动", cool: "制冷", heat: "制热", fan: "送风" }[mode] || "自动";
-}
-
-function fanLabel(speed) {
-  return { low: "低", medium: "中", high: "高" }[speed] || "中";
 }
 
 function hapticLabel(haptic) {
@@ -683,16 +721,6 @@ function surfaceLabel(surface) {
   }[surface] || "手机主端";
 }
 
-function orderStatusLabel(status) {
-  return {
-    awaiting_confirmation: "待确认",
-    completed: "已完成",
-    blocked: "已阻断",
-    failed: "失败",
-    preview: "预览"
-  }[status] || status || "待准备";
-}
-
 function decisionMeta(stage) {
   if (stage === "error") return { icon: "!", label: "连接异常", tone: "critical" };
   if (stage === "takeover_L3") return { icon: "!", label: "高负荷保护", tone: "critical" };
@@ -714,20 +742,7 @@ function decisionMeta(stage) {
 }
 
 function actionText(action) {
-  const prefix = action.type === "message"
-    ? `${action.target || "联系人"}消息`
-    : action.type === "service_order"
-      ? "超市配送"
-      : "任务调整";
-  const status = {
-    awaiting_confirmation: "待确认",
-    completed: "已完成",
-    blocked: "已阻断",
-    failed: "失败",
-    planned: "已规划",
-    ready: "已准备"
-  }[action.status] || action.status;
-  return `${prefix} · ${status}`;
+  return stateView.actionText(action);
 }
 
 function escapeHtml(value) {
@@ -762,49 +777,51 @@ function detailCopyItem(label, value, cls = "") {
   `;
 }
 
-function draftMarkup(action, kind) {
-  const draft = DRAFTS[kind];
+function draftMarkup(action) {
+  const target = action?.target || "联系人";
   const status = action?.status === "completed" ? "已发送" : action ? "等待确认" : "尚未生成";
+  const lines = splitDisplayText(action?.summary || "等待 Agent 生成消息内容。");
   return `
     <article class="message-preview">
       <header>
-        <span><strong>${escapeHtml(draft.target)}</strong><em>模拟消息</em></span>
+        <span><strong>${escapeHtml(target)}</strong><em>Agent 消息</em></span>
         <b class="${action?.status === "completed" ? "done" : ""}">${status}</b>
       </header>
-      <div>${draft.lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("")}</div>
+      <div>${lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("")}</div>
     </article>
   `;
 }
 
 function renderActions() {
-  const actions = worldState?.actions || [];
+  const actions = stateView.actions(worldState);
   if (!actions.length) {
     ui.actionList.innerHTML = "<li>等待 Agent 生成动作组</li>";
     return;
   }
-  ui.actionList.innerHTML = actions.slice(0, 3).map((action) => {
+  const visible = actions.slice(0, 3).map((action) => {
     const cls = action.status === "completed" ? "done" : action.status === "awaiting_confirmation" ? "pending" : "";
     return `<li class="${cls}">${escapeHtml(actionText(action))}</li>`;
-  }).join("");
+  });
+  if (actions.length > 3) visible.push(`<li class="more">另有 ${actions.length - 3} 项，点击“方案”查看</li>`);
+  ui.actionList.innerHTML = visible.join("");
 }
 
 function renderDraft() {
-  const messageActions = (worldState?.actions || []).filter((action) => action.type === "message");
+  const messageActions = stateView.actions(worldState).filter((action) => action.type === "message");
   if (!messageActions.length) {
     ui.draftState.textContent = "未生成";
     const hidden = $("#draftStateHidden");
     if (hidden) hidden.textContent = "未生成";
-    ui.draftBody.textContent = "风险成立后生成老师和家人的模拟消息草稿。";
+    ui.draftBody.textContent = "Agent 尚未生成消息动作。";
     return;
   }
-  const current = activeDraft === "family"
-    ? messageActions.find((action) => action.target.includes("家")) || messageActions[1] || messageActions[0]
-    : messageActions.find((action) => action.target.includes("老师")) || messageActions[0];
+  const current = messageActions.find((action) => action.action_id === activeDraft) || messageActions[0];
+  activeDraft = current.action_id;
   const draftLabel = current.status === "completed" ? "已模拟发送" : "等待确认";
   ui.draftState.textContent = draftLabel;
   const hidden = $("#draftStateHidden");
   if (hidden) hidden.textContent = draftLabel;
-  ui.draftBody.textContent = DRAFTS[activeDraft].lines.join("");
+  ui.draftBody.textContent = current.summary || `${current.target || "联系人"}消息已生成`;
 }
 
 function canQuickAsk() {
@@ -819,14 +836,37 @@ function detailItem(label, value, cls = "") {
 }
 
 function actionStatusLabel(status) {
-  return {
-    awaiting_confirmation: "待确认",
-    completed: "已完成",
-    blocked: "已阻断",
-    failed: "失败",
-    planned: "已规划",
-    ready: "已准备"
-  }[status] || status || "等待";
+  return stateView.actionStatusLabel(status);
+}
+
+function renderTaskBoard() {
+  const tasks = stateView.sortedTasks(worldState);
+  if (!tasks.length) {
+    ui.taskBoard.className = "task-board empty";
+    ui.taskBoard.style.setProperty("--task-columns", "1");
+    ui.taskBoard.innerHTML = `
+      <div class="task-empty">
+        <strong>等待任务同步</strong>
+        <span>手机创建任务后在此显示</span>
+      </div>
+    `;
+    return;
+  }
+  const columns = Math.min(tasks.length, 2);
+  ui.taskBoard.className = `task-board count-${Math.min(tasks.length, 4)}${tasks.length > 2 ? " many" : ""}`;
+  ui.taskBoard.style.setProperty("--task-columns", String(columns));
+  ui.taskBoard.innerHTML = tasks.map((task) => {
+    const item = stateView.taskView(task, worldState?.risk);
+    return `
+      <button class="task-card ${item.tone} active" type="button" data-task-id="${escapeHtml(item.id)}">
+        <span class="task-copy">
+          <em>${escapeHtml(item.type)} · ${escapeHtml(item.meta)}</em>
+          <strong>${escapeHtml(item.title)}</strong>
+        </span>
+        <span class="task-status">${escapeHtml(item.status)}</span>
+      </button>
+    `;
+  }).join("");
 }
 
 function taskFlowCard({
@@ -871,45 +911,44 @@ function setActiveLauncher(kind = "home") {
   });
 }
 
-function planResultSummary(order) {
-  if (["action_completed", "cooldown", "parked_review"].includes(worldState?.stage) && order) {
-    const itemCount = (order.items || []).length;
-    return `已通知孩子进度（模拟消息），并完成模拟商超订单：${itemCount}件商品共${order.total || 0}元，${order.delivery_window || "配送时间待定"}送达。`;
-  }
-  return worldState?.output?.conclusion || "等待风险判断";
+function planResultSummary() {
+  return stateView.planSummary(worldState);
 }
 
 function openDetail(kind) {
   const risk = worldState?.risk || { pressure_level: "L0", late_minutes: 0 };
   const eta = formatTime(worldState?.eta);
-  const pickup = pickupTask();
-  const grocery = groceryTask();
-  const vehicleState = worldState?.vehicle_state || {};
-  const actions = worldState?.actions || [];
-  const order = worldState?.service_orders?.[0];
+  const tasks = stateView.sortedTasks(worldState);
+  const counts = stateView.taskCounts(worldState);
+  const primary = stateView.primaryTask(worldState);
+  const navigation = stateView.navigationTask(worldState);
+  const actions = stateView.actions(worldState);
+  const progress = stateView.actionProgress(worldState);
+  const climate = stateView.climate(worldState);
 
   if (kind === "drafts") {
     renderDraft();
     const messageActions = actions.filter((action) => action.type === "message");
-    const currentAction = activeDraft === "family"
-      ? messageActions.find((action) => action.target?.includes("家")) || messageActions[1]
-      : messageActions.find((action) => action.target?.includes("老师")) || messageActions[0];
+    const currentAction = messageActions.find((action) => action.action_id === activeDraft) || messageActions[0];
+    if (currentAction) activeDraft = currentAction.action_id;
     ui.detailTitle.textContent = "消息";
     ui.detailBody.innerHTML = `
       <section class="message-overview">
         <span>消息协助</span>
-        <strong>${messageActions.length ? `${messageActions.length} 条草稿已准备` : "等待风险成立"}</strong>
-        <p>${messageActions.length ? "确认后统一发送，驾驶中无需编辑长文本。" : "风险成立后，AURI 会准备必要联系人消息。"}</p>
+        <strong>${messageActions.length ? `${messageActions.length} 条草稿已准备` : "等待 Agent 生成"}</strong>
+        <p>${messageActions.length ? "联系人和消息状态来自当前 Agent 动作组。" : "当前 World State 中没有消息动作。"}</p>
       </section>
-      <div class="detail-tabs contact-tabs">
-        <button type="button" data-detail-draft="teacher" class="${activeDraft === "teacher" ? "active" : ""}">
-          <span class="contact-avatar">师</span><span><strong>王老师</strong><em>${messageActions[0] ? actionStatusLabel(messageActions[0].status) : "未生成"}</em></span>
-        </button>
-        <button type="button" data-detail-draft="family" class="${activeDraft === "family" ? "active" : ""}">
-          <span class="contact-avatar">家</span><span><strong>家人</strong><em>${messageActions[1] ? actionStatusLabel(messageActions[1].status) : "未生成"}</em></span>
-        </button>
-      </div>
-      ${draftMarkup(currentAction, activeDraft)}
+      ${messageActions.length ? `
+        <div class="detail-tabs contact-tabs">
+          ${messageActions.map((action) => `
+            <button type="button" data-detail-draft="${escapeHtml(action.action_id)}" class="${activeDraft === action.action_id ? "active" : ""}">
+              <span class="contact-avatar">${escapeHtml((action.target || "联").slice(0, 1))}</span>
+              <span><strong>${escapeHtml(action.target || "联系人")}</strong><em>${escapeHtml(actionStatusLabel(action.status))}</em></span>
+            </button>
+          `).join("")}
+        </div>
+        ${draftMarkup(currentAction)}
+      ` : detailCopyItem("当前状态", "Agent 尚未生成消息动作。")}
       <div class="message-state-strip">
         <span class="${messageActions.length ? "done" : ""}"><i></i>生成草稿</span>
         <b></b>
@@ -917,77 +956,71 @@ function openDetail(kind) {
       </div>
     `;
   } else if (kind === "plan") {
-    ui.detailTitle.textContent = "接管方案";
-    const completedActions = actions.filter((action) => action.status === "completed").length;
+    ui.detailTitle.textContent = "任务与方案";
     const taskRisk = risk.late_minutes > 0;
+    if (!activeTaskDetail || !tasks.some((task) => task.task_id === activeTaskDetail)) {
+      activeTaskDetail = primary?.task_id || null;
+    }
     ui.detailBody.innerHTML = `
       <section class="task-overview ${taskRisk ? "warning" : ""}">
-        <span class="task-overview-kicker">今日关键责任</span>
-        <strong>${pickup ? "18:10 接孩子" : "等待手机创建任务"}</strong>
-        <p>${taskRisk ? `当前预计晚到 ${risk.late_minutes} 分钟，AURI 已优先保护刚性责任。` : "接孩子保持最高优先级，弹性事项可自动调整。"}</p>
+        <span class="task-overview-kicker">当前任务组合</span>
+        <strong>${escapeHtml(stateView.taskTitle(primary))}</strong>
+        <p>${taskRisk
+          ? `关键任务预计晚到 ${risk.late_minutes} 分钟，AURI 正按优先级处理全部任务。`
+          : counts.total
+            ? `${counts.rigid} 项刚性、${counts.flexible} 项弹性任务已从 Agent 同步。`
+            : "等待手机创建任务并同步到 Agent。"
+        }</p>
         <div class="task-overview-meta">
-          <span><b>${actions.length}</b> 个动作</span>
-          <span><b>${completedActions}</b> 已完成</span>
+          <span><b>${counts.total}</b> 个任务</span>
+          <span><b>${progress.total}</b> 个动作</span>
           <span class="${worldState?.confirmation?.status === "pending" ? "warning" : ""}">${worldState?.confirmation?.status === "pending" ? "等待确认" : "状态同步"}</span>
         </div>
       </section>
       <div class="task-flow-list">
-        ${taskFlowCard({
-          id: "pickup",
-          icon: "◷",
-          type: "刚性责任",
-          title: pickup ? "18:10 接孩子" : "等待创建",
-          status: "不可后置",
-          meta: pickup?.location || "阳光小学",
-          detail: taskRisk ? `预计晚到 ${risk.late_minutes} 分钟，老师消息已准备。` : "系统持续计算最晚出发时间和 ETA。",
-          selected: activeTaskDetail === "pickup",
-          tone: "rigid"
-        })}
-        ${taskFlowCard({
-          id: "grocery",
-          icon: "↻",
-          type: "弹性任务",
-          title: grocery ? "之后去超市" : "等待识别",
-          status: grocery?.status === "rescheduled" ? "已后置" : "可调整",
-          meta: order ? `${(order.items || []).length} 件 · ${order.total || 0} 元` : "不影响接孩子",
-          detail: order ? `${orderStatusLabel(order.status)}，预计 ${order.delivery_window || "配送时间待定"} 送达。` : "风险成立后可切换为模拟配送方案。",
-          selected: activeTaskDetail === "grocery",
-          tone: "flexible"
-        })}
+        ${tasks.length
+          ? tasks.map((task) => taskFlowCard({
+              ...stateView.taskView(task, risk),
+              selected: activeTaskDetail === task.task_id
+            })).join("")
+          : detailCopyItem("任务", "当前 World State 中没有任务。")
+        }
       </div>
       <section class="task-action-summary">
-        <header><span>处理进度</span><strong>${actions.length ? `${completedActions}/${actions.length}` : "0/0"}</strong></header>
-        <div class="task-action-track"><i style="--task-progress:${actions.length ? Math.round((completedActions / actions.length) * 100) : 0}%"></i></div>
-        <p>${escapeHtml(planResultSummary(order))}</p>
+        <header><span>动作进度</span><strong>${progress.completed}/${progress.total}</strong></header>
+        <div class="task-action-track"><i style="--task-progress:${progress.percent}%"></i></div>
+        <p>${escapeHtml(planResultSummary())}</p>
+        ${actions.length ? `<ul class="detail-action-list">${actions.map((action) => `
+          <li class="${escapeHtml(action.status)}">
+            <span>${escapeHtml(action.summary || actionText(action))}</span>
+            <b>${escapeHtml(actionStatusLabel(action.status))}</b>
+          </li>
+        `).join("")}</ul>` : ""}
       </section>
     `;
   } else if (kind === "vehicle") {
     ui.detailTitle.textContent = "座舱状态";
-    const acOn = vehicleState.ac_on === true;
-    const temperature = Number(vehicleState.ac_target_temp ?? 24).toFixed(1);
-    const mode = acModeLabel(vehicleState.ac_mode);
-    const fan = fanLabel(vehicleState.fan_speed);
-    const fanLevel = { low: 1, medium: 2, high: 3 }[vehicleState.fan_speed] || 2;
+    const fanLevel = { 低: 1, 中: 2, 高: 3 }[climate.fan] || 0;
     ui.detailBody.innerHTML = `
-      <section class="cabin-overview ${acOn ? "is-on" : "is-off"}">
+      <section class="cabin-overview ${climate.on ? "is-on" : "is-off"}">
         <div class="cabin-temperature">
           <span>目标温度</span>
-          <strong>${temperature}<small>°C</small></strong>
-          <em><i></i> AC ${acOn ? "已开启" : "已关闭"}</em>
+          <strong>${escapeHtml(climate.temperature)}<small>°C</small></strong>
+          <em><i></i> ${climate.available ? `AC ${climate.on ? "已开启" : "已关闭"}` : "等待 Agent 同步"}</em>
         </div>
         <div class="cabin-airflow">
-          <span>AUTO</span>
-          <div class="fan-meter" aria-label="风量${fan}">
+          <span>${escapeHtml(climate.mode)}</span>
+          <div class="fan-meter" aria-label="风量${escapeHtml(climate.fan)}">
             ${[1, 2, 3].map((level) => `<i class="${level <= fanLevel ? "active" : ""}"></i>`).join("")}
           </div>
-          <strong>风量 ${fan}</strong>
+          <strong>风量 ${escapeHtml(climate.fan)}</strong>
         </div>
       </section>
       <div class="cabin-control-grid">
-        <article class="${acOn ? "active" : ""}">
+        <article class="${climate.on ? "active" : ""}">
           <span>温控模式</span>
-          <strong>${mode}</strong>
-          <em>${acOn ? "正在调节" : "当前待机"}</em>
+          <strong>${escapeHtml(climate.mode)}</strong>
+          <em>${climate.available ? (climate.on ? "正在调节" : "当前待机") : "等待状态"}</em>
         </article>
         <article>
           <span>当前场景</span>
@@ -1005,13 +1038,13 @@ function openDetail(kind) {
           <em>${escapeHtml(hapticLabel(worldState?.wearable?.haptic))}</em>
         </article>
       </div>
-      <div class="cabin-sync-note"><i></i><span>座舱状态已同步至手机、腕上与车机</span></div>
+      <div class="cabin-sync-note"><i></i><span>${climate.available ? `来自 Agent revision ${escapeHtml(worldState?.revision ?? "--")}` : "等待 Agent 返回 vehicle_state"}</span></div>
     `;
   } else if (kind === "route") {
     ui.detailTitle.textContent = "行程详情";
     ui.detailBody.innerHTML = `
       <div class="detail-list">
-        ${detailItem("目的地", "阳光小学")}
+        ${detailItem("目的地", navigation?.location || navigation?.title || "等待路线")}
         ${detailItem("ETA", eta === "--:--" ? "等待路线" : eta, risk.late_minutes > 0 ? "warning" : "")}
         ${detailItem("预计晚到", risk.late_minutes > 0 ? `${risk.late_minutes} 分钟` : "暂无晚到风险", risk.late_minutes > 0 ? "warning" : "done")}
         ${detailItem("剩余距离", ui.amapRemain.textContent)}
@@ -1067,18 +1100,14 @@ function render() {
   const [mapStage, mapDistance, mapUnit, mapInstruction, mapLabel, mapIcon] = mapView;
   const risk = worldState?.risk || { pressure_level: "L0", late_minutes: 0 };
   const eta = formatTime(worldState?.eta);
-  const pickup = pickupTask();
-  const grocery = groceryTask();
+  const primary = stateView.primaryTask(worldState);
+  const navigation = stateView.navigationTask(worldState);
+  const actionProgress = stateView.actionProgress(worldState);
   const canConfirm = worldState?.primary_surface === "vehicle_hmi"
     && worldState?.confirmation?.owner_surface === "vehicle_hmi"
     && worldState?.confirmation?.status === "pending";
   const driving = ["driving", "high_load_driving"].includes(worldState?.scene);
-  const order = worldState?.service_orders?.[0];
-  const vehicleState = worldState?.vehicle_state || {};
-  const acOn = vehicleState.ac_on === true;
-  const acTemp = Number(vehicleState.ac_target_temp ?? 24).toFixed(1);
-  const acMode = acModeLabel(vehicleState.ac_mode);
-  const acFan = fanLabel(vehicleState.fan_speed);
+  const climate = stateView.climate(worldState);
   const showDebugDemo = queryParams.get("debug") === "1" || queryParams.get("demo") === "1";
 
   const stage = worldState?.stage || "connecting";
@@ -1086,18 +1115,25 @@ function render() {
   ui.root.className = `screen state-${className} stage-${stage} map-stage-${mapStage}${showDebugDemo ? " debug-demo" : ""}`;
   animateMapStage(mapStage);
   ui.speed.textContent = driving ? "42" : "--";
-  ui.headline.textContent = "博世苏州 · 星龙街455号 → 阳光小学";
+  ui.headline.textContent = navigation
+    ? `博世苏州 · 星龙街455号 → ${navigation.location || navigation.title}`
+    : "博世苏州 · 星龙街455号 → 目的地待定";
+  const destinationName = navigation?.location || navigation?.title || "目的地待定";
+  ui.destination.textContent = destinationName;
+  ui.mapDestinationLabel.textContent = destinationName.length > 8 ? `${destinationName.slice(0, 8)}…` : destinationName;
   ui.eta.textContent = eta;
   ui.etaNote.textContent = risk.late_minutes > 0 ? `晚到 ${risk.late_minutes} 分钟` : eta === "--:--" ? "等待路线" : "准时";
-  ui.windowLabel.textContent = "接送任务";
+  ui.windowLabel.textContent = primary ? (primary.task_type === "rigid" ? "关键任务" : "当前任务") : "任务状态";
   ui.windowState.textContent = risk.late_minutes > 0
     ? `晚到 ${risk.late_minutes} 分钟`
     : stage === "pre_departure_warning"
       ? "出发时间紧张"
-      : pickup
+      : primary
         ? "可按时到达"
         : "等待创建";
-  ui.windowDetail.textContent = pickup ? "原定 18:10" : "手机端创建任务";
+  ui.windowDetail.textContent = primary
+    ? `${stateView.formatClock(primary.scheduled_at) || "时间待定"} · ${primary.title}`
+    : "手机端创建任务";
   ui.modeChip.textContent = worldState?.primary_surface === "vehicle_hmi" ? "驾驶模式" : "手机为主端";
   ui.phoneStatus.textContent = worldState?.primary_surface === "mobile"
     ? "主端"
@@ -1115,13 +1151,10 @@ function render() {
   ui.connectionDetail.textContent = healthState
     ? `${healthState.llm_framework || "agent"} · r${worldState?.revision ?? "--"}`
     : `${worldState?.session_id || "session --"} · r${worldState?.revision ?? "--"}`;
-  ui.kidTask.classList.toggle("active", Boolean(pickup));
-  ui.shopTask.classList.toggle("active", Boolean(grocery));
-  ui.kidTaskState.textContent = pickup ? (pickup.adjustable ? "可调整" : "不可后置") : "等待创建";
-  ui.shopTaskState.textContent = grocery ? (grocery.status === "rescheduled" ? "已后置" : "可调整") : "等待创建";
+  renderTaskBoard();
   ui.agentTitle.textContent = title;
   ui.agentText.textContent = text;
-  ui.realConclusion.textContent = driverConclusion(conclusion, risk, order);
+  ui.realConclusion.textContent = driverConclusion(conclusion);
   ui.agentState.dataset.tone = decision.tone;
   ui.decisionStage.textContent = decision.label;
   ui.decisionIcon.textContent = decision.icon;
@@ -1136,7 +1169,7 @@ function render() {
         : "行程建议";
   ui.reviewLinks.hidden = stage !== "parked_review";
   ui.riskBadge.textContent = riskLabel(worldState?.stage, risk);
-  ui.actionState.textContent = actionState;
+  ui.actionState.textContent = actionProgress.total ? `${actionProgress.completed}/${actionProgress.total}` : actionState;
   renderActions();
   renderDraft();
   ui.syncPhone.textContent = worldState?.primary_surface === "mobile" ? "主端" : "只读";
@@ -1164,12 +1197,14 @@ function render() {
   ui.confirmBtn.classList.toggle("enabled", canConfirm);
   ui.confirmLabel.textContent = confirmLabel;
   ui.confirmSub.textContent = canConfirm ? confirmSub : (worldState?.confirmation?.owner_surface && worldState.confirmation.owner_surface !== "vehicle_hmi" ? "确认入口不在车机" : confirmSub);
-  ui.acState.textContent = `AC ${acOn ? "开启" : "关闭"} · ${acTemp}° · 风量${acFan}`;
-  ui.acTemp.textContent = `${acTemp}°`;
-  ui.acMode.textContent = acMode;
-  ui.acFan.textContent = acFan;
-  ui.climateTemp.textContent = `${acTemp}°`;
-  ui.climateMode.textContent = `${acOn ? "AC 开启" : "AC 关闭"} · ${acMode} · 风量${acFan}`;
+  ui.acState.textContent = climate.summary;
+  ui.acTemp.textContent = `${climate.temperature}°`;
+  ui.acMode.textContent = climate.mode;
+  ui.acFan.textContent = climate.fan;
+  ui.climateTemp.textContent = `${climate.temperature}°`;
+  ui.climateMode.textContent = climate.available
+    ? `AC ${climate.on ? "开启" : "关闭"} · ${climate.mode} · 风量${climate.fan}`
+    : climate.summary;
   ui.speedLimit.textContent = driving ? "40" : "--";
   ui.lightCountdown.textContent = risk.late_minutes > 0 ? "21" : "65";
   const useAmapInstruction = mapRuntimeStatus.mode === "online"
@@ -1270,12 +1305,10 @@ ui.openVehicle.addEventListener("click", () => openDetail("vehicle"));
 ui.openSync.addEventListener("click", () => openDetail("sync"));
 ui.openRoute.addEventListener("click", () => openDetail("route"));
 ui.openRouteSummary?.addEventListener("click", () => openDetail("route"));
-ui.kidTask.addEventListener("click", () => {
-  activeTaskDetail = "pickup";
-  openDetail("plan");
-});
-ui.shopTask.addEventListener("click", () => {
-  activeTaskDetail = "grocery";
+ui.taskBoard.addEventListener("click", (event) => {
+  const taskButton = event.target.closest("button[data-task-id]");
+  if (!taskButton) return;
+  activeTaskDetail = taskButton.dataset.taskId;
   openDetail("plan");
 });
 document.querySelectorAll("[data-detail]").forEach((button) => {
@@ -1363,6 +1396,13 @@ window.AURI_HMI = {
   reset: resetSession,
   consumeWorldState,
   getState: () => structuredClone(worldState),
+  getViewState: () => ({
+    tasks: stateView.sortedTasks(worldState).map((task) => stateView.taskView(task, worldState?.risk)),
+    taskCounts: stateView.taskCounts(worldState),
+    actionProgress: stateView.actionProgress(worldState),
+    climate: stateView.climate(worldState),
+    conclusion: ui.realConclusion.textContent
+  }),
   getMapStatus: () => ({ ...mapRuntimeStatus }),
   getMapUsage: () => mapAdapter?.getUsage?.() || null
 };

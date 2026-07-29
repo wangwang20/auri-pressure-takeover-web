@@ -62,7 +62,7 @@ GET /v1/map-config
 ```html
 <script>
   window.AURI_CONFIG = {
-    apiBase: "https://auri-langchain-agent-api.onrender.com",
+    apiBase: "https://auri-agent-api.onrender.com",
     token: "",
     stream: true
   };
@@ -75,7 +75,7 @@ GET /v1/map-config
 
 1. 打开车机 HMI 页面。
 2. 点击左侧快捷栏底部 `连接`。
-3. 选择 `LangChain 公网` 或手动填写 `Agent API`。
+3. 选择 `团队公网` 或手动填写 `Agent API`。
 4. 在 `Team Token` 输入框填写团队令牌。
 5. 点击 `保存并重连`。
 
@@ -84,12 +84,14 @@ GET /v1/map-config
 HMI 同时兼容本地 Agent 和公网 Agent：
 
 - 本地开发：`http://127.0.0.1:8000`
-- 团队公网联调：`https://auri-langchain-agent-api.onrender.com`
-- 旧版回退：`https://auri-agent-api.onrender.com`
+- 团队公网联调：`https://auri-agent-api.onrender.com`
+- 备用公网：`https://auri-langchain-agent-api.onrender.com`
 
 状态同步采用 SSE `/v1/stream` 加 `/v1/state` 轮询兜底。公网环境中如果 SSE 被浏览器、代理或部署平台中断，HMI 仍会通过轮询更新状态。
 
 新版公网 Agent 使用 LangChain 工具编排自然语言，但 HMI 不直接调用工具。HMI 仍只消费 `WorldState`，并通过 `/v1/confirm` 处理车机确认。
+
+任务区不假设固定任务数量。导航下方任务卡、方案二级页、联系人消息和动作进度都直接读取当前 `WorldState.tasks` 与 `WorldState.actions`；超过两项的导航任务卡可横向滚动。座舱空调只读取 `WorldState.vehicle_state`，字段缺失时显示“等待 Agent 同步”，不会伪造默认温度。空调控制回复只进入座舱状态，不覆盖驾驶主界面的现实结论。
 
 ## 主驾驶侧 Agent 交互
 

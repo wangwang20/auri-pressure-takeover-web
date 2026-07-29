@@ -101,19 +101,19 @@ Team Token: 留空，除非本地后端开启共享访问
 推荐公网 Agent 地址：
 
 ```text
-https://auri-langchain-agent-api.onrender.com
+https://auri-agent-api.onrender.com
 ```
 
-旧版回退地址：
+备用公网地址：
 
 ```text
-https://auri-agent-api.onrender.com
+https://auri-langchain-agent-api.onrender.com
 ```
 
 控制台顶部填写：
 
 ```text
-Agent API: https://auri-langchain-agent-api.onrender.com
+Agent API: https://auri-agent-api.onrender.com
 Team Token: 使用团队负责人单独提供的令牌
 ```
 
@@ -129,7 +129,7 @@ Team Token: 使用团队负责人单独提供的令牌
 - Team Token 只保存在当前浏览器 `localStorage`。
 - 不要把 Team Token 写入仓库、PR、截图或公开文档。
 - 公网 Agent 是共享 Demo 后端，多人同时操作会影响同一个状态。
-- 旧版回退地址只在新版 LangChain 服务不可用时使用。
+- 备用公网地址只在负责人明确切换共享实例时使用。
 
 ## Agent Health 展示
 
@@ -150,7 +150,7 @@ agent_last_tools
 
 用途：
 
-- 判断当前连接的是新版 LangChain Agent，还是旧版回退 Agent。
+- 判断当前连接的是团队共享 Agent，还是负责人临时切换的备用实例。
 - 通过 `agent_tools_enabled=true` 判断工具编排是否上线。
 - 通过 `agent_last_tools` 查看最近一轮实际调用过哪些工具。
 

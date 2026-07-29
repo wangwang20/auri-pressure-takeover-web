@@ -117,19 +117,19 @@ python -m uvicorn \
 推荐公网 Agent 地址：
 
 ```text
-https://auri-langchain-agent-api.onrender.com
+https://auri-agent-api.onrender.com
 ```
 
-旧版回退地址：
+备用公网地址：
 
 ```text
-https://auri-agent-api.onrender.com
+https://auri-langchain-agent-api.onrender.com
 ```
 
 打开车机 HMI 后：
 
 1. 点击左侧快捷栏底部 `连接`。
-2. 点击 `LangChain 公网`。
+2. 点击 `团队公网`。
 3. 在 `Team Token` 输入框填写团队负责人提供的令牌。
 4. 点击 `保存并重连`。
 
@@ -140,7 +140,7 @@ https://auri-agent-api.onrender.com
 - 不要把 OpenAI API Key 写入任何前端文件。
 - 如果页面部署在公网，Agent API 不能填 `127.0.0.1`，否则会访问使用者自己的电脑。
 - HMI 不直接调用 LangChain 工具，只消费 Agent 返回的 `WorldState`。
-- 旧版回退地址只在新版 LangChain 服务不可用时使用。
+- 备用公网地址只在负责人明确切换共享实例时使用。
 
 ## 默认高德在线地图
 

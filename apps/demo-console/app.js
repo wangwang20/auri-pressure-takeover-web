@@ -1,13 +1,16 @@
 const DEFAULT_CONFIG = {
-  apiBase: "https://auri-langchain-agent-api.onrender.com",
+  apiBase: "https://auri-agent-api.onrender.com",
   stream: true
 };
 
-const PUBLIC_AGENT_API = "https://auri-langchain-agent-api.onrender.com";
-const LEGACY_AGENT_API = "https://auri-agent-api.onrender.com";
+const PUBLIC_AGENT_API = "https://auri-agent-api.onrender.com";
+const LEGACY_AGENT_API = "https://auri-langchain-agent-api.onrender.com";
 const LOCAL_AGENT_API = "http://127.0.0.1:8000";
 
-const storedConfig = JSON.parse(localStorage.getItem("auri-demo-console-config") || "{}");
+const storedConfigRaw = JSON.parse(localStorage.getItem("auri-demo-console-config") || "{}");
+const storedConfig = storedConfigRaw.apiBase === LEGACY_AGENT_API && storedConfigRaw.configVersion !== 2
+  ? { ...storedConfigRaw, apiBase: PUBLIC_AGENT_API }
+  : storedConfigRaw;
 const CONFIG = { ...DEFAULT_CONFIG, ...storedConfig, ...(window.AURI_CONFIG || {}) };
 
 const ACTIONS = {
@@ -486,6 +489,7 @@ function saveConfig() {
   CONFIG.apiBase = ui.apiBase.value.trim().replace(/\/$/, "");
   CONFIG.token = ui.token.value.trim();
   localStorage.setItem("auri-demo-console-config", JSON.stringify({
+    configVersion: 2,
     apiBase: CONFIG.apiBase,
     token: CONFIG.token
   }));

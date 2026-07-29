@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>AURI 车机 HMI | 随行压力接管 Agent</title>
-  <link rel="stylesheet" href="./styles.css?v=auri-cockpit-20260728h" />
+  <link rel="stylesheet" href="./styles.css?v=auri-cockpit-20260729a" />
 </head>
 <body>
   <main class="screen" aria-label="AURI 车机 HMI">
@@ -74,7 +74,7 @@
           <p id="realConclusion">暂无风险结论。</p>
         </div>
         <div class="review-links" id="reviewLinks" hidden>
-          <button type="button" data-detail="drafts"><span aria-hidden="true">✉</span><strong>消息记录</strong><em>老师与家人</em></button>
+          <button type="button" data-detail="drafts"><span aria-hidden="true">✉</span><strong>消息记录</strong><em>Agent 联系人</em></button>
           <button type="button" data-detail="plan"><span aria-hidden="true">✓</span><strong>处理结果</strong><em>任务与订单</em></button>
         </div>
       </section>
@@ -123,25 +123,24 @@
       <section class="secondary-entry" aria-label="座舱状态">
         <button id="openVehicle" type="button">
           <span><b class="status-dot gold"></b><strong>座舱状态</strong></span>
-          <em id="acState">AC 关闭 · 24.0° · 风量中</em>
+          <em id="acState">座舱状态等待 Agent 同步</em>
         </button>
       </section>
 
       <section class="vehicle-state detail-source" aria-hidden="true">
         <div class="ac-grid">
-          <div><span>温度</span><strong id="acTemp">24°</strong></div>
-          <div><span>模式</span><strong id="acMode">自动</strong></div>
-          <div><span>风量</span><strong id="acFan">中</strong></div>
+          <div><span>温度</span><strong id="acTemp">--°</strong></div>
+          <div><span>模式</span><strong id="acMode">等待同步</strong></div>
+          <div><span>风量</span><strong id="acFan">等待同步</strong></div>
         </div>
       </section>
 
       <section class="drafts detail-source" aria-hidden="true">
         <span id="draftStateHidden">未生成</span>
         <div class="tabs">
-          <button class="active" data-draft="teacher" type="button">老师</button>
-          <button data-draft="family" type="button">家人</button>
+          <button class="active" data-draft="" type="button">联系人</button>
         </div>
-        <p id="draftBody">风险成立后生成老师和家人的消息草稿。</p>
+        <p id="draftBody">Agent 尚未生成消息动作。</p>
       </section>
 
       <section class="sync detail-source" aria-hidden="true">
@@ -156,7 +155,7 @@
         <div class="destination">
           <span id="modeChip">驾驶模式</span>
           <div>
-            <h2 id="destination">阳光小学</h2>
+            <h2 id="destination">目的地待定</h2>
             <p id="headline">等待任务创建，车机处于低干扰待机。</p>
           </div>
         </div>
@@ -354,7 +353,7 @@
           </g>
           <g class="school-label" transform="translate(1077 67)">
             <rect x="-68" y="-22" width="136" height="44" rx="12"/>
-            <text y="7" text-anchor="middle">阳光小学</text>
+            <text id="mapDestinationLabel" y="7" text-anchor="middle">目的地</text>
           </g>
         </svg>
         <div class="amap-turn-card">
@@ -413,15 +412,11 @@
         </div>
 
         <div class="map-bottom-sheet">
-          <div class="task-board" aria-label="任务责任">
-            <button class="task-card rigid" id="kidTask" type="button">
-              <span class="task-copy"><em>刚性责任</em><strong>18:10 接孩子</strong></span>
-              <span class="task-status" id="kidTaskState">等待创建</span>
-            </button>
-            <button class="task-card flexible" id="shopTask" type="button">
-              <span class="task-copy"><em>弹性任务</em><strong>之后去超市</strong></span>
-              <span class="task-status" id="shopTaskState">等待创建</span>
-            </button>
+          <div class="task-board" id="taskBoard" aria-label="Agent 同步任务">
+            <div class="task-empty">
+              <strong>等待任务同步</strong>
+              <span>手机创建任务后在此显示</span>
+            </div>
           </div>
           <button id="openRouteSummary" class="trip-summary" type="button" aria-label="打开行程详情">
             <span class="trip-primary"><em>剩余距离</em><strong id="amapRemain"><b>7.8</b><small>公里</small></strong></span>
@@ -450,9 +445,9 @@
       </button>
       <div class="climate">
         <button disabled aria-label="降低温度">−</button>
-        <strong id="climateTemp">24.0°</strong>
+        <strong id="climateTemp">--°</strong>
         <button disabled aria-label="升高温度">+</button>
-        <span id="climateMode">AC 只读 · 自动</span>
+        <span id="climateMode">等待 Agent 同步</span>
       </div>
     </footer>
 
@@ -485,15 +480,15 @@
           <legend>Agent</legend>
           <label>
             <span>Agent API</span>
-            <input id="configApiBase" autocomplete="off" placeholder="https://auri-langchain-agent-api.onrender.com" />
+            <input id="configApiBase" autocomplete="off" placeholder="https://auri-agent-api.onrender.com" />
           </label>
           <label>
             <span>Team Token</span>
             <input id="configToken" type="password" autocomplete="off" placeholder="仅保存在本浏览器，不写入仓库" />
           </label>
           <div class="config-actions agent-presets">
-            <button id="usePublicAgent" type="button">LangChain 公网</button>
-            <button id="useLegacyAgent" type="button">旧版回退</button>
+            <button id="usePublicAgent" type="button">团队公网</button>
+            <button id="useLegacyAgent" type="button">备用公网</button>
             <button id="useLocalAgent" type="button">本地 Agent</button>
           </div>
         </fieldset>
@@ -545,7 +540,8 @@
     <span>推荐 16:9 大屏或平板横屏。</span>
   </div>
 
-  <script src="./amap-adapter.js?v=auri-cockpit-20260728h"></script>
-  <script src="./app.js?v=auri-cockpit-20260728h"></script>
+  <script src="./world-state-view.js?v=auri-cockpit-20260729a"></script>
+  <script src="./amap-adapter.js?v=auri-cockpit-20260729a"></script>
+  <script src="./app.js?v=auri-cockpit-20260729a"></script>
 </body>
 </html>

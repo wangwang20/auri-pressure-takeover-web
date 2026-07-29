@@ -24,15 +24,15 @@
       <section class="connection-card" aria-label="连接配置">
         <label>
           <span>Agent API</span>
-          <input id="apiBase" value="https://auri-langchain-agent-api.onrender.com" autocomplete="off" />
+          <input id="apiBase" value="https://auri-agent-api.onrender.com" autocomplete="off" />
         </label>
         <label>
           <span>Team Token</span>
           <input id="token" type="password" placeholder="仅本地运行时填写，不提交仓库" autocomplete="off" />
         </label>
         <div class="connection-actions">
-          <button id="usePublicAgent" type="button">LangChain 公网</button>
-          <button id="useLegacyAgent" type="button">旧版回退</button>
+          <button id="usePublicAgent" type="button">团队公网</button>
+          <button id="useLegacyAgent" type="button">备用公网</button>
           <button id="useLocalAgent" type="button">本地 Agent</button>
           <button id="saveConfig" type="button">保存配置</button>
           <button id="preflightBtn" type="button">一键预检</button>
