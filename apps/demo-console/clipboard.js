@@ -37,8 +37,14 @@
     textarea.style.pointerEvents = "none";
     documentRef.body.appendChild(textarea);
     textarea.select();
-    const copied = documentRef.execCommand("copy");
-    textarea.remove();
+    let copied = false;
+    try {
+      copied = documentRef.execCommand("copy");
+    } catch (_error) {
+      throw new Error("浏览器未允许复制，请手动选择日志内容");
+    } finally {
+      textarea.remove();
+    }
     if (!copied) throw new Error("浏览器未允许复制，请手动选择日志内容");
     return "legacy";
   }
