@@ -933,13 +933,33 @@ ui.toggleTech.addEventListener("click", () => {
   ui.technicalActions.hidden = !ui.technicalActions.hidden;
   ui.toggleTech.textContent = ui.technicalActions.hidden ? "展开技术验证" : "收起技术验证";
 });
+
+async function copyText(content) {
+  if (window.isSecureContext && navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(content);
+    return;
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = content;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  textarea.style.pointerEvents = "none";
+  document.body.appendChild(textarea);
+  textarea.select();
+  const copied = document.execCommand("copy");
+  textarea.remove();
+  if (!copied) throw new Error("浏览器未允许复制，请手动选择日志内容");
+}
+
 ui.copyLog.addEventListener("click", async () => {
   const content = Array.from(ui.eventLog.querySelectorAll(".log-row"))
     .reverse()
     .map((row) => sanitizeLog(row.dataset.raw || row.textContent || ""))
     .join("\n");
   try {
-    await navigator.clipboard.writeText(content);
+    await copyText(content);
     log("copy", "sanitized log copied");
   } catch (error) {
     log("error", "copy log", friendlyError(error));
