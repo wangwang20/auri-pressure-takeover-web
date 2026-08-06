@@ -1,0 +1,17 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="388" height="298" viewBox="0 0 388 298" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Ambient Glow / Violet" filter="url(#filter0_f_0_15)">
+<ellipse cx="194" cy="149" rx="140" ry="95" fill="url(#paint0_radial_0_15)"/>
+</g>
+<defs>
+<filter id="filter0_f_0_15" x="0" y="0" width="388" height="298" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="27" result="effect1_foregroundBlur_0_15"/>
+</filter>
+<radialGradient id="paint0_radial_0_15" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(194 149) scale(140 95)">
+<stop stop-color="#7A47FF" stop-opacity="0.17"/>
+<stop offset="0.55" stop-color="#3338D6" stop-opacity="0.08"/>
+<stop offset="1" stop-color="#1A1A66" stop-opacity="0"/>
+</radialGradient>
+</defs>
+</svg>

@@ -1,0 +1,40 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="118" height="118" viewBox="0 0 118 118" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Group 1">
+<g id="Coffee Icon Background" filter="url(#filter0_di_0_20)">
+<circle cx="59" cy="52" r="37" fill="url(#paint0_radial_0_20)"/>
+<circle cx="59" cy="52" r="36.4" stroke="url(#paint1_linear_0_20)" stroke-width="1.2"/>
+</g>
+<g id="Coffee Cup">
+<path id="Vector" d="M46.1061 43.404H69.0286V58.447C69.0286 64.381 64.2177 69.1919 58.2837 69.1919H56.851C50.9169 69.1919 46.1061 64.381 46.1061 58.447V43.404Z" fill="#143E65" stroke="#A9DCFF" stroke-width="3"/>
+<path id="Vector_2" d="M69.0286 46.9857H72.6103C76.962 46.9857 80.4899 50.5136 80.4899 54.8653C80.4899 59.217 76.962 62.7449 72.6103 62.7449H68.3123" stroke="#A9DCFF" stroke-width="3" stroke-linecap="round"/>
+<path id="Vector_3" d="M50.404 36.9571C52.553 39.1061 51.1204 40.5387 48.9714 42.6877M59 34.8081C61.149 36.9571 59.7163 39.8224 57.5673 41.9714M66.8796 36.9571C69.0286 39.1061 67.596 40.5387 65.447 42.6877" stroke="#39A0FF" stroke-width="3" stroke-linecap="round"/>
+</g>
+</g>
+<defs>
+<filter id="filter0_di_0_20" x="0" y="0" width="118" height="118" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="7"/>
+<feGaussianBlur stdDeviation="11"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0.6 0 0 0 0 1 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_20"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_20" result="shape"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="1"/>
+<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.84 0 0 0 0 0.97 0 0 0 0 1 0 0 0 0.2 0"/>
+<feBlend mode="normal" in2="shape" result="effect2_innerShadow_0_20"/>
+</filter>
+<radialGradient id="paint0_radial_0_20" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(59 52) scale(37)">
+<stop stop-color="#1A6199" stop-opacity="0.82"/>
+<stop offset="0.56" stop-color="#09213D" stop-opacity="0.92"/>
+<stop offset="1" stop-color="#061224" stop-opacity="0.98"/>
+</radialGradient>
+<linearGradient id="paint1_linear_0_20" x1="22" y1="52" x2="96" y2="52" gradientUnits="userSpaceOnUse">
+<stop stop-color="#61E8FF" stop-opacity="0.82"/>
+<stop offset="0.5" stop-color="#2E85FF" stop-opacity="0.42"/>
+<stop offset="1" stop-color="#8C61FF" stop-opacity="0.34"/>
+</linearGradient>
+</defs>
+</svg>

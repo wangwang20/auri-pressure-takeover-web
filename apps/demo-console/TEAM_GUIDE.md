@@ -32,10 +32,14 @@ Demo 控制台是现场演示导演台，用于模拟本轮不接入真实系统
 不需要拉代码或启动静态服务器，打开：
 
 ```text
-https://wangwang20.github.io/auri-pressure-takeover-web/apps/demo-console/
+https://954593946.github.io/pressure-takeover-agent/apps/demo-console/
 ```
 
-第一次使用需填写团队 Agent API 和负责人单独提供的 Team Token。公网静态页面不包含 Token、OpenAI API Key 或后端环境变量。
+这是团队异地协作的正式入口。访问者与开发机无需处于同一局域网，开发机也无需保持开机；页面连接 `https://auri-agent-api.onrender.com`，不要填写发布者电脑的 `127.0.0.1` 或 `192.168.*` 地址。
+
+第一次使用需填写团队 Agent API 和负责人单独提供的 Team Token。公网静态页面的源码和部署产物不包含 Token、OpenAI API Key 或后端环境变量；用户填写的连接配置会保存在当前浏览器的同源 `localStorage`，不要在公共电脑长期保存。
+
+在同一个 GitHub Pages 域名下，Console 点击“保存配置”“连接 Agent”或“载入演示预置任务”后，正式 HMI 会复用同一浏览器连接配置。建议先配置 Console，再打开 HMI；两端应显示同一个 Session 和 revision。若 Console 与 HMI 分别运行在不同端口或域名，浏览器不会共享 `localStorage`，需要分别填写一次。
 
 ### 本机访问
 
@@ -67,6 +71,8 @@ http://<开发机局域网IP>:5174/apps/demo-console/
 
 公网、本机和局域网页面均可连接本地或公网 Agent；局域网设备若要连接开发机上的本地 Agent，需要后端监听 `0.0.0.0` 并配置允许该页面 Origin 的 CORS。
 
+局域网 URL 仅对同一网络中的设备有效。团队成员位于不同办公室、家庭网络或移动网络时，统一使用 GitHub Pages 公网地址。
+
 ## 连接本地 Agent
 
 本地开发时先启动 Agent：
@@ -95,6 +101,15 @@ Team Token: 留空，除非本地后端开启共享访问
 ```
 
 `State Sync` 应显示 `SSE 实时`。如果显示 `轮询兜底`，主线仍可继续，但导演需要确认 revision 持续更新；SSE 恢复后页面会自动切回实时模式。
+
+连接后同时打开以下页面进行核对：
+
+```text
+http://127.0.0.1:5174/apps/demo-console/
+http://127.0.0.1:5174/apps/vehicle-hmi/
+```
+
+两端必须显示相同 Session、revision 和 stage。`apps/vehicle-hmi/` 是唯一正式 HMI；旧版仅保留在 `apps/vehicle-hmi-legacy/` 用于回溯。
 
 ## 连接团队公网 Agent
 
@@ -193,7 +208,7 @@ service.mock.config
 
 | 按钮 | 接口 | 事件或操作 | 说明 |
 | --- | --- | --- | --- |
-| 同步手机语音任务 | `GET /v1/state` | 状态刷新 | 主线第 1 步；初始为空任务，等待手机端创建后同步。 |
+| 同步手机语音任务 | `GET /v1/state` + SSE | 状态刷新 | 主线第 1 步；初始为空任务，手机端创建首批任务后自动完成并进入“会议延迟”，无需点击第 1 步。 |
 | 载入演示预置任务 | `POST /v1/event` | `task.created` | 侧栏可选兜底：仅手机端不可用时模拟创建“18:10 接孩子，之后去超市”。 |
 | 会议延迟 | `POST /v1/event` | `meeting.overrun` | 会议延迟 20 分钟。 |
 | 接近车辆 | `POST /v1/event` | `scene.approaching` | 准备交接到车机。 |
@@ -210,6 +225,14 @@ service.mock.config
 | 低干扰恢复 | `POST /v1/event` | `cooldown.elapsed` | 完成后降低打扰。 |
 | 停车复盘 | `POST /v1/event` | `scene.parked` | 主端回到手机复盘。 |
 | 重置 Demo | `POST /v1/session/reset` | - | 回到初始状态。 |
+
+“载入演示预置任务”无需先单独点击“连接 Agent”。填写当前 Agent API 和 Team Token 后可直接点击“载入”，控制台会保存配置、读取当前 State，再提交包含结构化 `tasks[]` 的 `task.created`，不等待 LLM 解析；如果共享 State 已有任务，按钮会锁定，避免覆盖手机端输入。
+
+正常手机主线不使用预置任务：手机通过 `/v1/chat` 或标准 `task.created` 写入首批任务后，控制台根据同一 Session 的非空任务快照，自动把“同步手机语音任务”标记为完成。手机可以先创建任务、再打开 Console，或在 Console 断线时创建；恢复后仍应直接显示“下一步：会议延迟”。若仍停在第 1 步，应先核对手机、控制台是否连接同一 Agent URL 与 `session_id`，不要重复创建任务。
+
+Console 使用带 Team Token 的流式 `fetch` 读取 SSE，兼容 LF/CRLF、单行或多行 `data:`。不要改回原生 `EventSource`，否则无法发送 `X-Agent-Token`。
+
+公网服务冷启动时，按钮会显示“连接并载入中…”，`State Sync` 和 Event Log 同步显示连接/重试进度。Health 检查在 State 连接后后台执行，不阻塞任务载入；GET 请求三次失败或单次超过 45 秒后会显示明确错误，不会无限等待。
 
 ## 推荐演示顺序
 

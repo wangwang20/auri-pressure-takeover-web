@@ -1,0 +1,35 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Loading Orbit / Glow" filter="url(#orbit_glow)">
+<path d="M23.8079 30.7588C29.6789 21.7666 38.3958 15.0029 48.5646 11.5495C58.7333 8.09611 69.7663 8.1525 79.8992 11.7097C90.0321 15.2668 98.6794 22.1193 104.458 31.171C110.237 40.2228 112.813 50.951 111.775 61.6399L105.087 60.9903C105.979 51.7979 103.764 42.5716 98.794 34.7871C93.8243 27.0026 86.3876 21.1095 77.6733 18.0503C68.9591 14.9912 59.4706 14.9427 50.7255 17.9126C41.9804 20.8825 34.4839 26.6993 29.4348 34.4326L23.8079 30.7588Z" fill="url(#orbit_glow_gradient)" fill-opacity="0.72"/>
+</g>
+<g id="Loading Orbit / Active" filter="url(#orbit_active)">
+<path d="M23.8079 30.7588C29.6789 21.7666 38.3958 15.0029 48.5646 11.5495C58.7333 8.09611 69.7663 8.1525 79.8992 11.7097C90.0321 15.2668 98.6794 22.1193 104.458 31.171C110.237 40.2228 112.813 50.951 111.775 61.6399L108.67 61.3383C109.64 51.3442 107.232 41.3133 101.828 32.8499C96.4253 24.3865 88.34 17.9795 78.8658 14.6535C69.3915 11.3276 59.0756 11.2749 49.5679 14.5038C40.0601 17.7327 31.9098 24.0568 26.4204 32.4645L23.8079 30.7588Z" fill="url(#orbit_active_gradient)"/>
+</g>
+<defs>
+<filter id="orbit_glow" x="16.8079" y="2" width="102.192" height="66.6399" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="3.5" result="effect1_foregroundBlur"/>
+</filter>
+<filter id="orbit_active" x="15.8079" y="1" width="104.192" height="68.6399" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset/>
+<feGaussianBlur stdDeviation="4"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0.74 0 0 0 0 1 0 0 0 0.72 0"/>
+<feBlend mode="screen" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+</filter>
+<linearGradient id="orbit_glow_gradient" x1="16" y1="57" x2="112" y2="57" gradientUnits="userSpaceOnUse">
+<stop stop-color="#2E6BFF" stop-opacity="0.1"/>
+<stop offset="0.54" stop-color="#14B8FF" stop-opacity="0.75"/>
+<stop offset="1" stop-color="#9EF5FF"/>
+</linearGradient>
+<linearGradient id="orbit_active_gradient" x1="16" y1="57" x2="112" y2="57" gradientUnits="userSpaceOnUse">
+<stop stop-color="#3366FF" stop-opacity="0.12"/>
+<stop offset="0.48" stop-color="#1FB3FF" stop-opacity="0.72"/>
+<stop offset="0.8" stop-color="#33EBFF"/>
+<stop offset="1" stop-color="#E6FFFF"/>
+</linearGradient>
+</defs>
+</svg>

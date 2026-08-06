@@ -45,6 +45,30 @@
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
+    .archive {
+      margin-top: 18px;
+      padding-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      border-top: 1px solid var(--line);
+      color: #647083;
+      font-size: 13px;
+    }
+    .archive strong { color: var(--navy); }
+    .archive a {
+      min-height: 0;
+      padding: 0;
+      display: inline;
+      border: 0;
+      border-radius: 0;
+      color: #536681;
+      background: none;
+      box-shadow: none;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .archive a:hover, .archive a:focus-visible { color: #8b6a2f; transform: none; }
     a {
       min-height: 190px;
       padding: 25px;
@@ -102,6 +126,11 @@
         <em>注入会议延迟、进入车辆、拥堵与压力信号，推进完整演示。</em>
       </a>
     </section>
+    <div class="archive" aria-label="历史版本">
+      <strong>2026-07-31 归档</strong>
+      <a href="../vehicle-hmi-old/">旧版车机 HMI</a>
+      <a href="../demo-console-old/">旧版 Demo 控制台</a>
+    </div>
   </main>
 </body>
 </html>

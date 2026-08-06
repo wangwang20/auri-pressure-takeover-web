@@ -1,0 +1,2103 @@
+/*
+ * RDS Figma refresh
+ * Source: RPwwu6Bmb2c2s9Wkk1geeT (Coffee / Meeting flows)
+ *
+ * This file intentionally contains presentation overrides only. The existing
+ * HTML keeps ownership of routing, state, API calls, permissions, telemetry,
+ * voice handling, and the coffee/calendar workflows.
+ */
+
+:root {
+  --top: 46px;
+  --bot: 86px;
+  --vd: 488px;
+  --rds-glass-border: rgba(117, 229, 255, 0.72);
+  --rds-glass-fill-a: rgba(8, 23, 40, 0.95);
+  --rds-glass-fill-b: rgba(3, 9, 20, 0.93);
+  --rds-glass-fill-c: rgba(7, 7, 18, 0.96);
+  --rds-text: #f2f7ff;
+  --rds-muted: #94abc2;
+  --rds-cyan: #00d1e8;
+}
+
+body {
+  font-family: "Noto Sans SC", "PingFang SC", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+
+/* Top status bar --------------------------------------------------------- */
+.top-bar {
+  min-height: var(--top);
+  padding: 0 16px !important;
+  background: linear-gradient(180deg, #020813, #030b16) !important;
+  border-bottom-color: rgba(104, 178, 255, 0.12) !important;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.28) !important;
+}
+
+.top-bar::before {
+  content: "P R N D";
+  position: absolute;
+  left: 174px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(191, 201, 216, 0.64);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 9px;
+  white-space: nowrap;
+}
+
+.top-bar::after {
+  content: "";
+  position: absolute;
+  left: 220px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: #178dff;
+  box-shadow: 0 0 9px rgba(23, 141, 255, 0.9);
+}
+
+.tb-logo-img {
+  width: auto;
+  height: 44px;
+  object-fit: contain;
+}
+
+.tb-stat-time {
+  font-size: 16px !important;
+  font-weight: 450 !important;
+  letter-spacing: 0.4px !important;
+}
+
+.tb-status {
+  gap: 14px !important;
+}
+
+.tb-signal {
+  width: 19px;
+  height: 15px;
+}
+
+.tb-stat-5g {
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  font-size: 14px;
+  font-weight: 450;
+}
+
+.tb-bat {
+  width: 25px;
+  height: 12px;
+}
+
+.tb-mic {
+  width: 28px !important;
+  height: 28px !important;
+}
+
+#playbtn {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+/* Presenter controls stay available without appearing in the product UI. */
+.demo-ctl {
+  top: 4px !important;
+  opacity: 0;
+  transform: translateX(-50%) translateY(-5px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.demo-ctl:hover,
+.demo-ctl:focus-within {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Driver/navigation column ---------------------------------------------- */
+.vd-panel {
+  width: var(--vd) !important;
+  background:
+    radial-gradient(90% 46% at 52% 20%, rgba(16, 69, 126, 0.34), transparent 70%),
+    linear-gradient(180deg, #04101f 0%, #040b17 100%) !important;
+  border-right-color: rgba(75, 137, 202, 0.2) !important;
+}
+
+.vd-top {
+  display: none !important;
+}
+
+.vd-speed-block {
+  padding: 28px 0 8px;
+}
+
+.vd-speed-num {
+  font-size: 64px;
+}
+
+.vd-speed-block::before {
+  right: 70px;
+  top: 28px;
+}
+
+.vd-road-area {
+  min-height: 320px;
+  margin: 0 46px;
+}
+
+.vd-car-3d-img {
+  width: 188px;
+}
+
+.vd-nav-card {
+  margin: 10px 24px 12px;
+  padding: 14px 16px 12px;
+  border-radius: 14px;
+  background:
+    radial-gradient(105% 80% at 0% 0%, rgba(18, 72, 126, 0.24), transparent 58%),
+    linear-gradient(180deg, rgba(11, 29, 49, 0.96), rgba(5, 15, 28, 0.97));
+  border-color: rgba(112, 181, 255, 0.2);
+}
+
+/* Navigation map -------------------------------------------------------- */
+.right-panel {
+  background:
+    radial-gradient(70% 60% at 48% 43%, rgba(13, 56, 104, 0.24), transparent 72%),
+    linear-gradient(180deg, #061425, #020916) !important;
+}
+
+#rmap {
+  background:
+    radial-gradient(74% 66% at 55% 43%, rgba(13, 50, 90, 0.74), rgba(4, 15, 29, 0.96) 64%, #020814 100%) !important;
+}
+
+.map-art {
+  opacity: 0.94;
+}
+
+.map-major {
+  stroke: rgba(15, 67, 121, 0.7);
+}
+
+.map-route-core {
+  stroke: #087fff;
+}
+
+.map-route-highlight {
+  stroke: #81ddff;
+}
+
+/* Figma glass workflow panel -------------------------------------------- */
+.left-panel {
+  top: 76px !important;
+  right: 50px !important;
+  width: 540px !important;
+  max-height: calc(100% - 118px) !important;
+  border: 1.35px solid var(--rds-glass-border) !important;
+  border-radius: 24px !important;
+  background:
+    radial-gradient(260px 190px at -30px 86px, rgba(0, 188, 255, 0.18), transparent 72%),
+    radial-gradient(280px 210px at 105% 100%, rgba(88, 54, 220, 0.18), transparent 72%),
+    linear-gradient(90deg, var(--rds-glass-fill-a), var(--rds-glass-fill-b) 52%, var(--rds-glass-fill-c)) !important;
+  box-shadow:
+    0 10px 38px rgba(0, 92, 255, 0.2),
+    0 22px 48px rgba(0, 5, 20, 0.56),
+    inset 0 1px 3px rgba(184, 235, 255, 0.15) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+.left-panel::before {
+  display: none !important;
+}
+
+.left-panel.lp-no-hdr::after {
+  content: "◉   我在听...   ▂▅▃";
+  position: absolute;
+  z-index: 5;
+  top: 18px;
+  right: 16px;
+  min-width: 178px;
+  height: 42px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(61, 224, 255, 0.7);
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(8, 32, 52, 0.9), rgba(5, 17, 33, 0.94) 55%, rgba(8, 9, 27, 0.96));
+  box-shadow: 0 5px 16px rgba(0, 122, 255, 0.2), inset 0 1px 2px rgba(184, 245, 255, 0.15);
+  color: #bbc7e0;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  pointer-events: none;
+}
+
+.left-panel.lp-no-hdr .lp-body {
+  padding: 24px 30px 22px !important;
+}
+
+.left-panel.lp-no-hdr .design-panel {
+  padding-top: 0;
+}
+
+.left-panel.lp-no-hdr .design-hero-text {
+  padding-right: 205px;
+  min-height: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Terminal coffee failures do not accept voice input. The generic no-header
+   listening decoration is deliberately suppressed for this one card. */
+.left-panel.lp-no-hdr.lp-coffee-unavailable::after {
+  content: none;
+  display: none !important;
+}
+
+.left-panel.lp-no-hdr.lp-coffee-unavailable .design-hero-text {
+  padding-right: 0;
+  min-height: 0;
+}
+
+.left-panel.lp-coffee-unavailable .design-hero-sub {
+  max-width: 420px;
+  color: #ffc457 !important;
+}
+
+/*
+ * A transient fatigue HUD is only a bridge into the next workflow. Once the
+ * formal workflow panel is visible, suppress the HUD as a defensive guard
+ * against delayed async notifications painting underneath it.
+ */
+.left-panel.is-visible + .right-panel #hud {
+  display: none !important;
+}
+
+#body-a > div,
+#body-a .design-card {
+  margin: 0;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.design-panel {
+  gap: 14px;
+}
+
+.design-hero-title,
+.design-card-lg .design-hero-title {
+  color: var(--rds-text) !important;
+  font-size: 28px !important;
+  font-weight: 500 !important;
+  line-height: 40px !important;
+}
+
+.design-hero-sub {
+  color: #9eb2cc !important;
+  margin-top: 2px !important;
+  font-size: 15px !important;
+  line-height: 24px !important;
+}
+
+.design-card-lg .design-section,
+.design-section {
+  padding: 12px 18px;
+  border: 1px solid rgba(112, 199, 255, 0.36);
+  border-radius: 16px;
+  background: linear-gradient(90deg, rgba(18, 40, 59, 0.7), rgba(9, 23, 40, 0.76) 52%, rgba(8, 12, 29, 0.8));
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18), inset 0 1px 2px rgba(209, 242, 255, 0.1);
+}
+
+.design-card-lg .design-row,
+.design-row {
+  min-height: 34px;
+  padding: 6px 0;
+  gap: 12px;
+  border-bottom-color: rgba(87, 173, 237, 0.14);
+  color: #afbdca;
+  font-size: 15px;
+}
+
+.design-row-val {
+  color: #dbe8f5;
+}
+
+.design-primary-btn,
+.design-secondary-btn {
+  min-height: 56px;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: 450;
+}
+
+.design-primary-btn {
+  border: 1.1px solid rgba(122, 201, 255, 0.78);
+  background: linear-gradient(90deg, #0a42f5, #008cff 48%, #00d1e8);
+  box-shadow:
+    0 9px 22px rgba(0, 138, 255, 0.28),
+    inset 0 -1px 6px rgba(0, 38, 140, 0.32),
+    inset 0 1px 2px rgba(255, 255, 255, 0.24);
+}
+
+.design-secondary-btn {
+  border: 1px solid rgba(140, 199, 245, 0.4);
+  background: linear-gradient(90deg, rgba(15, 37, 57, 0.8), rgba(5, 15, 31, 0.88));
+  color: #d1deed;
+  box-shadow: 0 7px 16px rgba(0, 0, 0, 0.22), inset 0 1px 2px rgba(199, 237, 255, 0.1);
+}
+
+.design-coffee-product {
+  width: 112px !important;
+  height: 140px !important;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.38)) drop-shadow(0 4px 20px rgba(0, 166, 255, 0.22));
+}
+
+.design-coffee-product::before,
+.design-coffee-product::after {
+  opacity: 0.6;
+}
+
+/* Compact fatigue/info HUD, matching Coffee Flow / 01. */
+#hud.show {
+  border: 1.35px solid var(--rds-glass-border) !important;
+  border-radius: 24px !important;
+  background: linear-gradient(90deg, rgba(8, 24, 42, 0.94), rgba(3, 10, 21, 0.92) 50%, rgba(8, 8, 19, 0.95)) !important;
+  box-shadow:
+    0 10px 36px rgba(0, 92, 255, 0.2),
+    0 22px 48px rgba(0, 5, 20, 0.54),
+    inset 0 1px 3px rgba(184, 235, 255, 0.16) !important;
+  backdrop-filter: blur(12px);
+}
+
+#hud.hud-chip.show {
+  left: auto !important;
+  right: 50px !important;
+  top: 76px !important;
+  width: 540px !important;
+  min-height: 140px;
+}
+
+/* Bottom climate/application bar ---------------------------------------- */
+.bottom-bar {
+  height: var(--bot) !important;
+  padding: 0 24px !important;
+  background: linear-gradient(180deg, #03101d, #020a14) !important;
+  border-top-color: rgba(83, 157, 235, 0.18) !important;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.28);
+}
+
+.bb-main-icons {
+  gap: 34px !important;
+}
+
+.bb-ic {
+  width: 44px !important;
+  height: 44px !important;
+}
+
+.bb-pic,
+.bb-ic svg {
+  width: 27px !important;
+  height: 27px !important;
+}
+
+.bb-ic.bb-wheel .bb-pic {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+.bb-seat-img {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+.bb-temp {
+  font-size: 20px !important;
+}
+
+.bb-div-v {
+  height: 34px !important;
+}
+
+/* Fixed 1920×1080 canvas already scales uniformly through fitHMI().
+   These rules keep dense cards usable if the browser is extremely narrow. */
+@media (max-aspect-ratio: 4/3) {
+  .left-panel {
+    right: 32px !important;
+  }
+}
+
+/* Figma RDS / node 7:2 — the first visible state after silent tier-2 initialization. */
+.left-panel.lp-coffee-offer {
+  width: 540px !important;
+  height: 320px !important;
+  min-height: 320px !important;
+  overflow: hidden !important;
+  border-radius: 28px !important;
+}
+
+.left-panel.lp-coffee-offer::after {
+  display: none !important;
+}
+
+.left-panel.lp-coffee-offer .lp-body {
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.coffee-offer {
+  position: relative;
+  width: 540px;
+  height: 320px;
+  overflow: hidden;
+  border-radius: 28px;
+  color: #f5f8ff;
+}
+
+.coffee-offer-glow {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.coffee-offer-glow.cyan {
+  top: -127px;
+  left: -135px;
+  width: 334px;
+  height: 254px;
+}
+
+.coffee-offer-glow.violet {
+  top: 165px;
+  left: 305px;
+  width: 388px;
+  height: 298px;
+}
+
+.coffee-offer-head {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 540px;
+  height: 122px;
+}
+
+.coffee-offer-status-icon {
+  position: absolute;
+  top: 6px;
+  left: 3px;
+  width: 118px;
+  height: 118px;
+  object-fit: contain;
+}
+
+.coffee-offer-heading-copy {
+  position: absolute;
+  top: 29px;
+  left: 116px;
+  width: 265px;
+}
+
+.coffee-offer-title-row {
+  display: flex;
+  height: 43px;
+  align-items: center;
+  gap: 7px;
+}
+
+.coffee-offer-head h2 {
+  margin: 0;
+  font-size: 30px;
+  line-height: 42px;
+  font-weight: 550;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.coffee-offer-head p {
+  margin: 2px 0 0;
+  color: #9aabbe;
+  font-size: 17px;
+  line-height: 24px;
+  white-space: nowrap;
+}
+
+.coffee-offer-tired-face {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.coffee-offer-divider {
+  position: absolute;
+  z-index: 1;
+  top: 121px;
+  left: 29px;
+  width: 480px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(51, 140, 209, 0), rgba(87, 173, 237, 0.22) 28%, rgba(107, 115, 242, 0.16) 70%, rgba(51, 89, 184, 0));
+}
+
+.coffee-offer-info {
+  position: absolute;
+  z-index: 1;
+  top: 137px;
+  left: 29px;
+  width: 480px;
+  height: 68px;
+}
+
+.coffee-offer-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  height: 35px;
+}
+
+.coffee-offer-row + .coffee-offer-row {
+  border: 0;
+}
+
+.coffee-offer-row > img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.coffee-offer-row strong {
+  overflow: hidden;
+  color: #d9e5f1;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 25px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coffee-offer-row:last-child > img {
+  width: 26px;
+  height: 26px;
+  margin-left: 1px;
+  margin-right: 1px;
+}
+
+.coffee-offer-row:last-child strong {
+  color: #afbdca;
+  font-size: 17px;
+  line-height: 24px;
+}
+
+.coffee-offer-actions {
+  position: absolute;
+  z-index: 1;
+  top: 230px;
+  left: 30px;
+  display: grid;
+  grid-template-columns: 230px 232px;
+  gap: 18px;
+  width: 480px;
+  height: 62px;
+}
+
+.coffee-offer-actions button {
+  height: 62px;
+  border-radius: 14px;
+  color: #d9e5f1;
+  font-size: 18px;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.coffee-offer-primary {
+  border: 1px solid rgba(140, 218, 255, 0.8);
+  background: linear-gradient(100deg, #0b49f4, #0097ff 54%, #21cfe2);
+  box-shadow: 0 9px 22px rgba(0, 138, 255, 0.26), inset 0 1px 2px rgba(255, 255, 255, 0.22);
+}
+
+.coffee-offer-secondary {
+  border: 1px solid rgba(140, 199, 245, 0.4);
+  background: linear-gradient(90deg, rgba(15, 37, 57, 0.84), rgba(5, 15, 31, 0.9));
+}
+
+.coffee-offer-voice {
+  position: absolute;
+  top: 32px;
+  left: 391px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  height: 34px;
+  margin: 0;
+  padding: 6px 8px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid rgba(61, 224, 255, 0.72);
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(8, 32, 52, 0.92), rgba(5, 17, 33, 0.95) 56%, rgba(8, 9, 27, 0.97));
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.22), inset 0 1px 2px rgba(184, 245, 255, 0.14);
+  color: #e8f7ff;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.coffee-offer-voice img {
+  width: 18px;
+  height: 18px;
+}
+
+.coffee-offer-voice .coffee-offer-wave {
+  width: 32px;
+  height: 28px;
+  margin-left: 0;
+}
+
+/* Figma RDS / node 51:2 — compact order creation state after confirmation. */
+#hud.coffee-order-creating-hud.show {
+  top: 76px !important;
+  left: auto !important;
+  right: 50px !important;
+  width: 540px !important;
+  min-width: 540px !important;
+  max-width: 540px !important;
+  height: 150px !important;
+  min-height: 150px !important;
+  padding: 0 !important;
+  overflow: visible;
+  border: 0 !important;
+  border-radius: 24px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none;
+}
+
+.coffee-order-creating-bg {
+  position: absolute;
+  z-index: 0;
+  top: -28px;
+  left: -48px;
+  width: 636px;
+  height: 248px;
+  pointer-events: none;
+}
+
+.coffee-order-creating-icon {
+  position: absolute;
+  z-index: 1;
+  top: 19px;
+  left: 16px;
+  width: 128px;
+  height: 128px;
+  pointer-events: none;
+}
+
+.coffee-order-creating-orbit {
+  position: absolute;
+  z-index: 2;
+  top: 19px;
+  left: 16px;
+  width: 128px;
+  height: 128px;
+  pointer-events: none;
+  transform-origin: 50% 44.53125%;
+  animation: coffeeOrderCreatingOrbitSpin 1.15s linear infinite;
+  will-change: transform;
+}
+
+@keyframes coffeeOrderCreatingOrbitSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.coffee-order-creating-copy {
+  position: absolute;
+  z-index: 1;
+  top: 39px;
+  left: 152px;
+  right: 30px;
+  min-width: 0;
+}
+
+.coffee-order-creating-title {
+  color: #f5f8fc;
+  font-size: 30px;
+  font-weight: 550;
+  line-height: 42px;
+}
+
+.coffee-order-creating-detail {
+  margin-top: 0;
+  overflow: hidden;
+  color: #9eb2cc;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 27px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Figma RDS / node 7:3 — recommendation confirmation without internal processing details. */
+.left-panel.lp-coffee-confirmation {
+  width: 540px !important;
+  min-height: 534px !important;
+  height: 534px !important;
+  overflow: hidden !important;
+}
+
+.left-panel.lp-coffee-confirmation::after {
+  display: none !important;
+}
+
+.left-panel.lp-coffee-confirmation .lp-body {
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.coffee-confirmation-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 534px;
+  padding: 28px 30px 22px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 24px;
+  color: #f2f7ff;
+}
+
+.coffee-confirmation-glow {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.coffee-confirmation-glow.cyan {
+  top: -9px;
+  left: -151px;
+  width: 362px;
+  height: 282px;
+}
+
+.coffee-confirmation-glow.violet {
+  top: 299px;
+  left: 289px;
+  width: 420px;
+  height: 330px;
+}
+
+.coffee-confirmation-head,
+.coffee-confirmation-product,
+.coffee-confirmation-delivery,
+.coffee-confirmation-primary,
+.coffee-confirmation-actions {
+  position: relative;
+  z-index: 1;
+}
+
+.coffee-confirmation-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+}
+
+.coffee-confirmation-head h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 550;
+  line-height: 40px;
+}
+
+.coffee-confirmation-voice {
+  position: relative;
+  width: 205px;
+  height: 44px;
+  overflow: hidden;
+  border: 1px solid rgba(61, 224, 255, 0.7);
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(8, 32, 52, 0.9), rgba(5, 17, 33, 0.94) 55%, rgba(8, 9, 27, 0.96));
+  box-shadow: 0 5px 16px rgba(0, 122, 255, 0.2), inset 0 1px 2px rgba(184, 245, 255, 0.15);
+}
+
+.coffee-confirmation-voice-halo {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 44px;
+  height: 44px;
+}
+
+.coffee-confirmation-voice-mic {
+  position: absolute;
+  top: 0;
+  left: 5px;
+  width: 42px;
+  height: 42px;
+}
+
+.coffee-confirmation-voice span {
+  position: absolute;
+  top: 11px;
+  left: 64px;
+  color: #bbc7e0;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.coffee-confirmation-voice-wave {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 34px;
+  height: 28px;
+}
+
+.coffee-confirmation-product {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 156px;
+  overflow: hidden;
+}
+
+.coffee-confirmation-product-image {
+  width: 109px;
+  height: 140px;
+  flex: 0 0 109px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.38)) drop-shadow(0 4px 20px rgba(0, 166, 255, 0.22));
+}
+
+.coffee-confirmation-product-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.coffee-confirmation-product-copy > strong,
+.coffee-confirmation-product-copy > span,
+.coffee-confirmation-product-copy > b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coffee-confirmation-product-copy > strong {
+  font-size: 25px;
+  font-weight: 550;
+  line-height: 35px;
+}
+
+.coffee-confirmation-product-copy > span {
+  color: #9eb2cc;
+  font-size: 18px;
+  line-height: 27px;
+}
+
+.coffee-confirmation-product-copy > b {
+  font-size: 29px;
+  line-height: 38px;
+}
+
+.coffee-confirmation-match {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 24px;
+  color: #14e580;
+  font-size: 15px;
+}
+
+.coffee-confirmation-match img {
+  width: 22px;
+  height: 22px;
+}
+
+.coffee-confirmation-delivery {
+  display: flex;
+  height: 104px;
+  flex-direction: column;
+  padding: 12px 18px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid rgba(112, 199, 255, 0.44);
+  border-radius: 16px;
+  background: linear-gradient(90deg, rgba(18, 40, 59, 0.7), rgba(9, 23, 40, 0.76) 52%, rgba(8, 12, 29, 0.8));
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18), inset 0 1px 2px rgba(209, 242, 255, 0.1);
+}
+
+.coffee-confirmation-delivery > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 40px;
+  min-width: 0;
+}
+
+.coffee-confirmation-delivery img {
+  width: 26px;
+  height: 26px;
+}
+
+.coffee-confirmation-delivery span {
+  overflow: hidden;
+  color: #dbe8f5;
+  font-size: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coffee-confirmation-delivery > div:last-child span {
+  color: #afbdca;
+  font-size: 17px;
+}
+
+.coffee-confirmation-primary {
+  width: 480px;
+  height: 62px;
+  flex: 0 0 62px;
+  border: 1.1px solid rgba(122, 201, 255, 0.78);
+  border-radius: 14px;
+  background: linear-gradient(90deg, #0a42f5, #008cff 48%, #00d1e8);
+  box-shadow: 0 9px 11px rgba(0, 138, 255, 0.3), inset 0 -1px 6px rgba(0, 38, 140, 0.32), inset 0 1px 2px rgba(255, 255, 255, 0.24);
+  color: #f2faff;
+  font-size: 21px;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.coffee-confirmation-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 480px;
+  height: 56px;
+}
+
+.coffee-confirmation-actions button {
+  height: 56px;
+  border: 1px solid rgba(140, 199, 245, 0.38);
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(15, 37, 57, 0.76), rgba(5, 15, 31, 0.86));
+  box-shadow: 0 7px 8px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(199, 237, 255, 0.09);
+  color: #d1deed;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.coffee-confirmation-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* Figma RDS / node 68:43 — structured taste options backed by real product attrs. */
+.left-panel.lp-coffee-taste {
+  width: 540px !important;
+  min-height: 574px !important;
+  height: 574px !important;
+  overflow: hidden !important;
+}
+
+.left-panel.lp-coffee-taste::after {
+  display: none !important;
+}
+
+.left-panel.lp-coffee-taste .lp-body {
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.coffee-taste-card {
+  position: relative;
+  display: flex;
+  width: 540px;
+  height: 574px;
+  flex-direction: column;
+  gap: 14px;
+  padding: 28px 30px 22px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 24px;
+  color: #f2f7ff;
+}
+
+.coffee-taste-glow {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.coffee-taste-glow.cyan {
+  top: -9px;
+  left: -151px;
+  width: 362px;
+  height: 282px;
+}
+
+.coffee-taste-glow.violet {
+  top: 339px;
+  left: 289px;
+  width: 420px;
+  height: 330px;
+}
+
+.coffee-taste-head,
+.coffee-taste-product,
+.coffee-taste-selector,
+.coffee-taste-primary,
+.coffee-taste-actions {
+  position: relative;
+  z-index: 1;
+}
+
+.coffee-taste-head {
+  display: flex;
+  height: 44px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.coffee-taste-head h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 550;
+  line-height: 40px;
+}
+
+.coffee-taste-voice {
+  position: relative;
+  width: 205px;
+  height: 44px;
+  overflow: hidden;
+  border: 1px solid rgba(61, 224, 255, 0.7);
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(8, 32, 52, 0.9), rgba(5, 17, 33, 0.94) 55%, rgba(8, 9, 27, 0.96));
+  box-shadow: 0 5px 16px rgba(0, 122, 255, 0.2), inset 0 1px 2px rgba(184, 245, 255, 0.15);
+}
+
+.coffee-taste-voice-halo {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 44px;
+  height: 44px;
+}
+
+.coffee-taste-voice-mic {
+  position: absolute;
+  top: 0;
+  left: 5px;
+  width: 42px;
+  height: 42px;
+}
+
+.coffee-taste-voice span {
+  position: absolute;
+  top: 11px;
+  left: 64px;
+  color: #bbc7e0;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.coffee-taste-voice-wave {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 34px;
+  height: 28px;
+}
+
+.coffee-taste-product {
+  display: flex;
+  height: 156px;
+  align-items: center;
+  gap: 24px;
+  overflow: hidden;
+}
+
+.coffee-taste-product-image {
+  width: 109px;
+  height: 140px;
+  flex: 0 0 109px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.38)) drop-shadow(0 4px 20px rgba(0, 166, 255, 0.22));
+}
+
+.coffee-taste-product-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.coffee-taste-product-copy > strong,
+.coffee-taste-product-copy > span,
+.coffee-taste-product-copy > b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coffee-taste-product-copy > strong {
+  font-size: 25px;
+  font-weight: 550;
+  line-height: 35px;
+}
+
+.coffee-taste-product-copy > span {
+  color: #9eb2cc;
+  font-size: 18px;
+  line-height: 27px;
+}
+
+.coffee-taste-product-copy > b {
+  font-size: 29px;
+  line-height: 38px;
+}
+
+.coffee-taste-match {
+  display: flex;
+  height: 24px;
+  align-items: center;
+  gap: 8px;
+  color: #14e580;
+  font-size: 15px;
+}
+
+.coffee-taste-card.has-message .coffee-taste-match {
+  color: #ffbd5a;
+}
+
+.coffee-taste-match img {
+  width: 22px;
+  height: 22px;
+}
+
+.coffee-taste-selector {
+  display: flex;
+  width: 480px;
+  height: 144px;
+  flex-direction: column;
+  padding: 12px 18px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid rgba(112, 199, 255, 0.44);
+  border-radius: 16px;
+  background: linear-gradient(90deg, rgba(18, 40, 59, 0.7), rgba(9, 23, 40, 0.76) 52%, rgba(8, 12, 29, 0.8));
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18), inset 0 1px 2px rgba(209, 242, 255, 0.1);
+}
+
+.coffee-taste-row {
+  display: flex;
+  height: 40px;
+  flex: 0 0 40px;
+  align-items: center;
+  gap: 12px;
+}
+
+.coffee-taste-row > img {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  object-fit: contain;
+}
+
+.coffee-taste-row > strong {
+  width: 46px;
+  flex: 0 0 46px;
+  color: #dbe8f5;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.coffee-taste-options {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 13px;
+  overflow: hidden;
+}
+
+.coffee-taste-option {
+  display: inline-flex;
+  min-width: 0;
+  padding: 0;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  background: transparent;
+  color: #dbe8f5;
+  font: inherit;
+  font-size: 17px;
+  line-height: 28px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.coffee-taste-option span {
+  color: #a7bdd4;
+  font-size: 15px;
+}
+
+.coffee-taste-option.is-selected,
+.coffee-taste-option.is-selected span {
+  color: #1ac7ff;
+}
+
+.coffee-taste-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.36;
+}
+
+.coffee-taste-option.is-selected:disabled {
+  opacity: 0.72;
+}
+
+.coffee-taste-loading {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  color: #9eb2cc;
+  font-size: 17px;
+  text-align: center;
+}
+
+.coffee-taste-primary {
+  width: 480px;
+  height: 62px;
+  flex: 0 0 62px;
+  border: 1.1px solid rgba(122, 201, 255, 0.78);
+  border-radius: 14px;
+  background: linear-gradient(90deg, #0a42f5, #008cff 48%, #00d1e8);
+  box-shadow: 0 9px 11px rgba(0, 138, 255, 0.3), inset 0 -1px 6px rgba(0, 38, 140, 0.32), inset 0 1px 2px rgba(255, 255, 255, 0.24);
+  color: #f2faff;
+  font-size: 21px;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.coffee-taste-primary:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.coffee-taste-actions {
+  display: grid;
+  width: 480px;
+  height: 56px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 11px;
+}
+
+.coffee-taste-actions button {
+  height: 56px;
+  border: 1px solid rgba(140, 199, 245, 0.38);
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(15, 37, 57, 0.76), rgba(5, 15, 31, 0.86));
+  box-shadow: 0 7px 8px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(199, 237, 255, 0.09);
+  color: #d1deed;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.coffee-taste-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+/* Figma RDS / node 68:3 — automatic alternative recommendation in progress. */
+.left-panel.lp-coffee-reroll {
+  width: 540px !important;
+  min-height: 534px !important;
+  height: 534px !important;
+  overflow: hidden !important;
+}
+
+.left-panel.lp-coffee-reroll::after {
+  display: none !important;
+}
+
+.left-panel.lp-coffee-reroll .lp-body {
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.coffee-reroll-card {
+  position: relative;
+  display: flex;
+  height: 534px;
+  flex-direction: column;
+  gap: 14px;
+  padding: 28px 30px 22px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 24px;
+  color: #f2f7ff;
+}
+
+.coffee-reroll-glow {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.coffee-reroll-glow.cyan {
+  top: -9px;
+  left: -151px;
+  width: 362px;
+  height: 282px;
+}
+
+.coffee-reroll-glow.violet {
+  top: 299px;
+  left: 289px;
+  width: 420px;
+  height: 330px;
+}
+
+.coffee-reroll-head,
+.coffee-reroll-product,
+.coffee-reroll-delivery,
+.coffee-reroll-primary,
+.coffee-reroll-cancel {
+  position: relative;
+  z-index: 1;
+}
+
+.coffee-reroll-head {
+  display: flex;
+  height: 44px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.coffee-reroll-head h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 550;
+  line-height: 40px;
+}
+
+.coffee-reroll-voice {
+  position: relative;
+  width: 205px;
+  height: 44px;
+  overflow: hidden;
+  border: 1px solid rgba(61, 224, 255, 0.7);
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(8, 32, 52, 0.9), rgba(5, 17, 33, 0.94) 55%, rgba(8, 9, 27, 0.96));
+  box-shadow: 0 5px 16px rgba(0, 122, 255, 0.2), inset 0 1px 2px rgba(184, 245, 255, 0.15);
+}
+
+.coffee-reroll-voice-halo {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 44px;
+  height: 44px;
+}
+
+.coffee-reroll-voice-mic {
+  position: absolute;
+  top: 0;
+  left: 5px;
+  width: 42px;
+  height: 42px;
+}
+
+.coffee-reroll-voice span {
+  position: absolute;
+  top: 11px;
+  left: 64px;
+  color: #bbc7e0;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.coffee-reroll-voice-wave {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 34px;
+  height: 28px;
+}
+
+.coffee-reroll-product {
+  display: flex;
+  height: 156px;
+  align-items: center;
+  gap: 24px;
+  overflow: hidden;
+}
+
+.coffee-reroll-product-visual {
+  position: relative;
+  width: 109px;
+  height: 140px;
+  flex: 0 0 109px;
+}
+
+.coffee-reroll-product-image {
+  width: 109px;
+  height: 140px;
+  object-fit: contain;
+  opacity: 0.25;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.38)) drop-shadow(0 4px 20px rgba(0, 166, 255, 0.22));
+}
+
+.coffee-reroll-progress {
+  position: absolute;
+  top: 66px;
+  left: 29px;
+  width: 52px;
+  height: 10px;
+}
+
+.coffee-reroll-product-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.coffee-reroll-product-copy > strong,
+.coffee-reroll-product-copy > span,
+.coffee-reroll-product-copy > b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coffee-reroll-product-copy > strong {
+  font-size: 25px;
+  font-weight: 550;
+  line-height: 35px;
+}
+
+.coffee-reroll-product-copy > span {
+  color: #9eb2cc;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 27px;
+}
+
+.coffee-reroll-product-copy > b {
+  font-size: 20px;
+  font-weight: 550;
+  line-height: 38px;
+}
+
+.coffee-reroll-delivery {
+  display: flex;
+  height: 104px;
+  flex: 0 0 104px;
+  flex-direction: column;
+  padding: 12px 18px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid rgba(112, 199, 255, 0.44);
+  border-radius: 16px;
+  background: linear-gradient(90deg, rgba(18, 40, 59, 0.7), rgba(9, 23, 40, 0.76) 52%, rgba(8, 12, 29, 0.8));
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18), inset 0 1px 2px rgba(209, 242, 255, 0.1);
+}
+
+.coffee-reroll-delivery > div {
+  display: flex;
+  height: 40px;
+  min-width: 0;
+  align-items: center;
+  gap: 14px;
+}
+
+.coffee-reroll-delivery img {
+  width: 26px;
+  height: 26px;
+}
+
+.coffee-reroll-delivery span {
+  overflow: hidden;
+  color: #dbe8f5;
+  font-size: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coffee-reroll-delivery > div:last-child span {
+  color: #afbdca;
+  font-size: 17px;
+}
+
+.coffee-reroll-primary {
+  width: 480px;
+  height: 62px;
+  flex: 0 0 62px;
+  border: 1.1px solid rgba(122, 201, 255, 0.78);
+  border-radius: 14px;
+  background: linear-gradient(90deg, #0a42f5, #008cff 48%, #00d1e8);
+  box-shadow: 0 9px 11px rgba(0, 138, 255, 0.3), inset 0 -1px 6px rgba(0, 38, 140, 0.32), inset 0 1px 2px rgba(255, 255, 255, 0.24);
+  color: #f2faff;
+  font-size: 21px;
+  font-weight: 550;
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.coffee-reroll-cancel {
+  width: 480px;
+  height: 56px;
+  flex: 0 0 56px;
+  border: 1px solid rgba(140, 199, 245, 0.38);
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(15, 37, 57, 0.76), rgba(5, 15, 31, 0.86));
+  box-shadow: 0 7px 8px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(199, 237, 255, 0.09);
+  color: #d1deed;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.coffee-reroll-card.is-failed .coffee-reroll-product-image {
+  opacity: 0.42;
+}
+
+.coffee-reroll-card.is-failed .coffee-reroll-product-copy > b {
+  color: #ffbd5b;
+}
+
+/* Figma RDS / node 51:42 — pending mobile payment card. */
+.left-panel.lp-coffee-payment {
+  width: 540px !important;
+  min-height: 419px !important;
+  height: 419px !important;
+  overflow: hidden !important;
+}
+
+.left-panel.lp-coffee-payment::after {
+  display: none !important;
+}
+
+.left-panel.lp-coffee-payment .lp-body {
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.coffee-payment-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 419px;
+  padding: 28px 30px 22px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 24px;
+  color: #f2f7ff;
+}
+
+.coffee-payment-glow {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.coffee-payment-glow.cyan {
+  top: -9px;
+  left: -151px;
+  width: 362px;
+  height: 282px;
+}
+
+.coffee-payment-glow.violet {
+  top: 299px;
+  left: 289px;
+  width: 420px;
+  height: 330px;
+}
+
+.coffee-payment-head,
+.coffee-payment-product,
+.coffee-payment-primary,
+.coffee-payment-secondary {
+  position: relative;
+  z-index: 1;
+}
+
+.coffee-payment-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+}
+
+.coffee-payment-head h2 {
+  margin: 0;
+  color: #f2f7ff;
+  font-size: 28px;
+  font-weight: 550;
+  line-height: 40px;
+}
+
+.coffee-payment-voice {
+  position: relative;
+  width: 205px;
+  height: 44px;
+  overflow: hidden;
+  border: 1px solid rgba(61, 224, 255, 0.7);
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(8, 32, 52, 0.9), rgba(5, 17, 33, 0.94) 55%, rgba(8, 9, 27, 0.96));
+  box-shadow: 0 5px 16px rgba(0, 122, 255, 0.2), inset 0 1px 2px rgba(184, 245, 255, 0.15);
+}
+
+.coffee-payment-voice-halo {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 44px;
+  height: 44px;
+}
+
+.coffee-payment-voice-mic {
+  position: absolute;
+  top: 0;
+  left: 5px;
+  width: 42px;
+  height: 42px;
+}
+
+.coffee-payment-voice span {
+  position: absolute;
+  top: 11px;
+  left: 64px;
+  color: #bbc7e0;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.coffee-payment-voice-wave {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 34px;
+  height: 28px;
+}
+
+.coffee-payment-product {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 156px;
+  overflow: hidden;
+}
+
+.coffee-payment-product-image {
+  width: 109px;
+  height: 140px;
+  flex: 0 0 109px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.38)) drop-shadow(0 4px 20px rgba(0, 166, 255, 0.22));
+}
+
+.coffee-payment-product-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.coffee-payment-product-copy > strong,
+.coffee-payment-product-copy > span,
+.coffee-payment-product-copy > b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coffee-payment-product-copy > strong {
+  color: #f2f7ff;
+  font-size: 25px;
+  font-weight: 550;
+  line-height: 35px;
+}
+
+.coffee-payment-product-copy > span {
+  color: #9eb2cc;
+  font-size: 18px;
+  line-height: 27px;
+}
+
+.coffee-payment-product-copy > b {
+  color: #ebf5ff;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 38px;
+}
+
+.coffee-payment-match {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 24px;
+  color: #14e580;
+  font-size: 15px;
+}
+
+.coffee-payment-match img {
+  width: 22px;
+  height: 22px;
+}
+
+.coffee-payment-primary,
+.coffee-payment-secondary {
+  width: 480px;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.coffee-payment-primary {
+  height: 62px;
+  border: 1.1px solid rgba(122, 201, 255, 0.78);
+  background: linear-gradient(90deg, #0a42f5, #008cff 48%, #00d1e8);
+  box-shadow: 0 9px 11px rgba(0, 138, 255, 0.3), inset 0 -1px 6px rgba(0, 38, 140, 0.32), inset 0 1px 2px rgba(255, 255, 255, 0.24);
+  color: #f2faff;
+  font-size: 21px;
+  font-weight: 550;
+}
+
+.coffee-payment-secondary {
+  height: 56px;
+  border: 1px solid rgba(140, 199, 245, 0.38);
+  background: linear-gradient(90deg, rgba(15, 37, 57, 0.76), rgba(5, 15, 31, 0.86));
+  box-shadow: 0 7px 8px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(199, 237, 255, 0.09);
+  color: #d1deed;
+  font-size: 17px;
+}
+
+/* Real Meituan lifecycle notifications · Figma 51:82 / 68:202 ---------- */
+#hud.coffee-lifecycle-hud.show {
+  top: 50px;
+  right: 72px;
+  left: auto;
+  width: 540px;
+  min-width: 540px;
+  max-width: 540px;
+  min-height: 150px;
+  padding: 20px 24px;
+  box-sizing: border-box;
+  border: 1.35px solid rgba(72, 195, 255, 0.78);
+  border-radius: 20px;
+  background:
+    radial-gradient(220px 130px at 2% 20%, rgba(0, 175, 255, 0.18), transparent 72%),
+    radial-gradient(220px 150px at 100% 100%, rgba(94, 57, 223, 0.16), transparent 72%),
+    linear-gradient(90deg, rgba(8, 28, 46, 0.97), rgba(4, 12, 27, 0.98)) !important;
+  box-shadow:
+    0 18px 42px rgba(0, 5, 20, 0.5),
+    0 0 24px rgba(0, 153, 255, 0.16),
+    inset 0 1px 2px rgba(194, 240, 255, 0.12);
+}
+
+.coffee-lifecycle-card {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: 92px minmax(0, 1fr) 46px;
+  align-items: center;
+  gap: 20px;
+}
+
+.coffee-lifecycle-icon {
+  display: inline-flex;
+  width: 80px;
+  height: 80px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(77, 196, 255, 0.72);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 34%, rgba(35, 184, 255, 0.22), rgba(12, 24, 56, 0.86) 68%);
+  box-shadow: 0 0 20px rgba(25, 153, 255, 0.24);
+  font-size: 37px;
+  line-height: 1;
+}
+
+.coffee-lifecycle-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.coffee-lifecycle-copy strong {
+  overflow: hidden;
+  color: #f3f8ff;
+  font-size: 31px;
+  font-weight: 650;
+  line-height: 1.16;
+  letter-spacing: 0.2px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coffee-lifecycle-copy span {
+  overflow: hidden;
+  color: #aebdd2;
+  font-size: 18px;
+  line-height: 1.38;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coffee-lifecycle-check {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(40, 231, 127, 0.75);
+  border-radius: 50%;
+  background: rgba(23, 181, 91, 0.12);
+  box-shadow: 0 0 18px rgba(29, 220, 116, 0.22);
+  color: #2de783;
+  font-size: 23px;
+  font-weight: 700;
+}
+
+@media (max-width: 1180px), (max-height: 720px) {
+  #hud.coffee-lifecycle-hud.show {
+    width: 480px;
+    min-width: 480px;
+    max-width: 480px;
+    min-height: 132px;
+    padding: 16px 20px;
+  }
+
+  .coffee-lifecycle-card {
+    grid-template-columns: 74px minmax(0, 1fr) 38px;
+    gap: 16px;
+  }
+
+  .coffee-lifecycle-icon {
+    width: 66px;
+    height: 66px;
+    font-size: 30px;
+  }
+
+  .coffee-lifecycle-copy strong {
+    font-size: 27px;
+  }
+
+  .coffee-lifecycle-copy span {
+    font-size: 16px;
+  }
+}
+
+/* Coffee voice transcription -------------------------------------------- */
+.coffee-offer-voice,
+.coffee-confirmation-voice,
+.coffee-taste-voice,
+.coffee-reroll-voice,
+.coffee-payment-voice {
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.coffee-offer-voice {
+  width: 142px;
+}
+
+.coffee-offer-voice:focus-visible,
+.coffee-confirmation-voice:focus-visible,
+.coffee-taste-voice:focus-visible,
+.coffee-payment-voice:focus-visible {
+  outline: 2px solid rgba(103, 226, 255, 0.95);
+  outline-offset: 3px;
+}
+
+.coffee-offer-voice[aria-busy="true"],
+.coffee-confirmation-voice[aria-busy="true"],
+.coffee-taste-voice[aria-busy="true"],
+.coffee-payment-voice[aria-busy="true"] {
+  cursor: progress;
+}
+
+.coffee-reroll-voice:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.coffee-offer-voice [data-coffee-voice-status],
+.coffee-confirmation-voice [data-coffee-voice-status],
+.coffee-taste-voice [data-coffee-voice-status],
+.coffee-payment-voice [data-coffee-voice-status] {
+  overflow: hidden;
+  max-width: 108px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coffee-offer-voice [data-coffee-voice-status] {
+  flex: 1;
+  min-width: 0;
+  max-width: none;
+}
+
+.coffee-voice-feedback {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid rgba(82, 205, 255, 0.34);
+  border-radius: 10px;
+  color: #cfe8ff;
+  background: rgba(14, 47, 74, 0.48);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.coffee-voice-feedback[data-tone="warning"] {
+  border-color: rgba(255, 180, 89, 0.42);
+  color: #ffe0ae;
+  background: rgba(92, 57, 14, 0.34);
+}
+
+.coffee-voice-feedback[hidden] {
+  display: none;
+}
+
+.coffee-offer-wave,
+.coffee-confirmation-voice-wave,
+.coffee-taste-voice-wave,
+.coffee-reroll-voice-wave,
+.coffee-payment-voice-wave {
+  opacity: 0;
+  transform-origin: 50% 50%;
+}
+
+.coffee-offer-voice[data-coffee-voice-state="LISTENING"],
+.coffee-confirmation-voice[data-coffee-voice-state="LISTENING"],
+.coffee-taste-voice[data-coffee-voice-state="LISTENING"],
+.coffee-payment-voice[data-coffee-voice-state="LISTENING"],
+.coffee-offer-voice[data-coffee-voice-state="MONITORING"],
+.coffee-confirmation-voice[data-coffee-voice-state="MONITORING"],
+.coffee-taste-voice[data-coffee-voice-state="MONITORING"],
+.coffee-payment-voice[data-coffee-voice-state="MONITORING"],
+.coffee-offer-voice[data-coffee-voice-state="CAPTURING"],
+.coffee-confirmation-voice[data-coffee-voice-state="CAPTURING"],
+.coffee-taste-voice[data-coffee-voice-state="CAPTURING"],
+.coffee-payment-voice[data-coffee-voice-state="CAPTURING"] {
+  border-color: rgba(81, 232, 255, 0.98);
+  box-shadow:
+    0 0 20px rgba(0, 190, 255, 0.32),
+    inset 0 1px 3px rgba(205, 249, 255, 0.24);
+}
+
+.coffee-offer-voice[data-coffee-voice-state="LISTENING"] .coffee-offer-wave,
+.coffee-confirmation-voice[data-coffee-voice-state="LISTENING"] .coffee-confirmation-voice-wave,
+.coffee-taste-voice[data-coffee-voice-state="LISTENING"] .coffee-taste-voice-wave,
+.coffee-payment-voice[data-coffee-voice-state="LISTENING"] .coffee-payment-voice-wave,
+.coffee-offer-voice[data-coffee-voice-state="MONITORING"] .coffee-offer-wave,
+.coffee-confirmation-voice[data-coffee-voice-state="MONITORING"] .coffee-confirmation-voice-wave,
+.coffee-taste-voice[data-coffee-voice-state="MONITORING"] .coffee-taste-voice-wave,
+.coffee-payment-voice[data-coffee-voice-state="MONITORING"] .coffee-payment-voice-wave,
+.coffee-offer-voice[data-coffee-voice-state="CAPTURING"] .coffee-offer-wave,
+.coffee-confirmation-voice[data-coffee-voice-state="CAPTURING"] .coffee-confirmation-voice-wave,
+.coffee-taste-voice[data-coffee-voice-state="CAPTURING"] .coffee-taste-voice-wave,
+.coffee-payment-voice[data-coffee-voice-state="CAPTURING"] .coffee-payment-voice-wave {
+  opacity: 1;
+  animation: coffee-voice-wave-pulse 0.72s ease-in-out infinite alternate;
+}
+
+.coffee-offer-voice[data-coffee-voice-state="CAPTURING"],
+.coffee-confirmation-voice[data-coffee-voice-state="CAPTURING"],
+.coffee-taste-voice[data-coffee-voice-state="CAPTURING"],
+.coffee-payment-voice[data-coffee-voice-state="CAPTURING"] {
+  box-shadow:
+    0 0 24px rgba(0, 229, 255, 0.48),
+    inset 0 1px 4px rgba(222, 252, 255, 0.34);
+}
+
+.coffee-offer-voice.is-paused,
+.coffee-confirmation-voice.is-paused,
+.coffee-taste-voice.is-paused,
+.coffee-payment-voice.is-paused {
+  opacity: 0.78;
+  border-color: rgba(148, 163, 184, 0.48);
+  box-shadow: none;
+}
+
+.coffee-offer-voice.is-result,
+.coffee-confirmation-voice.is-result,
+.coffee-taste-voice.is-result,
+.coffee-payment-voice.is-result {
+  border-color: rgba(45, 231, 131, 0.78);
+}
+
+.coffee-offer-voice.is-error,
+.coffee-confirmation-voice.is-error,
+.coffee-taste-voice.is-error,
+.coffee-payment-voice.is-error {
+  border-color: rgba(255, 124, 105, 0.86);
+  box-shadow: 0 0 16px rgba(255, 90, 75, 0.16);
+}
+
+.coffee-offer-voice.is-error [data-coffee-voice-status],
+.coffee-confirmation-voice.is-error [data-coffee-voice-status],
+.coffee-taste-voice.is-error [data-coffee-voice-status],
+.coffee-payment-voice.is-error [data-coffee-voice-status] {
+  color: #ffc0b6;
+}
+
+@keyframes coffee-voice-wave-pulse {
+  from {
+    transform: scaleY(0.72);
+    filter: brightness(0.88);
+  }
+  to {
+    transform: scaleY(1.12);
+    filter: brightness(1.35) drop-shadow(0 0 5px rgba(52, 211, 255, 0.72));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coffee-offer-voice[data-coffee-voice-state="LISTENING"] .coffee-offer-wave,
+  .coffee-confirmation-voice[data-coffee-voice-state="LISTENING"] .coffee-confirmation-voice-wave,
+  .coffee-taste-voice[data-coffee-voice-state="LISTENING"] .coffee-taste-voice-wave,
+  .coffee-payment-voice[data-coffee-voice-state="LISTENING"] .coffee-payment-voice-wave,
+  .coffee-offer-voice[data-coffee-voice-state="MONITORING"] .coffee-offer-wave,
+  .coffee-confirmation-voice[data-coffee-voice-state="MONITORING"] .coffee-confirmation-voice-wave,
+  .coffee-taste-voice[data-coffee-voice-state="MONITORING"] .coffee-taste-voice-wave,
+  .coffee-payment-voice[data-coffee-voice-state="MONITORING"] .coffee-payment-voice-wave,
+  .coffee-offer-voice[data-coffee-voice-state="CAPTURING"] .coffee-offer-wave,
+  .coffee-confirmation-voice[data-coffee-voice-state="CAPTURING"] .coffee-confirmation-voice-wave,
+  .coffee-taste-voice[data-coffee-voice-state="CAPTURING"] .coffee-taste-voice-wave,
+  .coffee-payment-voice[data-coffee-voice-state="CAPTURING"] .coffee-payment-voice-wave {
+    animation: none;
+  }
+}

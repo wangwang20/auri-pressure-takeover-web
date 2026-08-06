@@ -1,359 +1,136 @@
-# 车机 HMI 团队协作操作指南
+# AURI 正式车机 HMI 团队操作指南
 
-本指南面向团队协作同事，用于运行和联调 `apps/vehicle-hmi/`。不要在本文档或代码中写入真实 Team Token、OpenAI API Key、联系人、地址或支付信息。
+本指南面向团队协作同事。不要在本文档、源码、Issue、截图或提交记录中写入 Team Token、高德安全码、OpenAI API Key、真实联系人或个人地址。
 
 ## 模块定位
 
-车机 HMI 是驾驶阶段的安全展示端，不是业务状态机。
+`apps/vehicle-hmi/` 是唯一正式车机 HMI，负责只读消费 Agent World State，并在确认 owner 属于车机时提供唯一确认入口。旧版位于 `apps/vehicle-hmi-legacy/`，仅用于回溯。
 
-它只做三件事：
+HMI 不负责：
 
-- 消费 Agent 返回的完整 `WorldState`。
-- 按 `stage`、`primary_surface`、`risk`、`actions` 和 `confirmation` 渲染驾驶界面。
-- 在车机是唯一确认端时调用 `/v1/confirm`。
+- 直接改写 `stage`、`risk`、`tasks`、`actions` 或 `vehicle_state`。
+- 代替手机创建语音任务。
+- 在前端自行计算业务 ETA 或伪造完成态。
+- 绕过 `confirmation_id` 调用动作。
 
-它不能做：
+## 访问地址
 
-- 直接设置 `stage`、`pressure_level` 或动作完成状态。
-- 自行生成 `confirmation_id`。
-- 绕过 Agent 直接让页面进入“已处理”。
-- 在驾驶中展示长聊天、多选复杂决策或完整商品明细。
-
-主屏默认只保留驾驶中必要信息。当前布局为：
-
-- 左侧 30% 主驾驶侧：AURI 判断、现实结论、语音求助、动作摘要和二级页入口。
-- 右侧 70%：持续可见的导航、ETA、责任窗口、刚性/弹性任务卡、速度、限速和档位。
-- 底部：左侧唯一确认按钮、中央语音提示、行程/消息快捷入口和空调只读摘要。
-- 左侧快捷栏底部：Agent 连接配置。
-
-消息草稿、行程详情、方案详情、车况详情和三端同步通过主驾驶侧原位二级页查看；二级页不得使用整屏灰色遮罩，导航和确认入口需要保持上下文可见。不得把控制台日志、商品长列表或消息全文铺在主屏上。
-
-底部任务和行程卡必须在 1280×720 完整显示 Agent 同步的任务标题、责任属性、剩余距离、预计用时和预计到达，不得用省略号隐藏这些关键值。消息正文只能进入二级页，并按段落换行。
-
-风险提醒采用短时或阶段内 Heads-up 通知：
-
-- L1 明确“黄色提示 + 双短震”。
-- L2 明确预计晚到和腕上已同步。
-- L3 明确已减少非必要提示和一次组合振动。
-- 通知不得覆盖左上转向卡、速度/限速区或底部确认入口。
-
-导航画布由 `WorldState.stage` 驱动，不允许写成固定背景：
-
-| 阶段 | 地图模式 | 必须出现的变化 |
-| --- | --- | --- |
-| `off_vehicle_idle` | 路线总览 | 地图低强调，等待手机创建任务。 |
-| `pre_departure_warning` | 出发预警 | 显示最晚出发标记和窗口压缩。 |
-| `handover_to_vehicle` | 路线流转 | 明确手机路线正在交接到车机。 |
-| `vehicle_observation` | 驾驶导航 | 显示转向、车道级引导、速度和路线进度。 |
-| `takeover_L2/L3` | 拥堵告警 | 黄色拥堵段、晚到事件、车辆当前位置和腕上联动通知成为焦点。 |
-| `planning/waiting_confirmation/executing` | Agent 接管 | 地图保持驾驶上下文，提示无需额外操作或等待确认。 |
-| `action_completed/cooldown` | 恢复 | 路段恢复绿态，显示已处理提示并降低打扰。 |
-
-阶段变化应使用短时过渡动画，不使用循环闪烁。必须支持 `prefers-reduced-motion`。当前版本默认接入高德 JS API 2.0 真实 2D 底图、道路 POI、驾车路线和实时交通图层；高德不可用时才显示离线模拟图层。地图路线几何可来自高德，但 ETA、晚到判断、压力等级和任务状态必须来自当前 Agent World State。
-
-## 启动页面
-
-### 公网直接访问
-
-不需要拉代码或启动静态服务器，横屏打开：
+团队 GitHub Pages 部署后：
 
 ```text
-https://wangwang20.github.io/auri-pressure-takeover-web/apps/vehicle-hmi/
+https://954593946.github.io/pressure-takeover-agent/apps/vehicle-hmi/
 ```
 
-第一次使用仍需点击左侧 `连接`，填写团队 Agent API 和负责人单独提供的 Team Token。公网静态页面不包含 Token、OpenAI API Key 或后端环境变量。
+这是团队异地协作的正式公网入口，不要求访问者与开发机处于同一局域网，也不要求开发机保持开机。异地访问时，Agent API 必须使用团队公网 HTTPS 地址；`127.0.0.1` 只指访问者自己的电脑，`192.168.*` 只能在同一局域网使用。
 
-### 本机访问
-
-从仓库根目录启动静态服务：
+本机从仓库根目录启动：
 
 ```bash
 python -m http.server 5174
 ```
 
-打开：
+然后打开：
 
 ```text
 http://127.0.0.1:5174/apps/vehicle-hmi/
 ```
 
-### 局域网访问
+同一局域网共享时改用 `python -m http.server 5174 --bind 0.0.0.0`，其他设备访问 `http://<开发机局域网IP>:5174/apps/vehicle-hmi/`。不同网络的成员不要使用该地址，直接使用上面的 GitHub Pages。
 
-让同一网络中的手机、平板或其他电脑访问开发机：
+## 连接 Agent
 
-```bash
-python -m http.server 5174 --bind 0.0.0.0
-```
+推荐先在同源 Demo Console 中填写 Agent API 和负责人单独提供的 Team Token，再打开 HMI。两页会共享同源浏览器配置。
 
-查询开发机局域网 IP 后，其他设备打开：
+源码和 GitHub Pages 部署产物不内置 Team Token；用户填写的连接配置会保存在当前浏览器的同源 `localStorage`。不要在公共电脑长期保存，也不要在截图、URL 或公开文档中传播 Token。
 
-```text
-http://<开发机局域网IP>:5174/apps/vehicle-hmi/
-```
-
-三种访问方式共用同一套前端代码。页面地址可以是公网、`127.0.0.1` 或局域网 IP，但 Agent API 仍需在页面内单独配置。
-
-## 连接本地 Agent
-
-本地开发时先启动 Agent：
-
-```bash
-python -m uvicorn \
-  auri_agent.app:app \
-  --app-dir services/agent-api/src \
-  --host 127.0.0.1 \
-  --port 8000
-```
-
-打开车机 HMI 后：
-
-1. 点击左侧快捷栏底部 `连接`。
-2. 点击 `本地 Agent`。
-3. Team Token 留空，除非本地后端开启了共享访问。
-4. 点击 `保存并重连`。
-
-## 连接团队公网 Agent
-
-推荐公网 Agent 地址：
+HMI 左上角连接状态可打开配置页。保存后必须同时满足：
 
 ```text
-https://auri-agent-api.onrender.com
+同步方式 = 实时流
+Session != --
+Revision != --
+Agent Health = 正常
 ```
 
-备用公网地址：
+Health 正常只表示服务在线，不表示 Token 鉴权成功。错误 Token 应显示“Team Token 无效或缺失”，Session 和 Revision 保持 `--`。
+
+## 高德地图
+
+默认模式为“自动读取 Agent 配置”：
 
 ```text
-https://auri-langchain-agent-api.onrender.com
-```
-
-打开车机 HMI 后：
-
-1. 点击左侧快捷栏底部 `连接`。
-2. 点击 `团队公网`。
-3. 在 `Team Token` 输入框填写团队负责人提供的令牌。
-4. 点击 `保存并重连`。
-
-注意：
-
-- Team Token 只保存在当前浏览器 `localStorage`。
-- 不要把 Team Token 写入仓库、截图、PR 描述或聊天记录。
-- 不要把 OpenAI API Key 写入任何前端文件。
-- 如果页面部署在公网，Agent API 不能填 `127.0.0.1`，否则会访问使用者自己的电脑。
-- HMI 不直接调用 LangChain 工具，只消费 Agent 返回的 `WorldState`。
-- 备用公网地址只在负责人明确切换共享实例时使用。
-
-## 默认高德在线地图
-
-HMI 页面启动时会携带已保存的 Team Token 请求 Agent：
-
-```http
 GET /v1/map-config
-X-Agent-Token: <团队令牌>
 ```
 
-Agent 配置完整时，HMI 自动加载高德真实 2D 地图，不需要协作同事填写地图 Key。自动配置失败时，可在左侧 `连接` 的“导航地图”区域查看状态或切换离线地图；仅地图负责人本机调试时才手动填写 Key。
+公网真实地图必须由 Agent 返回 `provider=amap`。若返回 `provider=offline`，HMI 会显示 Bosch 离线地图；这不是空白或连接成功的假状态。
 
-默认路线：
+本机地图负责人可复制 `env.local.example.js` 为 `env.local.js` 做真实 Key 诊断。`env.local.js` 已被 Git 忽略，禁止提交。
 
-```text
-起点：博世苏州・星龙街455号
-终点：阳光小学（Demo 冻结坐标）
+高德 SDK、路线或额度异常时，HMI 应在 2 秒内回退离线地图。Agent 的 ETA、晚到分钟、任务和风险仍是业务真相，高德只提供道路和路线表现。
+
+导航页提供“3D 跟车”和“路线全览”两种驾驶视角。跟车态应看到真实高德底图的道路、社区/园区、楼宇、商户和公共设施文字、路线向前、自车固定在下部，路线当前位置投影与固定车标误差不得超过 4px。补充道路名来自高德 `DrivingResult`；每条路线最多一次 `AMap.PlaceSearch.searchNearBy`，最多 10 个真实地点，以中性高德风格文字同时增强跟车与全览，不得写死地点或使用品牌金强调。搜索失败不得阻断原生底图和路线。高德没有返回可靠路名时隐藏补充路名，不显示“当前道路”等假标签。全览态应看到整条路线和起终点。若设备没有可用 WebGL，页面保持真实高德 2D 全览并禁用跟车。正式展示设备必须提前运行 `e2e_live_amap_navigation.py`，并人工核对跟车文字密度、拥堵停车、恢复行驶和全览切换。
+
+Agent 处理方案必须保留在驾驶员左侧常驻区，动作名称、摘要和状态应能快速扫读。`service_prepared` / `waiting_confirmation` 可出现一次非模态提示，但不得覆盖主导航、持续闪烁或要求复杂选择；`waiting_confirmation` 只保留一个主要确认入口。15 阶段视觉回归会检查处理方案标题、动作标题字号、确认按钮高度和方案提示内容。
+
+方案语音简报必须从当前 World State 动态生成，至少反映 `risk.late_minutes`、动作数量和确认端；具体联系人、金额和配送时段留在视觉卡片，不在驾驶语音中逐项朗读。不得写死老师、家人、采购或时间。只在车机为主交互端且方案指纹变化时自动播报，同一方案因无关 revision（例如空调变化）更新时不得重播；完成态同样根据执行后的状态生成。自动化测试通过拦截 `speechSynthesis.speak()` 验证准备和完成两段动态文本。
+
+## 标准联调
+
+1. Console 与 HMI 连接同一个 Agent，核对 Session 和 revision。
+2. 初始应为 0 项任务；手机通过 `/v1/chat` 创建任务，或 Console 选择性载入演示预置。
+3. Console 依次推进会议延迟、接近车辆、进入车辆、拥堵和压力辅助信号。
+4. 手机语音求助后，HMI 显示语音转写、动态动作组和三端状态。
+5. 只有 `primary_surface=vehicle_hmi`、confirmation pending 且未过期时出现确认按钮。
+6. 确认后等待更高 revision 的完成态；HMI 不提前显示成功。
+7. 点击接管主屏“AURI 已准备”或任一动作，应进入处理进度页；完成态显示 `完成数/总数` 和 `100%`，可继续进入消息/订单详情。
+8. cooldown 后降低打扰；停车后主端回到手机，HMI 只保留结束摘要。
+
+## 验收命令
+
+先启动启用测试鉴权的隔离 Agent。服务端变量必须叫 `AGENT_SHARED_TOKEN`；测试脚本读取的客户端变量才叫 `AURI_AGENT_TOKEN`，两者不要混用：
+
+```bash
+AGENT_SHARED_TOKEN=test-shared-token LLM_ENABLED=false BUILD_SHA=local-audit \
+/home/fly/miniconda3/envs/auri-agent-dev/bin/python -m uvicorn \
+  auri_agent.app:app --app-dir services/agent-api/src \
+  --host 127.0.0.1 --port 8795
 ```
 
-安全和额度约束：
+静态服务 `127.0.0.1:5174` 也已启动后执行：
 
-- 不把 Key 或 Security JS Code 写入代码和团队文档。
-- 高德 Key 缺失或调用失败时自动回退离线地图。
-- 高德只负责地图上下文；Agent 的 ETA、晚到判断、任务和确认仍是唯一业务事实。
-- 公网 Key 必须允许当前 HMI 域名。
-- 公网环境必须使用 Agent `/_AMapService` 代理保存 Security JS Code。
-- 当前浏览器每月最多初始化地图 200 次、规划路线 200 次；达到后自动回退离线地图。
-- 重跑故事线使用 Console 的 `重置 Demo`，不要通过反复刷新 HMI 重置。
-- Console 事件、SSE 和轮询不会重新调用高德路线规划。
+```bash
+node apps/vehicle-hmi/tests/world-state-model.test.cjs
+node apps/vehicle-hmi/tests/agent-client.test.cjs
+node apps/vehicle-hmi/tests/amap-adapter.test.cjs
 
-检查本浏览器地图状态和调用计数：
+/home/fly/miniconda3/envs/bosch-agent-dev/bin/python \
+  apps/vehicle-hmi/tests/e2e_config_interaction.py
 
-```js
-window.AURI_HMI.getMapStatus()
-window.AURI_HMI.getMapUsage()
+AURI_AGENT_TOKEN=test-shared-token \
+/home/fly/miniconda3/envs/bosch-agent-dev/bin/python \
+  apps/vehicle-hmi/tests/e2e_ultrawide_readability.py
+
+AURI_AGENT_TOKEN=test-shared-token \
+/home/fly/miniconda3/envs/bosch-agent-dev/bin/python \
+  apps/vehicle-hmi/tests/e2e_console_hmi_sync.py
 ```
 
-完整说明见：
-
-```text
-docs/amap-hmi-integration.md
-```
-
-## 车载状态和空调联动
-
-Agent 新增 `vehicle_state` 字段后，HMI 会只读展示空调状态：
-
-```text
-vehicle_state.ac_on
-vehicle_state.ac_target_temp
-vehicle_state.ac_mode
-vehicle_state.fan_speed
-```
-
-该状态来自 Agent 的 `control_ac` 工具。HMI 不直接控制空调，不绕过 Agent 写 World State。联调方式见 `docs/ac-control-hmi-handoff.md`。
-
-## 状态同步机制
-
-HMI 使用两种方式同步 Agent 状态：
-
-- SSE：`GET /v1/stream`
-- 轮询兜底：`GET /v1/state`
-
-客户端只接受相同 `session_id` 且更高 `revision` 的快照。
-
-如果公网 SSE 被代理或浏览器中断，HMI 会通过轮询继续更新，不需要手动保存重连。
-
-正式展示时 HMI 内置事件按钮默认隐藏。需要本地调试时，在地址后追加：
-
-```text
-?debug=1
-```
-
-## 与 LangChain Agent 的关系
-
-新版公网 Agent 使用 LangChain 做自然语言工具编排，但 HMI 的接入方式不变：
-
-```text
-GET /v1/state
-GET /v1/stream
-POST /v1/confirm
-```
-
-HMI 不读取工具调用细节，不从聊天回复反推状态，也不直接调用 `create_tasks`、`prepare_assistance` 等工具。工具结果最终会体现在 `WorldState.tasks`、`actions`、`confirmation` 和 `output.conclusion` 中，HMI 只按这些字段渲染。
-
-## 主驾驶侧交互规则
-
-左侧手机语音卡是只读的跨端转写展示，不是车机输入按钮。手机提交：
-
-```text
-POST /v1/event
-type = user.utterance
-source = mobile
-payload.text = 我还来得及吗？帮我处理
-payload.input_mode = voice
-```
-
-Agent 将转写写入 `WorldState.last_utterance`；HMI 收到更高 revision 后展示原文。HMI 禁止自行提交 `user.utterance`。
-
-`方案`、`车况`、`同步`、`消息草稿`、`行程详情`均为二级信息入口，只读展示当前 `WorldState` 摘要，不直接改写状态。二级信息在主驾驶侧原位替换 AURI 面板，保持地图和底部确认入口可见，不做网页式全屏遮罩。二级页打开期间收到新 revision 时，内容必须同步刷新。
-
-驾驶输出预算：
-
-- 主屏现实结论最多两句，优先呈现“继续加速无法明显缩短时间”等现实判断。
-- 动作组最多显示三条短摘要。
-- 待确认时只保留一个底部主要 CTA；手机语音卡保持只读。
-- 完成后显示“需要时再叫我”并降低视觉强调。
-
-二级页视觉与交互要求：
-
-- `任务`页使用一个责任总览、两张可展开任务卡和一个处理进度，不回退到键值表。
-- `消息`页使用联系人分段控件；联系人来自 Agent `actions[]`，老师、孩子妈妈、爷爷或奶奶变化时原位更新消息预览。
-- `同步`页必须同时显示三端流转关系、当前主交互端、设备状态和 World State revision。
-- 任务展开、联系人切换均需保持地图和底部唯一确认 CTA 可见。
-- 状态必须同时使用图形、颜色和文字，后端枚举不得直接暴露给用户。
-- 1280×720 和 1600×900 横屏下，三个页面不得产生页面级滚动或遮挡。
-- 主判断区必须使用“阶段状态卡 + 现实结论卡”，不得退回“标签 + 长标题 + 两段文字”的平铺方式。
-- `parked_review` 显示手机接续状态，并允许进入消息记录和处理结果；不再展示座舱状态入口。
-- 顶部接送状态使用“晚到 18 分钟”“出发时间紧张”“可按时到达”等用户语言，禁止使用“责任窗口突破/压缩”。
-
-## 车机确认规则
-
-确认按钮只有在以下条件同时满足时启用：
-
-```text
-primary_surface = vehicle_hmi
-confirmation.owner_surface = vehicle_hmi
-confirmation.status = pending
-```
-
-确认请求：
-
-```http
-POST /v1/confirm
-```
-
-请求体由页面根据 `WorldState.confirmation.confirmation_id` 生成。前端不得自己创建新的确认 ID。
-
-## 标准联调流程
-
-建议同时打开：
-
-```text
-车机 HMI:
-http://127.0.0.1:5174/apps/vehicle-hmi/
-
-Demo 控制台:
-http://127.0.0.1:5174/apps/demo-console/
-```
-
-在控制台按顺序推进：
-
-| 步骤 | 控制台按钮 | 车机期望表现 |
-| --- | --- | --- |
-| 1 | 重置 Demo | 车机回到初始状态。 |
-| 2 | 创建任务 | 任务卡出现接孩子和超市，地图保持路线总览。 |
-| 3 | 会议延迟 | 显示出发窗口压缩、`17:38 前出发` 标记，风险 L1。 |
-| 4 | 接近车辆 | 显示路线流转动画，进入交接到车机状态。 |
-| 5 | 进入车辆 | 主交互端切到车机，地图进入车道级驾驶导航。 |
-| 6 | 拥堵加剧 | 地图放大前方路段，黄色拥堵段显示晚到 18 分钟，进入 L2。 |
-| 7 | 用户求助 | 地图保持驾驶上下文，出现动作组和确认按钮。 |
-| 8 | 确认发送 | 拥堵段转恢复绿态，地图显示“已处理，保持当前速度”。 |
-| 9 | 低干扰恢复 | 进入 cooldown。 |
-| 10 | 停车复盘 | 主端回到手机。 |
+破坏性 E2E 只允许指向隔离本地 Agent，禁止对共享公网 Session 执行 reset 或完整写入测试。
 
 ## 常见问题
 
-### 页面打开但状态不更新
+### Health 正常，但 Session 为 `--`
 
-检查：
+检查 Token、浏览器 Network 中 `/v1/state` 的 HTTP 状态，以及 Console/HMI 是否同源。401 不是 SSE 问题。
 
-- HMI 和控制台是否连接同一个 Agent API。
-- Team Token 是否正确。
-- 浏览器 Network 中 `/v1/state` 是否 200。
-- 浏览器 Network 中 `/v1/stream` 是否成功或轮询是否持续。
+### 地图设置自动收起
 
-如果配置曾经连过旧地址，可在浏览器 Console 执行：
+当前版本不应发生。强制刷新后重试；若仍发生，记录 revision、浏览器版本和页面错误，并运行 `e2e_config_interaction.py`。
 
-```js
-localStorage.removeItem("auri-hmi-config")
-location.reload()
-```
+### 显示离线地图
 
-然后重新通过底部 `Agent` 配置。
+检查 Agent `/health` 的 `amap_configured` 和 `/v1/map-config` 的 `provider`。公网环境不要把安全码写进浏览器或仓库。
 
-### 确认按钮不可点击
+### Console 更新但 HMI 不更新
 
-这通常是正确行为。只有车机是 `primary_surface` 且确认 owner 是 `vehicle_hmi` 时才可点击。
-
-用 `/v1/state` 检查：
-
-```text
-primary_surface
-confirmation.owner_surface
-confirmation.status
-```
-
-### 页面连接公网 Agent 返回 401
-
-说明 Team Token 缺失或错误。请向 Agent Owner 获取令牌，并只填在浏览器配置中。
-
-## 提交前检查
-
-修改 HMI 后至少运行：
-
-```bash
-node --check apps/vehicle-hmi/app.js
-git diff --check
-```
-
-还要确认：
-
-- 没有提交 Team Token。
-- 没有提交 OpenAI API Key。
-- 没有让前端直接设置最终 World State。
-- HMI 仍可连接本地 Agent 和公网 Agent。
+核对两端 Session、revision 和 API Origin。HMI 应优先使用 SSE，断开时进入轮询并自动重连追平。

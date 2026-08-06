@@ -1,0 +1,3841 @@
+:root {
+  --auri-navy: #0b1b33;
+  --auri-gold: #d4af7a;
+  --auri-ivory: #f5f2ec;
+  --state-processing: #2f6bff;
+  --state-warning: #e6a700;
+  --state-success: #2e9d6f;
+  --state-critical: #d1495b;
+  --bg: #020817;
+  --panel: #071427;
+  --card: #0b1b33;
+  --blue: var(--state-processing);
+  --blue2: #6d96ff;
+  --green: var(--state-success);
+  --orange: var(--state-warning);
+  --red: var(--state-critical);
+  --t1: var(--auri-ivory);
+  --t2: rgba(245, 242, 236, 0.62);
+  --t3: rgba(245, 242, 236, 0.34);
+  --cyan: #7eb7ff;
+  --yellow: var(--state-warning);
+  --rds-glass-border: rgba(126, 183, 255, 0.46);
+  --rds-glass-fill-a: rgba(11, 27, 51, 0.96);
+  --rds-glass-fill-b: rgba(4, 13, 29, 0.95);
+  --rds-glass-fill-c: rgba(7, 12, 24, 0.97);
+  --rds-text: var(--auri-ivory);
+  --rds-muted: rgba(245, 242, 236, 0.58);
+  --rds-cyan: #7eb7ff;
+}
+
+body {
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #00030a;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+body {
+  position: fixed;
+  inset: 0;
+}
+
+.hmi {
+  background: var(--bg);
+}
+
+.top-bar {
+  background: linear-gradient(180deg, #020817, #061124) !important;
+  border-bottom-color: rgba(212, 175, 122, 0.13) !important;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.34) !important;
+}
+
+.tb-logo {
+  min-width: 138px;
+}
+
+.auri-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  color: var(--auri-ivory);
+  white-space: nowrap;
+}
+
+.auri-wordmark-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  object-fit: contain;
+  box-shadow: 0 0 0 1px rgba(212, 175, 122, 0.2), 0 5px 16px rgba(0, 0, 0, 0.26);
+}
+
+.auri-wordmark strong {
+  font-size: 18px;
+  font-weight: 660;
+  letter-spacing: 0;
+}
+
+.tb-offline {
+  color: rgba(245, 242, 236, 0.62) !important;
+  border-color: rgba(212, 175, 122, 0.24) !important;
+  background: rgba(212, 175, 122, 0.07) !important;
+}
+
+.tb-np-txt strong,
+.tb-stat-time,
+.tb-stat-5g {
+  color: var(--auri-ivory) !important;
+}
+
+.top-bar::after {
+  background: var(--state-processing) !important;
+  box-shadow: 0 0 9px rgba(47, 107, 255, 0.92) !important;
+}
+
+.demo-ctl,
+#playbtn,
+.day-tl,
+.sidebar,
+.pipe-strip,
+#tp,
+#scene-tx,
+#tx-tap-hint,
+#trip-summary,
+#severe-alert {
+  display: none !important;
+}
+
+.vd-panel {
+  background:
+    radial-gradient(92% 48% at 52% 20%, rgba(47, 107, 255, 0.25), transparent 70%),
+    linear-gradient(180deg, #061326 0%, #020817 100%) !important;
+  border-right-color: rgba(212, 175, 122, 0.12) !important;
+}
+
+.scene3d {
+  background:
+    radial-gradient(1.6px 1.6px at 18% 6%, rgba(245,242,236,.8), transparent 60%),
+    radial-gradient(1.2px 1.2px at 36% 12%, rgba(212,175,122,.58), transparent 60%),
+    radial-gradient(1.8px 1.8px at 58% 4%, rgba(245,242,236,.84), transparent 60%),
+    radial-gradient(1.1px 1.1px at 72% 14%, rgba(180,200,236,.5), transparent 60%),
+    radial-gradient(1.4px 1.4px at 84% 8%, rgba(245,242,236,.72), transparent 60%),
+    radial-gradient(ellipse 70% 18% at 50% 36%, rgba(47,107,255,.24), transparent 78%),
+    linear-gradient(180deg, #02040c 0%, #061026 34%, #081630 36%, #071226 36.5%, #040b19 64%, #02050d 100%),
+    #02040c !important;
+}
+
+.auri-car-mark {
+  position: absolute;
+  left: 50%;
+  z-index: 24;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: #0b1b33;
+  background: linear-gradient(180deg, #f9f8f3, #d9dce2);
+  border: 1px solid rgba(11, 27, 51, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.34);
+  font-weight: 780;
+  letter-spacing: 0;
+}
+
+.auri-car-mark--badge {
+  top: calc(92% - 100px);
+  width: 48px;
+  height: 11px;
+  border-radius: 50%;
+  font-size: 5px;
+  color: #8a6a36;
+}
+
+.auri-car-mark--plate {
+  top: calc(92% - 84px);
+  width: 70px;
+  height: 23px;
+  border-radius: 3px;
+  font-size: 10px;
+  color: var(--auri-navy);
+}
+
+.vd-nav-card {
+  border-color: rgba(126, 183, 255, 0.2) !important;
+  background:
+    radial-gradient(105% 80% at 0% 0%, rgba(47, 107, 255, 0.18), transparent 58%),
+    linear-gradient(180deg, rgba(11, 27, 51, 0.97), rgba(4, 13, 29, 0.98)) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28), inset 0 1px rgba(245, 242, 236, 0.035);
+}
+
+.vd-nav-card.is-default .vd-nav-arrow {
+  color: var(--auri-ivory) !important;
+  filter: drop-shadow(0 0 8px rgba(47, 107, 255, 0.7)) !important;
+}
+
+.vd-nav-card[role="button"] {
+  cursor: pointer;
+}
+
+.vd-nav-card[role="button"]:focus-visible {
+  border-color: rgba(212, 175, 122, 0.58) !important;
+  outline: 3px solid rgba(212, 175, 122, 0.16);
+  outline-offset: 3px;
+}
+
+.auri-responsibility-strip {
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  gap: 7px;
+}
+
+.auri-responsibility-strip[hidden] { display: none !important; }
+
+.auri-responsibility-item,
+.auri-responsibility-more {
+  min-width: 0;
+  height: 64px;
+  box-sizing: border-box;
+  border: 1px solid rgba(126, 183, 255, 0.13);
+  border-radius: 11px;
+  color: var(--auri-ivory);
+  background: rgba(245, 242, 236, 0.035);
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+
+.auri-responsibility-item {
+  padding: 7px 10px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 20px 27px;
+  column-gap: 6px;
+  text-align: left;
+}
+
+.auri-responsibility-item span {
+  grid-row: 1;
+  grid-column: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: rgba(245, 242, 236, 0.46);
+  font-size: 13px;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auri-responsibility-item b {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  min-width: 0;
+  overflow: hidden;
+  color: rgba(245, 242, 236, 0.91);
+  font-size: 18px;
+  line-height: 27px;
+  font-weight: 620;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auri-responsibility-item em {
+  grid-row: 1;
+  grid-column: 2;
+  color: rgba(245, 242, 236, 0.52);
+  font-size: 13px;
+  font-style: normal;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.auri-responsibility-item.is-rigid {
+  border-color: rgba(230, 167, 0, 0.26);
+  background: linear-gradient(135deg, rgba(230, 167, 0, 0.095), rgba(245, 242, 236, 0.025));
+}
+
+.auri-responsibility-item.is-rigid span,
+.auri-responsibility-item.is-rigid em { color: #e9c467; }
+
+.auri-responsibility-item.is-flexible {
+  border-color: rgba(47, 107, 255, 0.25);
+  background: linear-gradient(135deg, rgba(47, 107, 255, 0.1), rgba(245, 242, 236, 0.025));
+}
+
+.auri-responsibility-item.is-flexible span,
+.auri-responsibility-item.is-flexible em { color: #8fb6ff; }
+
+.auri-responsibility-more {
+  width: 38px;
+  color: rgba(245, 242, 236, 0.7);
+  font-size: 12px;
+}
+
+.auri-responsibility-item:hover,
+.auri-responsibility-item:focus-visible,
+.auri-responsibility-more:hover,
+.auri-responsibility-more:focus-visible {
+  border-color: rgba(212, 175, 122, 0.48);
+  background-color: rgba(245, 242, 236, 0.075);
+  outline: none;
+}
+
+.auri-responsibility-item:active,
+.auri-responsibility-more:active { transform: scale(0.98); }
+
+.vd-nav-card:has(.auri-responsibility-strip:not([hidden])) {
+  gap: 7px;
+}
+
+.vd-nav-card:has(.auri-responsibility-strip:not([hidden])) .vd-nav-main {
+  margin-top: 0;
+  padding-bottom: 3px;
+}
+
+.vd-nav-card:has(.auri-responsibility-strip:not([hidden])) .vd-nav-stats {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+}
+
+.vd-nav-card:has(.auri-responsibility-strip:not([hidden])) .vd-nav-progress {
+  margin-top: 2px;
+}
+
+.vd-half-bot.is-auri-takeover #vd-nav-card {
+  display: none !important;
+}
+
+.vd-panel:has(.vd-half-bot.is-auri-takeover) .vd-half-top {
+  flex-basis: 440px !important;
+}
+
+.vd-half-bot.is-auri-takeover .vd-status-icons {
+  display: none !important;
+}
+
+.auri-takeover-card {
+  height: 440px;
+  min-height: 440px;
+  margin: 10px 24px 12px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border: 1px solid rgba(126, 183, 255, 0.24);
+  border-radius: 16px;
+  color: var(--auri-ivory);
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(47, 107, 255, 0.22), transparent 56%),
+    linear-gradient(180deg, rgba(11, 27, 51, 0.985), rgba(4, 13, 29, 0.99));
+  box-shadow: 0 13px 34px rgba(0, 0, 0, 0.32), inset 0 1px rgba(245, 242, 236, 0.04);
+  box-sizing: border-box;
+  overflow: hidden;
+  animation: auriTakeoverIn 320ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.auri-takeover-card[hidden] { display: none !important; }
+
+.auri-takeover-card[data-tone="warning"] { border-color: rgba(230, 167, 0, 0.4); }
+.auri-takeover-card[data-tone="critical"] { border-color: rgba(209, 73, 91, 0.46); }
+.auri-takeover-card[data-tone="success"] { border-color: rgba(46, 157, 111, 0.42); }
+
+.auri-takeover-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 34px;
+  flex-shrink: 0;
+}
+
+.auri-takeover-head > span:last-child { min-width: 0; }
+
+.auri-takeover-head b,
+.auri-takeover-head small { display: block; }
+
+.auri-takeover-head b {
+  font-size: 20px;
+  font-weight: 680;
+}
+
+.auri-takeover-head small {
+  margin-top: 2px;
+  max-width: 350px;
+  overflow: hidden;
+  color: rgba(245, 242, 236, 0.5);
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auri-takeover-orbit {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(212, 175, 122, 0.4);
+  border-radius: 50%;
+  background: rgba(212, 175, 122, 0.08);
+  box-shadow: 0 0 0 6px rgba(212, 175, 122, 0.035);
+}
+
+.auri-takeover-orbit i {
+  color: var(--auri-gold);
+  font: 730 18px/1 Inter, sans-serif;
+}
+
+.auri-takeover-conclusion {
+  margin: 0;
+  min-height: 80px;
+  flex-shrink: 0;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--auri-ivory);
+  font-size: 32px;
+  line-height: 1.22;
+  font-weight: 610;
+}
+
+.auri-takeover-actions {
+  display: grid;
+  gap: 4px;
+  min-height: 30px;
+  max-height: 138px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.auri-takeover-action {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 9px;
+  display: grid;
+  grid-template-columns: 25px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(126, 183, 255, 0.11);
+  border-radius: 10px;
+  background: rgba(245, 242, 236, 0.035);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.auri-takeover-action:hover,
+.auri-takeover-action:focus-visible {
+  border-color: rgba(212, 175, 122, 0.46);
+  background: rgba(245, 242, 236, 0.075);
+  outline: none;
+}
+
+.auri-takeover-action:active { transform: translateY(1px); }
+
+.auri-takeover-action > span {
+  width: 23px;
+  height: 23px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: #a9c7ff;
+  background: rgba(47, 107, 255, 0.13);
+  font-size: 11px;
+}
+
+.auri-takeover-action b {
+  min-width: 0;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: rgba(245, 242, 236, 0.86);
+  font-size: 18px;
+  line-height: 1.22;
+  font-weight: 540;
+}
+
+.auri-takeover-action small {
+  color: rgba(245, 242, 236, 0.44);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.auri-takeover-action.is-completed > span {
+  color: #73d7ae;
+  background: rgba(46, 157, 111, 0.13);
+}
+
+.auri-takeover-devices {
+  min-height: 34px;
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.auri-takeover-devices > span {
+  min-width: 0;
+  padding: 6px 7px;
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr);
+  align-content: center;
+  column-gap: 6px;
+  border-radius: 10px;
+  background: rgba(245, 242, 236, 0.028);
+}
+
+.auri-takeover-devices i {
+  width: 7px;
+  height: 7px;
+  align-self: center;
+  border-radius: 50%;
+  background: rgba(245, 242, 236, 0.28);
+}
+
+.auri-takeover-devices .is-active i {
+  background: var(--state-success);
+  box-shadow: 0 0 8px rgba(46, 157, 111, 0.72);
+}
+
+.auri-takeover-devices b,
+.auri-takeover-devices small {
+  grid-column: 2;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auri-takeover-devices b { font-size: 14px; font-weight: 650; }
+.auri-takeover-devices small { margin-top: 1px; color: rgba(245, 242, 236, 0.4); font-size: 12px; }
+
+.auri-takeover-confirm {
+  min-height: 56px;
+  flex-shrink: 0;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 1px solid rgba(212, 175, 122, 0.48);
+  border-radius: 13px;
+  color: var(--auri-navy);
+  background: linear-gradient(135deg, #f5f2ec, #d4af7a);
+  box-shadow: 0 9px 22px rgba(0, 0, 0, 0.24), inset 0 1px rgba(255, 255, 255, 0.64);
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+  cursor: pointer;
+  transition: transform 140ms ease, filter 140ms ease;
+}
+
+.auri-takeover-confirm[hidden] { display: none !important; }
+.auri-takeover-confirm:not(:disabled):active { transform: scale(0.98); }
+.auri-takeover-confirm:not(:disabled):hover { filter: brightness(1.04); }
+.auri-takeover-confirm:disabled { cursor: default; opacity: 0.78; }
+.auri-takeover-confirm > span { font-size: 17px; font-weight: 730; }
+.auri-takeover-confirm > small { color: rgba(11, 27, 51, 0.58); font-size: 11px; }
+
+.auri-takeover-confirm.is-loading::before {
+  content: "";
+  width: 17px;
+  height: 17px;
+  border: 2px solid rgba(11, 27, 51, 0.2);
+  border-top-color: var(--auri-navy);
+  border-radius: 50%;
+  animation: auriSpin 800ms linear infinite;
+}
+
+.auri-confirm-error {
+  margin: 0;
+  color: #ff9aa6;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.auri-device-notice {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  z-index: 32;
+  width: min(470px, calc(100% - 260px));
+  min-height: 72px;
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 11px;
+  border: 1px solid rgba(11, 27, 51, 0.12);
+  border-radius: 18px;
+  color: var(--auri-navy);
+  background: rgba(245, 242, 236, 0.94);
+  box-shadow: 0 16px 36px rgba(11, 27, 51, 0.18);
+  backdrop-filter: blur(20px) saturate(1.12);
+  opacity: 0;
+  transform: translate(-50%, -14px) scale(0.98);
+  transition: opacity 210ms ease, transform 260ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.auri-device-notice[hidden] { display: none !important; }
+.auri-device-notice.is-visible { opacity: 1; transform: translate(-50%, 0) scale(1); }
+
+.auri-notice-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  color: var(--state-processing);
+  background: rgba(47, 107, 255, 0.1);
+  font-size: 16px;
+  font-weight: 720;
+}
+
+.auri-device-notice[data-tone="warning"] .auri-notice-icon {
+  color: #745500;
+  background: rgba(230, 167, 0, 0.15);
+}
+
+.auri-device-notice[data-tone="completed"] .auri-notice-icon {
+  color: #176544;
+  background: rgba(46, 157, 111, 0.13);
+}
+
+.auri-notice-copy { min-width: 0; }
+.auri-notice-copy b,
+.auri-notice-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.auri-notice-copy b { font-size: 16px; font-weight: 690; }
+.auri-notice-copy small { margin-top: 4px; color: rgba(11, 27, 51, 0.58); font-size: 13px; }
+
+.auri-device-notice button {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  color: rgba(11, 27, 51, 0.52);
+  background: rgba(11, 27, 51, 0.055);
+  font: 300 21px/1 Inter, sans-serif;
+  cursor: pointer;
+}
+
+.auri-stage-notice {
+  position: absolute;
+  top: 66px;
+  left: 20px;
+  z-index: 30;
+  width: min(430px, calc(100% - 110px));
+  min-height: 88px;
+  padding: 12px 12px 12px 14px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(126, 183, 255, 0.22);
+  border-radius: 16px;
+  color: var(--auri-ivory);
+  background:
+    radial-gradient(110% 120% at 0% 0%, rgba(47, 107, 255, 0.2), transparent 58%),
+    rgba(4, 13, 29, 0.91);
+  box-shadow: 0 16px 38px rgba(3, 9, 24, 0.3);
+  backdrop-filter: blur(20px) saturate(1.1);
+  opacity: 0;
+  transform: translateY(-10px) scale(0.985);
+  transition: opacity 200ms ease, transform 250ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.auri-stage-notice[hidden] { display: none !important; }
+.auri-stage-notice.is-visible { opacity: 1; transform: none; }
+
+.auri-stage-notice-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(212, 175, 122, 0.35);
+  border-radius: 13px;
+  color: var(--auri-gold);
+  background: rgba(212, 175, 122, 0.08);
+  font-size: 17px;
+  font-weight: 720;
+}
+
+.auri-stage-notice > span:nth-child(2) { min-width: 0; }
+.auri-stage-notice small,
+.auri-stage-notice b,
+.auri-stage-notice em { display: block; }
+.auri-stage-notice small { color: #8fb6ff; font-size: 10px; font-weight: 650; }
+.auri-stage-notice b { margin-top: 3px; overflow: hidden; font-size: 16px; font-weight: 680; text-overflow: ellipsis; white-space: nowrap; }
+.auri-stage-notice em { margin-top: 3px; overflow: hidden; color: rgba(245, 242, 236, 0.52); font-size: 12px; font-style: normal; text-overflow: ellipsis; white-space: nowrap; }
+
+.auri-stage-notice[data-tone="success"] {
+  border-color: rgba(46, 157, 111, 0.32);
+  background: linear-gradient(135deg, rgba(46, 157, 111, 0.18), rgba(4, 13, 29, 0.93));
+}
+
+.auri-stage-notice[data-tone="success"] small { color: #73d7ae; }
+
+.auri-stage-notice[data-tone="warning"] {
+  border-color: rgba(230, 167, 0, 0.38);
+  background: linear-gradient(135deg, rgba(230, 167, 0, 0.18), rgba(4, 13, 29, 0.93));
+}
+
+.auri-stage-notice[data-tone="warning"] small { color: #ffd365; }
+
+.auri-stage-notice button {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  color: rgba(245, 242, 236, 0.55);
+  background: rgba(245, 242, 236, 0.055);
+  font: 300 21px/1 Inter, sans-serif;
+  cursor: pointer;
+}
+
+@keyframes auriTakeoverIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes auriSpin { to { transform: rotate(360deg); } }
+
+.right-panel {
+  background:
+    radial-gradient(70% 60% at 48% 43%, rgba(47, 107, 255, 0.15), transparent 72%),
+    linear-gradient(180deg, #07162a, #020817) !important;
+}
+
+.auri-amap-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  opacity: 0;
+  background: #edf1f2;
+  pointer-events: none;
+  transition: opacity 260ms ease;
+}
+
+.right-panel.is-amap-online .auri-amap-canvas {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.right-panel .map-design {
+  transition: opacity 260ms ease, visibility 0s linear 260ms;
+}
+
+.right-panel.is-amap-online .map-design {
+  opacity: 0 !important;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.right-panel.is-amap-online #rmap {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.auri-map-source {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  z-index: 29;
+  min-height: 34px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(11, 27, 51, 0.12);
+  border-radius: 12px;
+  color: rgba(11, 27, 51, 0.72);
+  background: rgba(245, 242, 236, 0.9);
+  box-shadow: 0 7px 22px rgba(11, 27, 51, 0.12);
+  backdrop-filter: blur(16px) saturate(1.12);
+  font-size: 14px;
+  font-weight: 650;
+  pointer-events: none;
+}
+
+.auri-map-source::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(11, 27, 51, 0.36);
+}
+
+.auri-map-source[data-mode="loading"]::before {
+  background: var(--state-processing);
+  box-shadow: 0 0 0 5px rgba(47, 107, 255, 0.12);
+}
+
+.auri-map-source[data-mode="online"]::before {
+  background: var(--state-success);
+  box-shadow: 0 0 0 5px rgba(46, 157, 111, 0.11);
+}
+
+.auri-map-source[data-mode="offline"] {
+  color: rgba(245, 242, 236, 0.7);
+  border-color: rgba(245, 242, 236, 0.1);
+  background: rgba(4, 13, 29, 0.76);
+}
+
+.auri-map-controls {
+  position: absolute;
+  right: 22px;
+  bottom: 30px;
+  z-index: 29;
+  display: grid;
+  grid-template-columns: repeat(2, 48px);
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid rgba(11, 27, 51, 0.1);
+  border-radius: 16px;
+  background: rgba(245, 242, 236, 0.91);
+  box-shadow: 0 10px 28px rgba(11, 27, 51, 0.16);
+  backdrop-filter: blur(18px) saturate(1.14);
+}
+
+.auri-map-controls[hidden] {
+  display: none;
+}
+
+.auri-map-controls button {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(11, 27, 51, 0.1);
+  border-radius: 12px;
+  color: var(--auri-navy);
+  background: rgba(255, 255, 255, 0.72);
+  font: 600 24px/1 Inter, sans-serif;
+  cursor: pointer;
+  transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
+}
+
+.auri-map-controls button:hover,
+.auri-map-controls button:focus-visible {
+  border-color: rgba(47, 107, 255, 0.34);
+  background: #fff;
+  outline: none;
+}
+
+.auri-map-controls button:active {
+  transform: scale(0.94);
+}
+
+.auri-map-controls button:disabled {
+  color: rgba(11, 27, 51, 0.34);
+  background: rgba(255, 255, 255, 0.48);
+  cursor: not-allowed;
+  opacity: 0.64;
+}
+
+.right-panel[data-traffic-visible="false"] .map-route-traffic {
+  display: none !important;
+}
+
+.right-panel[data-amap3d="overview-only"] #auri-amap-canvas {
+  overflow: hidden;
+  background: #edf1f2;
+}
+
+.right-panel[data-amap3d="overview-only"] #auri-amap-canvas .amap-maps {
+  width: 100% !important;
+  height: 100% !important;
+  transform: none !important;
+}
+
+.right-panel[data-amap3d="overview-only"] #auri-amap-canvas .amap-layer-tile {
+  filter: none;
+  opacity: 1 !important;
+}
+
+.right-panel[data-amap3d="overview-only"] #auri-amap-canvas::after {
+  display: none;
+}
+
+.auri-amap-fixed-vehicle {
+  position: absolute;
+  left: 50%;
+  top: 72%;
+  z-index: 76;
+  width: 72px;
+  height: 72px;
+  display: none;
+  place-items: center;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 10px 17px rgba(11, 27, 51, 0.35));
+}
+
+#vd-nav-card .vd-nav-main {
+  min-width: 0;
+  gap: 14px;
+}
+
+#vd-nav-card .vd-nav-info {
+  min-width: 0;
+  overflow: hidden;
+}
+
+#vd-nav-card .vd-nav-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  column-gap: 4px;
+  font-size: 42px;
+  line-height: 1.02;
+  letter-spacing: 0;
+}
+
+#vd-nav-card .vd-nav-title span {
+  margin-left: 0;
+  font-size: 22px;
+}
+
+#vd-nav-card .vd-nav-sub {
+  display: -webkit-box;
+  margin-top: 7px;
+  overflow: hidden;
+  white-space: normal;
+  font-size: 22px;
+  line-height: 1.22;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+#vd-nav-card .vd-nav-stat b {
+  overflow: visible;
+  font-size: 28px;
+  letter-spacing: 0;
+}
+
+.right-panel[data-camera-mode="follow"][data-vehicle-visible="true"] .auri-amap-fixed-vehicle {
+  display: grid;
+}
+
+.auri-amap-fixed-vehicle > span {
+  position: absolute;
+  inset: 2px;
+  border: 3px solid rgba(47, 107, 255, 0.46);
+  border-radius: 50%;
+  background: rgba(245, 242, 236, 0.78);
+  box-shadow: 0 0 0 10px rgba(47, 107, 255, 0.12), 0 0 30px rgba(47, 107, 255, 0.32);
+}
+
+.auri-amap-fixed-vehicle > i {
+  position: relative;
+  width: 31px;
+  height: 41px;
+  clip-path: polygon(50% 0, 94% 92%, 50% 76%, 6% 92%);
+  background: linear-gradient(180deg, #2f6bff, #0b1b33 78%);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.92);
+}
+
+.auri-amap-fixed-vehicle > b {
+  position: absolute;
+  top: 69px;
+  padding: 4px 8px;
+  border-radius: 7px;
+  color: var(--auri-ivory);
+  background: var(--auri-navy);
+  font-size: 9px;
+  letter-spacing: 0;
+}
+
+.right-panel[data-vehicle-motion="moving"] .auri-amap-fixed-vehicle > span {
+  animation: auriVehicleFixPulse 1.35s ease-in-out infinite;
+}
+
+.right-panel[data-vehicle-motion="stopped"] .auri-amap-fixed-vehicle > span {
+  border-color: rgba(209, 73, 91, 0.58);
+  box-shadow: 0 0 0 10px rgba(209, 73, 91, 0.11), 0 0 27px rgba(209, 73, 91, 0.24);
+}
+
+@keyframes auriVehicleFixPulse {
+  0%, 100% { transform: scale(0.96); opacity: 0.84; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+
+.auri-amap-vehicle {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  filter: drop-shadow(0 8px 12px rgba(11, 27, 51, 0.28));
+}
+
+.auri-amap-vehicle-ring {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 2px solid rgba(47, 107, 255, 0.34);
+  background: rgba(245, 242, 236, 0.38);
+  box-shadow: 0 0 0 7px rgba(47, 107, 255, 0.08);
+}
+
+.auri-amap-vehicle i {
+  position: relative;
+  width: 27px;
+  height: 35px;
+  clip-path: polygon(50% 0, 94% 92%, 50% 76%, 6% 92%);
+  background: linear-gradient(180deg, #17396d, var(--auri-navy));
+  box-shadow: inset 0 0 0 2px rgba(245, 242, 236, 0.9);
+  transform: rotate(var(--auri-vehicle-heading, 0deg));
+  transform-origin: center;
+  transition: transform 420ms cubic-bezier(.2, .72, .2, 1);
+}
+
+.auri-amap-vehicle b {
+  position: absolute;
+  top: 58px;
+  padding: 3px 7px;
+  border-radius: 7px;
+  color: var(--auri-ivory);
+  background: var(--auri-navy);
+  font-size: 9px;
+  letter-spacing: 0;
+  transform: none;
+}
+
+.auri-amap-origin,
+.auri-amap-destination,
+.auri-amap-incident {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 220px;
+  padding: 8px 12px;
+  border: 1px solid rgba(11, 27, 51, 0.12);
+  border-radius: 12px;
+  color: var(--auri-navy);
+  background: rgba(245, 242, 236, 0.94);
+  box-shadow: 0 7px 20px rgba(11, 27, 51, 0.16);
+  font-size: 14px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.auri-amap-origin i,
+.auri-amap-destination i,
+.auri-amap-incident i {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--state-processing);
+  box-shadow: 0 0 0 5px rgba(47, 107, 255, 0.12);
+}
+
+.auri-amap-destination i {
+  background: var(--auri-gold);
+  box-shadow: 0 0 0 5px rgba(212, 175, 122, 0.14);
+}
+
+.auri-amap-incident {
+  color: #5e4600;
+  border-color: rgba(230, 167, 0, 0.26);
+  background: rgba(255, 250, 232, 0.96);
+}
+
+.auri-amap-incident i {
+  border-radius: 3px;
+  background: var(--state-warning);
+  box-shadow: 0 0 0 5px rgba(230, 167, 0, 0.12);
+}
+
+.auri-amap-chevron {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  border-radius: 50%;
+  background: rgba(47, 107, 255, 0.88);
+  box-shadow: 0 5px 13px rgba(47, 107, 255, 0.24);
+  font: 700 17px/1 Inter, sans-serif;
+}
+
+.auri-amap-chevron.is-2 { opacity: 0.68; }
+.auri-amap-chevron.is-3 { opacity: 0.44; }
+
+.auri-amap-route-label {
+  display: inline-flex;
+  min-height: 24px;
+  padding: 0 8px;
+  align-items: center;
+  border: 1px solid rgba(11, 27, 51, 0.13);
+  border-radius: 7px;
+  color: rgba(11, 27, 51, 0.78);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 3px 10px rgba(11, 27, 51, 0.1);
+  backdrop-filter: blur(8px);
+  font: 650 12px/1 Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+  white-space: nowrap;
+}
+
+.auri-amap-route-label.is-current {
+  min-height: 28px;
+  padding: 0 10px;
+  border-color: rgba(47, 107, 255, 0.28);
+  color: #fff;
+  background: rgba(11, 27, 51, 0.9);
+  box-shadow: 0 5px 16px rgba(11, 27, 51, 0.22);
+  font-size: 13px;
+}
+
+.auri-amap-canvas .amap-logo,
+.auri-amap-canvas .amap-copyright {
+  opacity: 0.72 !important;
+}
+
+#rmap {
+  background:
+    radial-gradient(74% 66% at 55% 43%, rgba(17, 49, 82, 0.76), rgba(4, 15, 29, 0.96) 64%, #020814 100%) !important;
+}
+
+.map-route-halo {
+  stroke: rgba(47, 107, 255, 0.76) !important;
+}
+
+.map-route-soft,
+.map-route-core {
+  stroke: var(--state-processing) !important;
+}
+
+.map-route-highlight {
+  stroke: #a9c7ff !important;
+}
+
+.map-car-dot .mcd-ring {
+  fill: rgba(47, 107, 255, 0.3) !important;
+}
+
+.map-car-dot .mcd-mid {
+  fill: var(--state-processing) !important;
+}
+
+.map-car-dot .mcd-core {
+  fill: #6d96ff !important;
+}
+
+.map-poi-warning .poi-disc {
+  stroke: var(--state-warning) !important;
+}
+
+.map-poi-processing .poi-disc {
+  stroke: #6d96ff !important;
+}
+
+.map-poi-success .poi-disc {
+  stroke: var(--state-success) !important;
+}
+
+.wm {
+  gap: 8px !important;
+  color: rgba(245, 242, 236, 0.64) !important;
+}
+
+.wm-auri-icon {
+  width: 25px;
+  height: 25px;
+  border-radius: 8px;
+  object-fit: contain;
+  box-shadow: 0 0 0 1px rgba(212, 175, 122, 0.2);
+}
+
+.wm-text {
+  color: var(--auri-ivory) !important;
+  font-weight: 640 !important;
+  letter-spacing: 0 !important;
+}
+
+.bottom-bar {
+  background: linear-gradient(180deg, #031020, #020817) !important;
+  border-top-color: rgba(212, 175, 122, 0.13) !important;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.26) !important;
+}
+
+.bb-ic {
+  position: relative;
+  cursor: pointer;
+}
+
+.bb-ic.active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  width: 5px;
+  height: 5px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: var(--auri-gold);
+  box-shadow: 0 0 10px rgba(212, 175, 122, 0.8);
+}
+
+.bb-ic.active .bb-pic {
+  filter: drop-shadow(0 0 9px rgba(47, 107, 255, 0.92)) brightness(1.12) !important;
+}
+
+.bb-auri-pic {
+  width: 39px !important;
+  height: 39px !important;
+  border-radius: 12px;
+}
+
+.left-panel.auri-shell-panel {
+  border-color: rgba(126, 183, 255, 0.42) !important;
+  background:
+    radial-gradient(300px 210px at -20px 60px, rgba(47, 107, 255, 0.22), transparent 72%),
+    radial-gradient(250px 180px at 102% 104%, rgba(212, 175, 122, 0.12), transparent 72%),
+    linear-gradient(100deg, rgba(11, 27, 51, 0.97), rgba(4, 13, 29, 0.96) 58%, rgba(7, 12, 24, 0.98)) !important;
+  box-shadow: 0 16px 46px rgba(0, 4, 18, 0.64), 0 0 0 1px rgba(245, 242, 236, 0.04) inset !important;
+}
+
+.left-panel.auri-shell-panel .lp-agent-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  filter: drop-shadow(0 0 18px rgba(212, 175, 122, 0.26));
+}
+
+.left-panel.auri-shell-panel .lp-hdr-title {
+  color: var(--auri-ivory) !important;
+  font-size: 24px !important;
+  font-weight: 660;
+}
+
+.left-panel.auri-shell-panel .lp-hdr-sub {
+  color: rgba(245, 242, 236, 0.58) !important;
+  font-size: 16px;
+}
+
+.auri-panel-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(245, 242, 236, 0.12);
+  border-radius: 50%;
+  background: rgba(245, 242, 236, 0.04);
+  color: var(--auri-ivory);
+  font: 300 27px/1 Inter, sans-serif;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+  z-index: 3;
+}
+
+.auri-panel-close:hover,
+.auri-panel-close:focus-visible {
+  background: rgba(245, 242, 236, 0.1);
+  transform: scale(1.04);
+  outline: none;
+}
+
+.auri-shell-content {
+  display: grid;
+  gap: 12px;
+}
+
+.auri-shell-lead {
+  margin: 2px 0 8px;
+  color: var(--auri-ivory);
+  font-size: 30px;
+  line-height: 1.28;
+  font-weight: 560;
+}
+
+.auri-shell-copy {
+  color: rgba(245, 242, 236, 0.58);
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.auri-shell-row {
+  min-height: 70px;
+  padding: 15px 17px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 13px;
+  border: 1px solid rgba(126, 183, 255, 0.13);
+  border-radius: 16px;
+  background: rgba(245, 242, 236, 0.035);
+}
+
+.auri-shell-row-button {
+  width: 100%;
+  color: inherit;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+
+.auri-shell-row-button:hover,
+.auri-shell-row-button:focus-visible {
+  border-color: rgba(212, 175, 122, 0.38);
+  background: rgba(245, 242, 236, 0.065);
+  outline: none;
+}
+
+.auri-shell-row-button:active { transform: scale(0.992); }
+
+.auri-shell-row-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  color: #a9c7ff;
+  background: rgba(47, 107, 255, 0.13);
+  font-size: 20px;
+}
+
+.auri-shell-row-copy {
+  min-width: 0;
+}
+
+.auri-shell-row-copy strong,
+.auri-shell-row-copy span {
+  display: block;
+}
+
+.auri-shell-row-copy strong {
+  color: var(--auri-ivory);
+  font-size: 18px;
+  font-weight: 580;
+}
+
+.auri-shell-row-copy span {
+  margin-top: 4px;
+  color: rgba(245, 242, 236, 0.48);
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.auri-shell-row-state {
+  color: var(--auri-gold);
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.auri-shell-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  margin-top: 8px;
+  color: rgba(245, 242, 236, 0.58);
+  font-size: 15px;
+}
+
+.auri-shell-status::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--state-processing);
+  box-shadow: 0 0 11px rgba(47, 107, 255, 0.86);
+}
+
+.tb-offline {
+  cursor: pointer;
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.tb-offline[data-tone="success"] {
+  color: #73d7ae !important;
+  border-color: rgba(46, 157, 111, 0.42) !important;
+  background: rgba(46, 157, 111, 0.12) !important;
+}
+
+.tb-offline[data-tone="warning"] {
+  color: #ffd365 !important;
+  border-color: rgba(230, 167, 0, 0.42) !important;
+  background: rgba(230, 167, 0, 0.1) !important;
+}
+
+.tb-offline[data-tone="critical"] {
+  color: #ff8492 !important;
+  border-color: rgba(209, 73, 91, 0.44) !important;
+  background: rgba(209, 73, 91, 0.12) !important;
+}
+
+.auri-demo-data-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(212, 175, 122, 0.38);
+  border-radius: 999px;
+  color: #f1d5a8;
+  background: rgba(212, 175, 122, 0.1);
+  font-size: 14px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.vd-hud-overlay .vh-speed .vh-source {
+  margin-top: 8px;
+  padding: 5px 9px;
+  border: 1px solid rgba(212, 175, 122, 0.34);
+  border-radius: 999px;
+  color: #f2d4a3;
+  background: rgba(11, 27, 51, 0.78);
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.left-panel.auri-shell-panel .lp-body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(126, 183, 255, 0.3) transparent;
+}
+
+.left-panel.auri-shell-panel .lp-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.left-panel.auri-shell-panel .lp-body::-webkit-scrollbar-thumb {
+  border-radius: 99px;
+  background: rgba(126, 183, 255, 0.3);
+}
+
+.auri-shell-status.is-warning::before {
+  background: var(--state-warning);
+  box-shadow: 0 0 11px rgba(230, 167, 0, 0.72);
+}
+
+.auri-shell-status.is-success::before,
+.auri-shell-status.is-completed::before {
+  background: var(--state-success);
+  box-shadow: 0 0 11px rgba(46, 157, 111, 0.72);
+}
+
+.auri-shell-status.is-critical::before,
+.auri-shell-status.is-error::before {
+  background: var(--state-critical);
+  box-shadow: 0 0 11px rgba(209, 73, 91, 0.72);
+}
+
+.auri-shell-status.is-idle::before {
+  background: rgba(245, 242, 236, 0.38);
+  box-shadow: none;
+}
+
+.auri-shell-row.is-rigid {
+  border-color: rgba(230, 167, 0, 0.2);
+}
+
+.auri-shell-row.is-rigid .auri-shell-row-icon {
+  color: #ffd365;
+  background: rgba(230, 167, 0, 0.12);
+}
+
+.auri-shell-row.is-flexible .auri-shell-row-icon {
+  color: #8cc8ff;
+  background: rgba(47, 107, 255, 0.14);
+}
+
+.auri-shell-row.is-completed .auri-shell-row-icon,
+.auri-shell-row.is-success .auri-shell-row-icon {
+  color: #73d7ae;
+  background: rgba(46, 157, 111, 0.13);
+}
+
+.auri-shell-row.is-error .auri-shell-row-icon {
+  color: #ff8492;
+  background: rgba(209, 73, 91, 0.13);
+}
+
+.auri-config-form {
+  display: grid;
+  gap: 15px;
+  margin-top: 6px;
+}
+
+.auri-connection-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.auri-connection-summary > span {
+  min-width: 0;
+  min-height: 62px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid rgba(126, 183, 255, 0.13);
+  border-radius: 13px;
+  background: rgba(245, 242, 236, 0.03);
+}
+
+.auri-connection-summary small,
+.auri-connection-summary b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.auri-connection-summary small { color: rgba(245, 242, 236, 0.42); font-size: 11px; }
+.auri-connection-summary b { margin-top: 5px; color: var(--auri-ivory); font-size: 14px; font-weight: 610; }
+
+.auri-config-form label {
+  display: grid;
+  gap: 8px;
+  color: rgba(245, 242, 236, 0.62);
+  font-size: 14px;
+}
+
+.auri-config-form input {
+  width: 100%;
+  height: 50px;
+  padding: 0 15px;
+  border: 1px solid rgba(126, 183, 255, 0.18);
+  border-radius: 13px;
+  outline: none;
+  color: var(--auri-ivory);
+  background: rgba(245, 242, 236, 0.045);
+  font: 15px/1.2 Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+  box-sizing: border-box;
+}
+
+.auri-config-form select {
+  width: 100%;
+  height: 50px;
+  padding: 0 15px;
+  border: 1px solid rgba(126, 183, 255, 0.18);
+  border-radius: 13px;
+  outline: none;
+  color: var(--auri-ivory);
+  background: #0b1b33;
+  font: 15px/1.2 Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.auri-map-config {
+  padding: 13px 14px;
+  border: 1px solid rgba(126, 183, 255, 0.13);
+  border-radius: 14px;
+  background: rgba(245, 242, 236, 0.025);
+}
+
+.auri-map-config summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 34px;
+  color: rgba(245, 242, 236, 0.76);
+  font-size: 15px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.auri-map-config summary::-webkit-details-marker { display: none; }
+
+.auri-map-config summary::before {
+  content: "+";
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: #a9c7ff;
+  background: rgba(47, 107, 255, 0.12);
+}
+
+.auri-map-config[open] summary::before { content: "−"; }
+
+.auri-map-config summary span {
+  margin-left: auto;
+  color: rgba(245, 242, 236, 0.46);
+  font-size: 13px;
+}
+
+.auri-map-config[open] label:first-of-type { margin-top: 14px; }
+.auri-map-config[open] label + label { margin-top: 12px; }
+
+.auri-config-form input:focus {
+  border-color: rgba(126, 183, 255, 0.58);
+  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.12);
+}
+
+.auri-config-presets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.auri-config-presets button,
+.auri-config-submit {
+  min-height: 44px;
+  border: 1px solid rgba(126, 183, 255, 0.16);
+  border-radius: 12px;
+  color: rgba(245, 242, 236, 0.76);
+  background: rgba(245, 242, 236, 0.045);
+  font: 14px/1 Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+  cursor: pointer;
+}
+
+.auri-config-presets button:hover,
+.auri-config-presets button:focus-visible {
+  color: var(--auri-ivory);
+  border-color: rgba(126, 183, 255, 0.42);
+  background: rgba(47, 107, 255, 0.12);
+  outline: none;
+}
+
+.auri-config-submit {
+  min-height: 56px;
+  border-color: rgba(212, 175, 122, 0.34);
+  color: var(--auri-navy);
+  background: linear-gradient(135deg, #f5f2ec, #d4af7a);
+  font-size: 16px;
+  font-weight: 680;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+.bb-arr[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.48;
+}
+
+.vd-nav-card[data-risk="warning"],
+.vd-nav-card[data-risk="critical"] {
+  border-color: rgba(230, 167, 0, 0.36) !important;
+}
+
+.vd-nav-card[data-risk="critical"] {
+  border-color: rgba(209, 73, 91, 0.42) !important;
+}
+
+.vd-nav-card[data-risk="warning"] .vd-nav-title,
+.vd-nav-card[data-risk="critical"] .vd-nav-title {
+  color: #ffd365 !important;
+}
+
+.hmi[data-auri-risk="success"] .vd-nav-progress span {
+  background: linear-gradient(90deg, #2e9d6f, #73d7ae) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .left-panel,
+  .bb-ic,
+  .auri-panel-close,
+  .map-car-dot .mcd-ring {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* 1920x720 class cockpit displays: preserve physical type size and give the
+   additional horizontal area to navigation instead of letterboxing. */
+.hmi.is-ultrawide {
+  --top: 96px;
+  --bot: 132px;
+  --vd: 720px;
+}
+
+.hmi.is-ultrawide .top-bar {
+  padding-inline: 28px;
+}
+
+.hmi.is-ultrawide .auri-wordmark-icon {
+  width: 51px;
+  height: 51px;
+  border-radius: 15px;
+}
+
+.hmi.is-ultrawide .auri-wordmark strong,
+.hmi.is-ultrawide .tb-stat-time {
+  font-size: 27px !important;
+}
+
+.hmi.is-ultrawide .tb-offline,
+.hmi.is-ultrawide .tb-np-txt {
+  font-size: 18px !important;
+}
+
+.hmi.is-ultrawide .vd-half-top {
+  flex-basis: 220px !important;
+}
+
+.hmi.is-ultrawide .vd-panel:has(.vd-half-bot.is-auri-takeover) .vd-half-top {
+  flex-basis: 220px !important;
+}
+
+.hmi.is-ultrawide .vd-hud-overlay .vh-speed .vh-num {
+  font-size: 92px;
+}
+
+.hmi.is-ultrawide .vd-hud-overlay .vh-speed .vh-unit {
+  font-size: 20px;
+}
+
+.hmi.is-ultrawide .auri-car-mark--badge,
+.hmi.is-ultrawide .auri-car-mark--plate {
+  transform: translateX(-50%) scale(1.35);
+}
+
+.hmi.is-ultrawide .auri-takeover-card {
+  height: 580px;
+  min-height: 580px;
+  margin: 12px 36px 18px;
+  padding: 8px 26px;
+  gap: 4px;
+  border-radius: 22px;
+}
+
+.hmi.is-ultrawide .auri-takeover-head {
+  min-height: 42px;
+}
+
+.hmi.is-ultrawide .auri-takeover-head b { font-size: 27px; }
+.hmi.is-ultrawide .auri-takeover-head small { max-width: 560px; font-size: 18px; }
+.hmi.is-ultrawide .auri-takeover-orbit { width: 48px; height: 48px; }
+.hmi.is-ultrawide .auri-takeover-orbit i { font-size: 27px; }
+
+.hmi.is-ultrawide .auri-takeover-conclusion {
+  min-height: 120px;
+  font-size: 48px;
+  line-height: 1.18;
+}
+
+.hmi.is-ultrawide .auri-takeover-actions {
+  max-height: 180px;
+  gap: 6px;
+}
+
+.hmi.is-ultrawide .auri-takeover-action {
+  min-height: 54px;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  gap: 12px;
+  border-radius: 15px;
+}
+
+.hmi.is-ultrawide .auri-takeover-action > span {
+  width: 34px;
+  height: 34px;
+  font-size: 17px;
+}
+
+.hmi.is-ultrawide .auri-takeover-action b { font-size: 27px; }
+.hmi.is-ultrawide .auri-takeover-action small { font-size: 17px; }
+
+.hmi.is-ultrawide .auri-takeover-devices {
+  min-height: 36px;
+  gap: 9px;
+}
+
+.hmi.is-ultrawide .auri-takeover-devices b { font-size: 17px; }
+.hmi.is-ultrawide .auri-takeover-devices small { font-size: 14px; }
+
+.hmi.is-ultrawide .auri-takeover-confirm {
+  min-height: 84px;
+  border-radius: 18px;
+  font-size: 24px;
+}
+
+.hmi.is-ultrawide .auri-responsibility-strip { min-height: 84px; gap: 10px; }
+.hmi.is-ultrawide .auri-responsibility-item,
+.hmi.is-ultrawide .auri-responsibility-more { height: 84px; }
+.hmi.is-ultrawide .auri-responsibility-item { grid-template-rows: 27px 36px; padding: 10px 14px; }
+.hmi.is-ultrawide .auri-responsibility-item span,
+.hmi.is-ultrawide .auri-responsibility-item em { font-size: 18px; line-height: 27px; }
+.hmi.is-ultrawide .auri-responsibility-item b { font-size: 27px; line-height: 36px; }
+
+.hmi.is-ultrawide .left-panel {
+  top: 75px;
+  right: 75px;
+  width: 810px !important;
+  max-height: calc(100% - 150px);
+}
+
+.hmi.is-ultrawide .left-panel.auri-shell-panel .lp-hdr-title { font-size: 32px !important; }
+.hmi.is-ultrawide .left-panel.auri-shell-panel .lp-hdr-sub { font-size: 22px !important; }
+.hmi.is-ultrawide .auri-shell-lead { font-size: 45px; }
+.hmi.is-ultrawide .auri-shell-copy { font-size: 27px; }
+.hmi.is-ultrawide .auri-shell-row { min-height: 94px; }
+.hmi.is-ultrawide .auri-shell-row-copy strong { font-size: 27px; }
+.hmi.is-ultrawide .auri-shell-row-copy span { font-size: 24px; }
+.hmi.is-ultrawide .auri-shell-row-state,
+.hmi.is-ultrawide .auri-shell-status { font-size: 22px; }
+
+.hmi.is-ultrawide .bottom-bar {
+  padding-inline: 42px;
+}
+
+.hmi.is-ultrawide .bb-temp { font-size: 27px; }
+.hmi.is-ultrawide .bb-ic { width: 54px; height: 54px; }
+.hmi.is-ultrawide .bb-ic svg { width: 30px; height: 30px; }
+
+/* Phase 9: driver-near AURI, Bosch driving visualization, full navigation. */
+.auri-icon {
+  width: 22px;
+  height: 22px;
+  display: block;
+  flex: 0 0 auto;
+}
+
+.hmi-body {
+  display: grid !important;
+  grid-template-columns: clamp(330px, 24vw, 430px) clamp(350px, 24vw, 470px) minmax(0, 1fr);
+  min-width: 0;
+}
+
+.auri-driver-panel,
+.vd-panel,
+.right-panel {
+  width: auto !important;
+  min-width: 0;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.auri-driver-panel {
+  position: relative;
+  z-index: 8;
+  padding: 18px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+  color: var(--auri-ivory);
+  border-right: 1px solid rgba(212, 175, 122, 0.16);
+  background:
+    radial-gradient(95% 42% at 0% 0%, rgba(212, 175, 122, 0.12), transparent 64%),
+    radial-gradient(80% 45% at 80% 100%, rgba(47, 107, 255, 0.12), transparent 70%),
+    linear-gradient(180deg, #091a31 0%, #061326 50%, #030b19 100%);
+  box-shadow: 12px 0 34px rgba(0, 4, 13, 0.24);
+}
+
+.auri-driver-head {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.auri-driver-brand {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.auri-driver-brand > img {
+  width: 42px;
+  height: 42px;
+  padding: 3px;
+  object-fit: contain;
+  border-radius: 13px;
+  background: rgba(245, 242, 236, 0.96);
+  box-shadow: 0 0 0 1px rgba(212, 175, 122, 0.28), 0 9px 22px rgba(0, 0, 0, 0.24);
+}
+
+.auri-driver-brand b,
+.auri-driver-brand small {
+  display: block;
+  letter-spacing: 0;
+}
+
+.auri-driver-brand b { font-size: 20px; font-weight: 760; }
+.auri-driver-brand small { margin-top: 2px; color: rgba(245, 242, 236, 0.5); font-size: 11px; }
+
+.auri-driver-risk {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(126, 183, 255, 0.24);
+  border-radius: 17px;
+  color: #a9c7ff;
+  background: rgba(47, 107, 255, 0.1);
+  font: 650 12px/1 Inter, "PingFang SC", sans-serif;
+  cursor: pointer;
+}
+
+.auri-driver-risk[data-tone="warning"] { color: #ffd66e; border-color: rgba(230, 167, 0, 0.34); background: rgba(230, 167, 0, 0.11); }
+.auri-driver-risk[data-tone="critical"] { color: #ff99a7; border-color: rgba(209, 73, 91, 0.38); background: rgba(209, 73, 91, 0.12); }
+.auri-driver-risk[data-tone="success"] { color: #80dab6; border-color: rgba(46, 157, 111, 0.34); background: rgba(46, 157, 111, 0.11); }
+
+.auri-driver-summary {
+  position: relative;
+  padding: 18px 17px 17px;
+  border: 1px solid rgba(212, 175, 122, 0.2);
+  border-radius: 18px;
+  color: var(--auri-navy);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(245, 242, 236, 0.94));
+  box-shadow: 0 16px 34px rgba(0, 5, 17, 0.25), inset 0 1px rgba(255, 255, 255, 0.84);
+  cursor: pointer;
+}
+
+.auri-driver-summary::after {
+  content: "";
+  position: absolute;
+  left: 17px;
+  top: 0;
+  width: 54px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: var(--auri-gold);
+}
+
+.auri-driver-summary > small { color: rgba(11, 27, 51, 0.55); font-size: 11px; font-weight: 700; }
+.auri-driver-summary h2 {
+  margin: 8px 0 0;
+  max-width: 100%;
+  color: var(--auri-navy);
+  font-size: clamp(23px, 1.75vw, 30px);
+  font-weight: 720;
+  line-height: 1.18;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+.auri-driver-summary p {
+  margin: 9px 0 0;
+  color: rgba(11, 27, 51, 0.64);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.auri-driver-context {
+  min-height: 61px;
+  padding: 9px 10px;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(126, 183, 255, 0.14);
+  border-radius: 14px;
+  background: rgba(245, 242, 236, 0.055);
+  cursor: pointer;
+}
+
+.auri-driver-context.is-active { border-color: rgba(47, 107, 255, 0.35); background: rgba(47, 107, 255, 0.105); }
+.auri-driver-context-icon { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; color: #9ebdff; background: rgba(47, 107, 255, 0.13); }
+.auri-driver-context-icon .auri-icon { width: 20px; height: 20px; }
+.auri-driver-context > span:nth-child(2) { min-width: 0; }
+.auri-driver-context small,
+.auri-driver-context b { display: block; }
+.auri-driver-context small { color: rgba(245, 242, 236, 0.42); font-size: 10px; }
+.auri-driver-context b { margin-top: 4px; overflow: hidden; color: var(--auri-ivory); font-size: 13px; font-weight: 620; text-overflow: ellipsis; white-space: nowrap; }
+.auri-driver-context em { color: rgba(245, 242, 236, 0.48); font-size: 11px; font-style: normal; white-space: nowrap; }
+
+.auri-driver-tasks { min-height: 0; }
+.auri-driver-section-head { height: 30px; display: flex; align-items: center; justify-content: space-between; color: rgba(245, 242, 236, 0.44); font-size: 11px; font-weight: 650; }
+.auri-driver-section-head button { padding: 4px 7px; border: 0; border-radius: 8px; color: #a9c7ff; background: rgba(47, 107, 255, 0.08); font: inherit; cursor: pointer; }
+.auri-driver-task-list { display: grid; gap: 6px; }
+.auri-driver-task {
+  width: 100%;
+  min-height: 53px;
+  padding: 7px 8px;
+  display: grid;
+  grid-template-columns: 35px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  border: 0;
+  border-bottom: 1px solid rgba(245, 242, 236, 0.08);
+  color: var(--auri-ivory);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.auri-driver-task:hover { background: rgba(245, 242, 236, 0.045); }
+.auri-driver-task-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 11px; color: #9ebdff; background: rgba(47, 107, 255, 0.11); }
+.auri-driver-task.is-rigid .auri-driver-task-icon { color: #ffd166; background: rgba(230, 167, 0, 0.12); }
+.auri-driver-task.is-empty .auri-driver-task-icon { color: rgba(245, 242, 236, 0.46); background: rgba(245, 242, 236, 0.06); }
+.auri-driver-task-icon .auri-icon { width: 18px; height: 18px; }
+.auri-driver-task > span:nth-child(2) { min-width: 0; }
+.auri-driver-task b,
+.auri-driver-task small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.auri-driver-task b { font-size: 13px; font-weight: 650; }
+.auri-driver-task small { margin-top: 3px; color: rgba(245, 242, 236, 0.4); font-size: 10px; }
+.auri-driver-task em { color: rgba(245, 242, 236, 0.44); font-size: 10px; font-style: normal; white-space: nowrap; }
+.auri-driver-task-more { min-height: 32px; border: 0; color: #9ebdff; background: transparent; font-size: 11px; cursor: pointer; }
+
+.auri-driver-devices {
+  margin-top: auto;
+  padding-top: 9px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  border-top: 1px solid rgba(245, 242, 236, 0.08);
+}
+.auri-driver-devices button { min-width: 0; min-height: 47px; padding: 6px 7px; display: grid; grid-template-columns: 23px minmax(0, 1fr); align-items: center; gap: 6px; border: 1px solid transparent; border-radius: 11px; color: rgba(245, 242, 236, 0.46); background: rgba(245, 242, 236, 0.035); text-align: left; cursor: pointer; }
+.auri-driver-devices button.is-active { color: #a9c7ff; border-color: rgba(47, 107, 255, 0.2); background: rgba(47, 107, 255, 0.075); }
+.auri-driver-devices .auri-icon { width: 19px; height: 19px; }
+.auri-driver-devices b,
+.auri-driver-devices small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.auri-driver-devices b { color: currentColor; font-size: 10px; }
+.auri-driver-devices small { margin-top: 2px; color: rgba(245, 242, 236, 0.36); font-size: 8px; }
+
+.auri-driver-primary { min-height: 0; }
+.auri-driver-panel:not(.is-auri-takeover) .auri-driver-primary { display: none; }
+.auri-driver-panel.is-auri-takeover .auri-driver-tasks { display: none; }
+.auri-driver-panel.is-auri-takeover .auri-driver-summary { display: none; }
+.auri-driver-panel.is-auri-takeover .auri-driver-devices { display: none; }
+
+.auri-driver-panel .auri-takeover-card,
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-card {
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 12px 0 0;
+  gap: 7px;
+  border: 0;
+  border-top: 1px solid rgba(212, 175, 122, 0.16);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+.auri-driver-panel .auri-takeover-head { min-height: 38px; }
+.auri-driver-panel .auri-takeover-orbit { width: 36px; height: 36px; }
+.auri-driver-panel .auri-takeover-head b { font-size: 18px; }
+.auri-driver-panel .auri-takeover-head small { max-width: 295px; font-size: 11px; }
+.auri-driver-panel .auri-takeover-conclusion { min-height: 0; margin: 1px 0; font-size: 20px; line-height: 1.25; }
+.auri-driver-panel .auri-takeover-actions { max-height: 150px; gap: 5px; overflow-y: auto; scrollbar-width: thin; }
+.auri-driver-panel .auri-takeover-action { min-height: 42px; grid-template-columns: 31px minmax(0, 1fr) auto; gap: 8px; padding: 5px 7px; border-radius: 11px; }
+.auri-driver-panel .auri-takeover-action > span { width: 30px; height: 30px; }
+.auri-driver-panel .auri-takeover-action > span .auri-icon { width: 17px; height: 17px; }
+.auri-driver-panel .auri-takeover-action b { font-size: 12px; line-height: 1.3; }
+.auri-driver-panel .auri-takeover-action small { max-width: 66px; font-size: 9px; }
+.auri-driver-panel .auri-takeover-devices { min-height: 30px; gap: 5px; }
+.auri-driver-panel .auri-takeover-devices b { font-size: 10px; }
+.auri-driver-panel .auri-takeover-devices small { font-size: 8px; }
+.auri-driver-panel .auri-takeover-confirm,
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-confirm { min-height: 56px; border-radius: 14px; font-size: 17px; }
+
+.vd-half-bot.is-auri-takeover #vd-nav-card { display: flex !important; }
+.vd-panel:has(.vd-half-bot.is-auri-takeover) .vd-half-top { flex-basis: initial !important; }
+.vd-half-bot.is-auri-takeover .vd-status-icons { display: flex !important; }
+
+.right-panel .map-poi-layer,
+.right-panel .map-flow,
+.right-panel .map-detour,
+.right-panel .map-branch-flow { display: none !important; }
+
+#auri-map-source { display: none !important; }
+
+.auri-nav-hud {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 28;
+  width: min(520px, calc(100% - 140px));
+  min-height: 78px;
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(11, 27, 51, 0.11);
+  border-radius: 17px;
+  color: var(--auri-navy);
+  background: rgba(250, 249, 245, 0.95);
+  box-shadow: 0 14px 34px rgba(11, 27, 51, 0.19);
+  backdrop-filter: blur(18px) saturate(1.08);
+}
+.auri-nav-maneuver { width: 54px; height: 54px; display: grid; place-items: center; border-radius: 14px; color: #fff; background: var(--state-processing); box-shadow: 0 8px 18px rgba(47, 107, 255, 0.24); }
+.auri-nav-maneuver .auri-icon { width: 34px; height: 34px; }
+.auri-nav-next,
+.auri-nav-remaining { min-width: 0; }
+.auri-nav-next b,
+.auri-nav-next small,
+.auri-nav-next em,
+.auri-nav-remaining b,
+.auri-nav-remaining small { display: block; }
+.auri-nav-next b { font-size: 22px; font-weight: 760; }
+.auri-nav-next small { margin-top: 3px; overflow: hidden; color: rgba(11, 27, 51, 0.58); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.auri-nav-next em {
+  width: fit-content;
+  margin-top: 5px;
+  padding: 2px 7px;
+  border: 1px solid rgba(11, 27, 51, 0.1);
+  border-radius: 999px;
+  color: rgba(11, 27, 51, 0.58);
+  background: rgba(11, 27, 51, 0.04);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 680;
+}
+.auri-nav-next em[data-mode="online"] { color: #237d59; background: rgba(46, 157, 111, 0.09); }
+.auri-nav-remaining { padding-left: 12px; border-left: 1px solid rgba(11, 27, 51, 0.1); text-align: right; }
+.auri-nav-remaining b { font-size: 15px; font-weight: 720; }
+.auri-nav-remaining small { margin-top: 4px; color: rgba(11, 27, 51, 0.5); font-size: 10px; white-space: nowrap; }
+
+.auri-stage-notice,
+.auri-device-notice {
+  left: auto;
+  right: 18px;
+  width: min(430px, calc(100% - 36px));
+  transform: translateY(-12px) scale(0.985);
+}
+.auri-stage-notice { top: 112px; }
+.auri-device-notice { top: 212px; }
+.auri-device-notice.is-visible { transform: none; }
+.auri-stage-notice-icon .auri-icon,
+.auri-notice-icon .auri-icon { width: 22px; height: 22px; }
+
+.auri-shell-row-icon .auri-icon { width: 19px; height: 19px; }
+.auri-takeover-action > span .auri-icon { width: 18px; height: 18px; }
+
+.auri-amap-chevron {
+  width: 18px !important;
+  height: 18px !important;
+  color: transparent !important;
+  background: transparent !important;
+}
+.auri-amap-chevron::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 5px;
+  width: 8px;
+  height: 8px;
+  border-top: 3px solid #fff;
+  border-right: 3px solid #fff;
+  transform: rotate(-45deg);
+  filter: drop-shadow(0 1px 2px rgba(0, 31, 92, 0.55));
+}
+
+@media (max-width: 1500px) {
+  .hmi-body { grid-template-columns: 480px 480px minmax(0, 1fr); }
+  .auri-driver-panel { padding: 18px; gap: 10px; }
+  .auri-driver-head { min-height: 48px; }
+  .auri-driver-brand > img { width: 42px; height: 42px; }
+  .auri-driver-brand b { font-size: 22px; }
+  .auri-driver-summary { padding: 16px 18px; }
+  .auri-driver-summary h2 { font-size: 28px; }
+  .auri-driver-summary p { margin-top: 7px; font-size: 14px; }
+  .auri-driver-context { min-height: 62px; }
+  .auri-driver-context b { font-size: 16px; }
+  .auri-driver-context small,
+  .auri-driver-context em { font-size: 12px; }
+  .auri-driver-task { min-height: 54px; }
+  .auri-driver-task b { font-size: 16px; }
+  .auri-driver-task small,
+  .auri-driver-task em { font-size: 12px; }
+  .auri-driver-devices button { min-height: 48px; }
+  .auri-driver-panel .auri-takeover-actions { max-height: 150px; }
+  .auri-nav-hud { width: min(520px, calc(100% - 120px)); }
+}
+
+.hmi.is-ultrawide .hmi-body {
+  grid-template-columns: 650px 650px minmax(0, 1fr);
+}
+.hmi.is-ultrawide .auri-driver-panel { padding: 18px; gap: 10px; }
+.hmi.is-ultrawide .auri-driver-brand > img { width: 48px; height: 48px; }
+.hmi.is-ultrawide .auri-driver-brand b { font-size: 27px; }
+.hmi.is-ultrawide .auri-driver-brand small { font-size: 16px; }
+.hmi.is-ultrawide .auri-driver-risk { min-height: 48px; padding-inline: 18px; font-size: 17px; }
+.hmi.is-ultrawide .auri-driver-summary { padding: 18px 20px; }
+.hmi.is-ultrawide .auri-driver-summary > small { font-size: 16px; }
+.hmi.is-ultrawide .auri-driver-summary h2 { font-size: 38px; }
+.hmi.is-ultrawide .auri-driver-summary p { font-size: 18px; }
+.hmi.is-ultrawide .auri-driver-context { min-height: 72px; }
+.hmi.is-ultrawide .auri-driver-context b { font-size: 19px; }
+.hmi.is-ultrawide .auri-driver-context small,
+.hmi.is-ultrawide .auri-driver-context em { font-size: 15px; }
+.hmi.is-ultrawide .auri-driver-section-head { height: 38px; font-size: 16px; }
+.hmi.is-ultrawide .auri-driver-task { min-height: 66px; }
+.hmi.is-ultrawide .auri-driver-task b { font-size: 19px; }
+.hmi.is-ultrawide .auri-driver-task small,
+.hmi.is-ultrawide .auri-driver-task em { font-size: 14px; }
+.hmi.is-ultrawide .auri-driver-devices button { min-height: 58px; }
+.hmi.is-ultrawide .auri-driver-devices b { font-size: 15px; }
+.hmi.is-ultrawide .auri-driver-devices small { font-size: 12px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-head b { font-size: 27px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-head small { max-width: 500px; font-size: 16px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-conclusion { min-height: 120px; font-size: 48px; line-height: 1.15; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-actions { max-height: 235px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-action { min-height: 76px; grid-template-columns: 44px minmax(0, 1fr) auto; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-action > span { width: 42px; height: 42px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-action b { font-size: 27px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-action small { font-size: 16px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-devices b { font-size: 16px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-devices small { font-size: 13px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-confirm { min-height: 84px; }
+.hmi.is-ultrawide .auri-nav-hud { width: 650px; min-height: 104px; padding: 14px 18px; }
+.hmi.is-ultrawide .auri-nav-maneuver { width: 70px; height: 70px; }
+.hmi.is-ultrawide .auri-nav-next b { font-size: 32px; }
+.hmi.is-ultrawide .auri-nav-next small { font-size: 18px; }
+.hmi.is-ultrawide .auri-nav-next em { font-size: 18px; }
+.hmi.is-ultrawide .auri-nav-remaining b { font-size: 22px; }
+.hmi.is-ultrawide .auri-nav-remaining small { font-size: 16px; }
+
+@media (max-height: 760px) {
+  .auri-driver-panel { padding-top: 9px; padding-bottom: 8px; gap: 6px; }
+  .auri-driver-head { min-height: 36px; }
+  .auri-driver-brand > img { width: 33px; height: 33px; border-radius: 10px; }
+  .auri-driver-brand small { display: none; }
+  .auri-driver-summary { padding: 10px 12px; }
+  .auri-driver-summary h2 { margin-top: 5px; font-size: 19px; }
+  .auri-driver-summary p { margin-top: 4px; font-size: 10px; line-height: 1.35; }
+  .auri-driver-context { min-height: 44px; padding-block: 5px; }
+  .auri-driver-section-head { height: 24px; }
+  .auri-driver-task { min-height: 39px; padding-block: 4px; }
+  .auri-driver-task-icon { width: 30px; height: 30px; }
+  .auri-driver-devices { padding-top: 5px; }
+  .auri-driver-devices button { min-height: 36px; padding-block: 3px; }
+  .auri-driver-panel .auri-takeover-head { min-height: 32px; }
+  .auri-driver-panel .auri-takeover-conclusion { font-size: 17px; }
+  .auri-driver-panel .auri-takeover-actions { max-height: 96px; }
+  .auri-driver-panel .auri-takeover-action { min-height: 35px; }
+  .auri-driver-panel .auri-takeover-devices { display: none; }
+  .auri-driver-panel .auri-takeover-confirm { min-height: 48px; }
+  .auri-nav-hud { top: 12px; min-height: 66px; }
+  .auri-nav-maneuver { width: 46px; height: 46px; }
+  .auri-nav-next b { font-size: 18px; }
+  .auri-stage-notice { top: 90px; }
+  .auri-device-notice { top: 184px; }
+}
+
+@media (max-width: 1500px) and (max-height: 760px) {
+  .auri-driver-panel { padding: 14px 16px; gap: 8px; }
+  .auri-driver-brand > img { width: 40px; height: 40px; }
+  .auri-driver-brand b { font-size: 22px; }
+  .auri-driver-summary { padding: 14px 16px; }
+  .auri-driver-summary h2 { font-size: 28px; }
+  .auri-driver-summary p { font-size: 14px; }
+  .auri-driver-context { min-height: 56px; }
+  .auri-driver-context b { font-size: 16px; }
+  .auri-driver-task { min-height: 49px; }
+  .auri-driver-task b { font-size: 16px; }
+  .auri-driver-task small,
+  .auri-driver-task em { font-size: 12px; }
+  .auri-driver-devices button { min-height: 44px; }
+}
+
+/* Phase 11: map-first proportions and app-specific driver-side pages. */
+.hmi-body {
+  grid-template-columns: 460px minmax(0, 1fr) 400px !important;
+}
+
+.hmi.is-ultrawide .hmi-body {
+  grid-template-columns: 560px minmax(0, 1fr) 520px !important;
+}
+
+.bb-dock-item {
+  width: 68px !important;
+  height: 70px !important;
+  display: grid !important;
+  grid-template-rows: 38px 18px;
+  place-items: center;
+  align-content: center;
+  gap: 3px;
+}
+.bb-dock-item .bb-pic,
+.bb-dock-icon,
+.bb-dock-icon .auri-icon { width: 34px; height: 34px; }
+.bb-dock-icon { display: grid; place-items: center; color: rgba(245, 242, 236, 0.76); }
+.bb-dock-item small { color: rgba(245, 242, 236, 0.48); font-size: 12px; line-height: 1; letter-spacing: 0; }
+.bb-dock-item.active .bb-dock-icon { color: #8fb6ff; filter: drop-shadow(0 0 8px rgba(47, 107, 255, 0.56)); }
+.bb-dock-item.active small { color: var(--auri-ivory); }
+.bb-dock-item.active::after { bottom: -2px; }
+
+.auri-driver-detail-body.is-custom { padding-top: 16px; }
+.auri-shell-content.is-custom { min-height: 100%; gap: 16px; align-content: start; }
+
+.auri-empty-state {
+  min-height: 300px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 13px;
+  text-align: center;
+  color: rgba(245, 242, 236, 0.52);
+}
+.auri-empty-state > span { width: 64px; height: 64px; display: grid; place-items: center; border-radius: 20px; color: #9ebdff; background: rgba(47, 107, 255, 0.12); }
+.auri-empty-state > span .auri-icon { width: 30px; height: 30px; }
+.auri-empty-state h3 { margin: 0; color: var(--auri-ivory); font-size: 24px; letter-spacing: 0; }
+.auri-empty-state p { max-width: 340px; margin: 0; font-size: 18px; line-height: 1.5; }
+
+.auri-task-group { display: grid; gap: 8px; }
+.auri-task-group + .auri-task-group { margin-top: 10px; }
+.auri-task-group > header { min-height: 64px; display: grid; grid-template-columns: 42px minmax(0, 1fr) 34px; align-items: center; gap: 12px; }
+.auri-task-group > header > span { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 13px; color: #9ebdff; background: rgba(47, 107, 255, 0.12); }
+.auri-task-group.is-rigid > header > span { color: #ffd36c; background: rgba(230, 167, 0, 0.13); }
+.auri-task-group header b,
+.auri-task-group header small { display: block; }
+.auri-task-group header b { font-size: 21px; }
+.auri-task-group header small { margin-top: 3px; color: rgba(245, 242, 236, 0.46); font-size: 15px; }
+.auri-task-group header em { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; color: var(--auri-ivory); background: rgba(245, 242, 236, 0.08); font-size: 15px; font-style: normal; }
+.auri-task-card { width: 100%; min-height: 72px; padding: 12px 15px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; border: 1px solid rgba(126, 183, 255, 0.13); border-radius: 14px; color: var(--auri-ivory); background: rgba(245, 242, 236, 0.035); text-align: left; font-family: inherit; cursor: pointer; }
+.auri-task-group.is-rigid .auri-task-card { border-left: 4px solid var(--state-warning); }
+.auri-task-group.is-flexible .auri-task-card { border-left: 4px solid var(--state-processing); }
+.auri-task-card b,
+.auri-task-card small { display: block; }
+.auri-task-card b { font-size: 20px; }
+.auri-task-card small { margin-top: 5px; color: rgba(245, 242, 236, 0.48); font-size: 16px; }
+.auri-task-card em { color: var(--auri-gold); font-size: 16px; font-style: normal; }
+
+.auri-action-board > header { min-height: 52px; display: flex; align-items: center; justify-content: space-between; }
+.auri-action-board > header b { font-size: 22px; }
+.auri-action-board > header span { color: rgba(245, 242, 236, 0.52); font-size: 16px; }
+.auri-action-step { position: relative; width: 100%; min-height: 82px; padding: 12px 10px; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 12px; border: 0; border-bottom: 1px solid rgba(245, 242, 236, 0.09); color: var(--auri-ivory); background: transparent; text-align: left; font-family: inherit; cursor: pointer; }
+.auri-action-index { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid rgba(47, 107, 255, 0.28); border-radius: 50%; color: #a9c7ff; background: rgba(47, 107, 255, 0.1); font-size: 16px; }
+.auri-action-step.is-completed .auri-action-index { color: #79d9b3; border-color: rgba(46, 157, 111, 0.32); background: rgba(46, 157, 111, 0.11); }
+.auri-action-step b,
+.auri-action-step small { display: block; }
+.auri-action-step b { font-size: 20px; }
+.auri-action-step small { margin-top: 5px; max-width: 100%; color: rgba(245, 242, 236, 0.62); font-size: 18px; line-height: 1.4; }
+.auri-action-step small { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.auri-action-step em { color: var(--auri-gold); font-size: 18px; font-style: normal; white-space: nowrap; }
+
+.auri-sync-board { position: relative; display: grid; gap: 12px; }
+.auri-sync-line { position: absolute; left: 39px; top: 60px; bottom: 112px; width: 2px; background: linear-gradient(var(--state-success), rgba(47, 107, 255, 0.22)); }
+.auri-sync-board article { position: relative; min-height: 88px; padding: 13px 14px; display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; grid-template-rows: auto auto; align-content: center; gap: 3px 13px; border: 1px solid rgba(126, 183, 255, 0.13); border-radius: 15px; background: rgba(245, 242, 236, 0.035); }
+.auri-sync-board article > span { grid-row: 1 / 3; width: 50px; height: 50px; display: grid; place-items: center; border-radius: 15px; color: rgba(245, 242, 236, 0.5); background: rgba(245, 242, 236, 0.06); }
+.auri-sync-board article.is-online > span { color: #78d8b2; background: rgba(46, 157, 111, 0.12); }
+.auri-sync-board article b { font-size: 20px; }
+.auri-sync-board article small { color: rgba(245, 242, 236, 0.48); font-size: 16px; }
+.auri-sync-board article em { grid-column: 3; grid-row: 1 / 3; align-self: center; color: rgba(245, 242, 236, 0.42); font-size: 15px; font-style: normal; }
+.auri-sync-board article.is-online em { color: #78d8b2; }
+.auri-sync-board footer { min-height: 72px; margin-top: 5px; padding: 12px 15px; display: grid; grid-template-columns: 38px minmax(0, 1fr); align-items: center; gap: 12px; border: 1px solid rgba(212, 175, 122, 0.2); border-radius: 15px; background: rgba(212, 175, 122, 0.07); }
+.auri-sync-board footer > .auri-icon { color: var(--auri-gold); }
+.auri-sync-board footer b,
+.auri-sync-board footer small { display: block; }
+.auri-sync-board footer b { font-size: 18px; }
+.auri-sync-board footer small { margin-top: 3px; color: rgba(245, 242, 236, 0.48); font-size: 15px; }
+
+.auri-climate-board { display: grid; gap: 16px; }
+.auri-climate-board > header { min-height: 66px; display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; align-items: center; gap: 12px; }
+.auri-climate-symbol { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 15px; color: rgba(245, 242, 236, 0.45); background: rgba(245, 242, 236, 0.06); }
+.auri-climate-board.is-on .auri-climate-symbol { color: #a9c7ff; background: rgba(47, 107, 255, 0.13); box-shadow: 0 0 0 7px rgba(47, 107, 255, 0.04); }
+.auri-climate-board header small,
+.auri-climate-board header b { display: block; }
+.auri-climate-board header small { color: rgba(245, 242, 236, 0.46); font-size: 15px; }
+.auri-climate-board header b { margin-top: 4px; font-size: 22px; }
+.auri-power-toggle { min-width: 94px; height: 54px; padding: 0 13px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid rgba(245, 242, 236, 0.14); border-radius: 15px; color: rgba(245, 242, 236, 0.58); background: rgba(245, 242, 236, 0.055); font: 650 16px/1 inherit; cursor: pointer; }
+.auri-power-toggle.is-on { color: #a9c7ff; border-color: rgba(47, 107, 255, 0.32); background: rgba(47, 107, 255, 0.12); }
+.auri-temperature-control { min-height: 156px; display: grid; grid-template-columns: 64px minmax(0, 1fr) 64px; place-items: center; gap: 12px; border-radius: 20px; background: radial-gradient(circle at 50% 45%, rgba(47, 107, 255, 0.18), rgba(245, 242, 236, 0.035) 62%); }
+.auri-temperature-control > button { width: 62px; height: 62px; display: grid; place-items: center; border: 1px solid rgba(245, 242, 236, 0.14); border-radius: 50%; color: var(--auri-ivory); background: rgba(245, 242, 236, 0.065); cursor: pointer; }
+.auri-temperature-control > div { display: grid; grid-template-columns: auto auto; place-items: baseline center; justify-content: center; }
+.auri-temperature-control strong { color: var(--auri-ivory); font-size: 68px; line-height: 1; font-weight: 420; }
+.auri-temperature-control div > span { color: var(--auri-gold); font-size: 28px; }
+.auri-temperature-control small { grid-column: 1 / 3; margin-top: 8px; color: rgba(245, 242, 236, 0.48); font-size: 15px; }
+.auri-climate-setting { display: grid; gap: 9px; }
+.auri-climate-setting > label { color: rgba(245, 242, 236, 0.52); font-size: 16px; }
+.auri-segmented { min-height: 56px; padding: 4px; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; border-radius: 16px; background: rgba(245, 242, 236, 0.06); }
+.auri-segmented button { min-width: 0; border: 0; border-radius: 12px; color: rgba(245, 242, 236, 0.54); background: transparent; font: 620 17px/1 inherit; cursor: pointer; }
+.auri-segmented button.is-active { color: var(--auri-navy); background: var(--auri-ivory); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
+.auri-climate-sync { min-height: 66px; padding: 10px 13px; display: grid; grid-template-columns: 36px minmax(0, 1fr); align-items: center; gap: 11px; border: 1px solid rgba(46, 157, 111, 0.18); border-radius: 14px; background: rgba(46, 157, 111, 0.07); }
+.auri-climate-sync > .auri-icon { color: #78d8b2; }
+.auri-climate-sync b,
+.auri-climate-sync small { display: block; }
+.auri-climate-sync b { font-size: 17px; }
+.auri-climate-sync small { margin-top: 3px; color: rgba(245, 242, 236, 0.46); font-size: 14px; }
+.auri-climate-apply { min-height: 62px; border: 1px solid rgba(212, 175, 122, 0.5); border-radius: 15px; color: var(--auri-navy); background: linear-gradient(135deg, var(--auri-ivory), var(--auri-gold)); font: 730 19px/1 inherit; cursor: pointer; }
+.auri-climate-apply:disabled { opacity: 0.58; cursor: default; }
+
+.bb-dock-item .bb-auri-pic { filter: none !important; object-fit: contain; }
+
+.auri-route-board { display: grid; gap: 17px; }
+.auri-route-board > header { min-height: 78px; display: grid; grid-template-columns: 54px minmax(0, 1fr); align-items: center; gap: 14px; }
+.auri-route-board > header > span { width: 54px; height: 54px; display: grid; place-items: center; border-radius: 17px; color: #fff; background: var(--state-processing); }
+.auri-route-board header small { color: rgba(245, 242, 236, 0.46); font-size: 15px; }
+.auri-route-board h3 { margin: 4px 0 0; font-size: 25px; letter-spacing: 0; }
+.auri-route-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.auri-route-metrics article { min-height: 88px; padding: 12px; display: grid; align-content: center; gap: 6px; border: 1px solid rgba(126, 183, 255, 0.12); border-radius: 14px; background: rgba(245, 242, 236, 0.035); }
+.auri-route-metrics small { color: rgba(245, 242, 236, 0.44); font-size: 14px; }
+.auri-route-metrics b { font-size: 20px; }
+.auri-route-next { min-height: 88px; padding: 13px 15px; display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; align-items: center; gap: 12px; border: 1px solid rgba(47, 107, 255, 0.24); border-radius: 15px; background: rgba(47, 107, 255, 0.09); }
+.auri-route-next > span:first-child { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 13px; color: #a9c7ff; background: rgba(47, 107, 255, 0.14); }
+.auri-route-next small,
+.auri-route-next b { display: block; }
+.auri-route-next small { color: #9ebdff; font-size: 14px; }
+.auri-route-next b { margin-top: 4px; font-size: 19px; }
+.auri-route-next em { color: var(--auri-gold); font-size: 17px; font-style: normal; white-space: nowrap; }
+.auri-route-board > p { margin: 0; color: rgba(245, 242, 236, 0.45); font-size: 15px; line-height: 1.5; }
+
+@media (max-width: 1500px) and (max-height: 760px) {
+  .hmi-body { grid-template-columns: 500px minmax(0, 1fr) 420px !important; }
+  .auri-driver-panel { padding: 18px; }
+  .auri-temperature-control { min-height: 138px; }
+  .auri-temperature-control strong { font-size: 60px; }
+}
+
+/* Phase 10: driver-side AURI owns all app detail pages; map stays central and
+   the Bosch driving visualization moves to the far-right glance zone. */
+.hmi-body {
+  grid-template-columns: 520px minmax(0, 1fr) 470px !important;
+}
+
+/* Phase 12: live driving playback, navigation controls and cross-device clarity. */
+.auri-takeover-action > .auri-takeover-action-copy {
+  width: auto;
+  height: auto;
+  min-width: 0;
+  display: grid;
+  place-items: initial;
+  gap: 3px;
+  border-radius: 0;
+  color: inherit;
+  background: transparent;
+}
+.auri-takeover-action-copy > em {
+  overflow: hidden;
+  color: rgba(245, 242, 236, 0.5);
+  font-size: 12px;
+  font-style: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.auri-order-meta { min-width: 0; display: flex; align-items: center; gap: 5px; overflow: hidden; }
+.auri-order-meta i {
+  min-width: 0;
+  padding: 3px 6px;
+  overflow: hidden;
+  border: 1px solid rgba(212, 175, 122, 0.17);
+  border-radius: 6px;
+  color: rgba(245, 242, 236, 0.68);
+  background: rgba(212, 175, 122, 0.065);
+  font-size: 10px;
+  font-style: normal;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.auri-driver-panel .auri-takeover-action { min-height: 54px; padding-block: 6px; }
+.auri-driver-panel .auri-takeover-action > span:first-child { width: 34px; height: 34px; }
+.auri-driver-panel .auri-takeover-action b { font-size: 14px; line-height: 1.25; }
+.auri-driver-panel .auri-takeover-action > small { max-width: 58px; font-size: 11px; }
+
+.auri-driver-panel .auri-takeover-devices {
+  min-height: 60px;
+  gap: 7px;
+}
+.auri-takeover-devices > span {
+  position: relative;
+  min-height: 60px;
+  padding: 8px 8px;
+  grid-template-columns: 30px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-content: center;
+  column-gap: 8px;
+  border: 1px solid rgba(245, 242, 236, 0.08);
+  border-radius: 13px;
+  background: rgba(245, 242, 236, 0.04);
+}
+.auri-takeover-devices > span > i {
+  grid-row: 1 / 3;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  color: rgba(245, 242, 236, 0.46);
+  background: rgba(245, 242, 236, 0.06);
+}
+.auri-takeover-devices > span > i .auri-icon { width: 18px; height: 18px; }
+.auri-takeover-devices > span.is-active { border-color: rgba(46, 157, 111, 0.2); background: rgba(46, 157, 111, 0.065); }
+.auri-takeover-devices > span.is-active > i { color: #7ddbb6; background: rgba(46, 157, 111, 0.13); box-shadow: none; }
+.auri-takeover-devices > span > span { min-width: 0; align-self: center; }
+.auri-takeover-devices > span > span b,
+.auri-takeover-devices > span > span small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.auri-driver-panel .auri-takeover-devices > span > span b { color: rgba(245, 242, 236, 0.9); font-size: 14px; font-weight: 680; }
+.auri-driver-panel .auri-takeover-devices > span > span small { margin-top: 2px; color: rgba(245, 242, 236, 0.5); font-size: 11px; }
+.auri-takeover-devices > span > em {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  padding: 2px 5px;
+  border-radius: 999px;
+  color: rgba(245, 242, 236, 0.4);
+  background: rgba(245, 242, 236, 0.06);
+  font-size: 8px;
+  font-style: normal;
+  line-height: 1.2;
+}
+.auri-takeover-devices > span.is-active > em { color: #7ddbb6; background: rgba(46, 157, 111, 0.11); }
+
+.auri-map-controls {
+  right: 18px;
+  bottom: 22px;
+  display: flex;
+  grid-template-columns: none;
+  align-items: center;
+  gap: 7px;
+  padding: 6px;
+  border-radius: 15px;
+}
+.auri-map-controls[hidden] { display: none; }
+.auri-map-view-toggle,
+.auri-map-zoom { display: flex; align-items: center; gap: 3px; }
+.auri-map-view-toggle { padding: 3px; border-radius: 11px; background: rgba(11, 27, 51, 0.055); }
+.auri-map-zoom { padding-left: 6px; border-left: 1px solid rgba(11, 27, 51, 0.1); }
+.auri-map-controls button {
+  width: auto;
+  min-width: 50px;
+  height: 44px;
+  padding: 0 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 9px;
+  font-size: 14px;
+}
+.auri-map-controls button .auri-icon { width: 18px; height: 18px; }
+.auri-map-controls button span { font-size: 13px; font-weight: 680; }
+.auri-map-controls button.is-active { color: #fff; border-color: var(--state-processing); background: var(--state-processing); box-shadow: 0 5px 13px rgba(47, 107, 255, 0.2); }
+.auri-map-zoom button { min-width: 38px; width: 38px; padding: 0; font-size: 21px; }
+
+.hmi[data-auri-motion="idle"] .s3d-lane-dashes span,
+.hmi[data-auri-motion="ready"] .s3d-lane-dashes span,
+.hmi[data-auri-motion="stopped"] .s3d-lane-dashes span,
+.hmi[data-auri-motion="parked"] .s3d-lane-dashes span,
+.hmi[data-auri-motion="idle"] .s3d-curb,
+.hmi[data-auri-motion="ready"] .s3d-curb,
+.hmi[data-auri-motion="stopped"] .s3d-curb,
+.hmi[data-auri-motion="parked"] .s3d-curb,
+.hmi[data-auri-motion="idle"] .s3d-roadflow,
+.hmi[data-auri-motion="ready"] .s3d-roadflow,
+.hmi[data-auri-motion="stopped"] .s3d-roadflow,
+.hmi[data-auri-motion="parked"] .s3d-roadflow,
+.hmi[data-auri-motion="idle"] .s3d-car,
+.hmi[data-auri-motion="ready"] .s3d-car,
+.hmi[data-auri-motion="stopped"] .s3d-car,
+.hmi[data-auri-motion="parked"] .s3d-car { animation-play-state: paused !important; }
+.hmi[data-auri-motion="idle"] .s3d-particles,
+.hmi[data-auri-motion="ready"] .s3d-particles,
+.hmi[data-auri-motion="stopped"] .s3d-particles,
+.hmi[data-auri-motion="parked"] .s3d-particles,
+.hmi[data-auri-motion="idle"] .s3d-motion,
+.hmi[data-auri-motion="ready"] .s3d-motion,
+.hmi[data-auri-motion="stopped"] .s3d-motion,
+.hmi[data-auri-motion="parked"] .s3d-motion { opacity: 0 !important; }
+.hmi[data-auri-motion="stopped"] .s3d-brakes span { opacity: 1; animation-duration: 0.72s; }
+
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-devices { min-height: 82px; }
+.hmi.is-ultrawide .auri-takeover-devices > span { min-height: 82px; grid-template-columns: 42px minmax(0, 1fr); padding: 10px 12px; }
+.hmi.is-ultrawide .auri-takeover-devices > span > i { width: 42px; height: 42px; }
+.hmi.is-ultrawide .auri-takeover-devices > span > i .auri-icon { width: 24px; height: 24px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-devices > span > span b { font-size: 18px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-devices > span > span small { font-size: 14px; }
+.hmi.is-ultrawide .auri-takeover-devices > span > em { font-size: 11px; }
+
+.auri-driver-panel {
+  grid-column: 1;
+  grid-row: 1;
+  padding: 20px 20px 18px;
+  gap: 15px;
+}
+
+.right-panel {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.vd-panel {
+  grid-column: 3;
+  grid-row: 1;
+  border-right: 0 !important;
+  border-left: 1px solid rgba(126, 183, 255, 0.14) !important;
+}
+
+/* The legacy Bosch overlay remains in the DOM for compatibility, but all
+   bottom-dock destinations now render inside the permanent AURI surface. */
+.hmi-body > .left-panel { display: none !important; }
+
+.auri-driver-overview {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-right: 4px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(126, 183, 255, 0.35) transparent;
+}
+.auri-driver-overview::-webkit-scrollbar { width: 5px; }
+.auri-driver-overview::-webkit-scrollbar-thumb { border-radius: 99px; background: rgba(126, 183, 255, 0.35); }
+.auri-driver-tasks,
+.auri-driver-glance,
+.auri-driver-devices { flex-shrink: 0; }
+
+.auri-driver-panel.is-detail .auri-driver-overview { display: none; }
+
+.auri-driver-detail {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.auri-driver-detail[hidden] { display: none !important; }
+
+.auri-driver-detail-head {
+  min-height: 70px;
+  padding-bottom: 14px;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: center;
+  gap: 13px;
+  border-bottom: 1px solid rgba(245, 242, 236, 0.1);
+}
+
+.auri-driver-detail-head > span { min-width: 0; }
+.auri-driver-detail-head small,
+.auri-driver-detail-head h2 { display: block; margin: 0; letter-spacing: 0; }
+.auri-driver-detail-head small { color: rgba(245, 242, 236, 0.5); font-size: 13px; }
+.auri-driver-detail-head h2 { margin-top: 4px; color: var(--auri-ivory); font-size: 25px; line-height: 1.15; }
+
+.auri-driver-back {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(126, 183, 255, 0.2);
+  border-radius: 15px;
+  color: #b9d0ff;
+  background: rgba(47, 107, 255, 0.1);
+  cursor: pointer;
+}
+.auri-driver-back .auri-icon { width: 24px; height: 24px; }
+.auri-driver-back:hover,
+.auri-driver-back:focus-visible { border-color: rgba(212, 175, 122, 0.45); background: rgba(245, 242, 236, 0.08); outline: none; }
+
+.auri-driver-detail-body {
+  min-height: 0;
+  flex: 1;
+  padding: 16px 3px 4px 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(126, 183, 255, 0.35) transparent;
+}
+.auri-driver-detail-body::-webkit-scrollbar { width: 5px; }
+.auri-driver-detail-body::-webkit-scrollbar-thumb { border-radius: 99px; background: rgba(126, 183, 255, 0.35); }
+
+.auri-driver-panel .auri-shell-content { gap: 14px; }
+.auri-driver-panel .auri-shell-lead {
+  margin: 0;
+  color: var(--auri-ivory);
+  font-size: 27px;
+  font-weight: 680;
+  line-height: 1.22;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.auri-driver-panel .auri-shell-copy {
+  color: rgba(245, 242, 236, 0.62);
+  font-size: 16px;
+  line-height: 1.55;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.auri-driver-panel .auri-shell-row { min-height: 74px; padding: 14px 15px; }
+.auri-driver-panel .auri-shell-row-copy strong { font-size: 18px; }
+.auri-driver-panel .auri-shell-row-copy span { font-size: 18px; line-height: 1.4; }
+.auri-driver-panel .auri-shell-row-state { font-size: 18px; }
+
+.auri-driver-brand b { font-size: 24px; }
+.auri-driver-brand small { font-size: 13px; }
+.auri-driver-risk { min-height: 38px; padding-inline: 14px; font-size: 14px; }
+.auri-driver-summary { padding: 20px 20px 19px; }
+.auri-driver-summary > small { font-size: 13px; }
+.auri-driver-summary h2 { font-size: 32px; line-height: 1.16; }
+.auri-driver-summary p { font-size: 16px; line-height: 1.48; }
+.auri-driver-context { min-height: 72px; padding: 10px 12px; grid-template-columns: 44px minmax(0, 1fr) auto; }
+.auri-driver-context-icon { width: 44px; height: 44px; }
+.auri-driver-context-icon .auri-icon { width: 23px; height: 23px; }
+.auri-driver-context small { font-size: 12px; }
+.auri-driver-context b { font-size: 17px; }
+.auri-driver-context em { font-size: 13px; }
+.auri-driver-section-head { height: 38px; font-size: 14px; }
+.auri-driver-section-head button { font-size: 13px; }
+.auri-driver-task-list { gap: 8px; }
+.auri-driver-task { min-height: 62px; padding: 9px 10px; grid-template-columns: 42px minmax(0, 1fr) auto; gap: 11px; }
+.auri-driver-task-icon { width: 40px; height: 40px; }
+.auri-driver-task-icon .auri-icon { width: 21px; height: 21px; }
+.auri-driver-task b { font-size: 17px; }
+.auri-driver-task small { font-size: 13px; }
+.auri-driver-task em { font-size: 12px; }
+.auri-driver-task-more { min-height: 40px; font-size: 13px; }
+.auri-driver-glance {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+.auri-driver-glance button {
+  min-height: 58px;
+  padding: 9px 11px;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(126, 183, 255, 0.13);
+  border-radius: 14px;
+  color: var(--auri-ivory);
+  background: rgba(245, 242, 236, 0.035);
+  text-align: left;
+  cursor: pointer;
+}
+.auri-driver-glance button:hover,
+.auri-driver-glance button:focus-visible { border-color: rgba(212, 175, 122, 0.38); background: rgba(245, 242, 236, 0.065); outline: none; }
+.auri-driver-glance .auri-icon { width: 23px; height: 23px; color: #a9c7ff; }
+.auri-driver-glance span { min-width: 0; }
+.auri-driver-glance small,
+.auri-driver-glance b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.auri-driver-glance small { color: rgba(245, 242, 236, 0.45); font-size: 11px; }
+.auri-driver-glance b { margin-top: 3px; font-size: 15px; font-weight: 620; }
+.auri-driver-glance em { color: rgba(245, 242, 236, 0.46); font-size: 12px; font-style: normal; }
+.auri-driver-devices { padding-top: 12px; gap: 8px; }
+.auri-driver-devices button { min-height: 58px; padding: 8px; grid-template-columns: 25px minmax(0, 1fr); gap: 7px; }
+.auri-driver-devices .auri-icon { width: 21px; height: 21px; }
+.auri-driver-devices b { font-size: 12px; }
+.auri-driver-devices small { font-size: 10px; }
+
+.auri-driver-panel .auri-takeover-card,
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-card {
+  height: 100%;
+  padding-top: 14px;
+  gap: 9px;
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
+}
+.auri-driver-panel.is-auri-takeover .auri-driver-primary { min-height: 0; flex: 1; display: flex; }
+.auri-driver-panel .auri-takeover-head { min-height: 46px; }
+.auri-driver-panel .auri-takeover-orbit { width: 42px; height: 42px; }
+.auri-driver-panel .auri-takeover-head b { font-size: 21px; }
+.auri-driver-panel .auri-takeover-head small { max-width: 360px; font-size: 13px; }
+.auri-takeover-label,
+.auri-takeover-section-head {
+  color: rgba(245, 242, 236, 0.48);
+  font-size: 12px;
+  font-weight: 700;
+}
+.auri-takeover-section-head {
+  width: 100%;
+  min-height: 30px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.auri-takeover-section-head > span:last-child { display: flex; align-items: center; gap: 5px; }
+.auri-takeover-section-head .auri-icon { width: 15px; height: 15px; transform: rotate(180deg); }
+.auri-takeover-section-head:hover,
+.auri-takeover-section-head:focus-visible { color: var(--auri-gold); outline: none; }
+.auri-takeover-section-head em { color: #a9c7ff; font-style: normal; }
+.auri-driver-panel .auri-takeover-conclusion {
+  min-height: 0;
+  margin: 5px 0 0;
+  display: block;
+  overflow: visible;
+  color: var(--auri-ivory);
+  font-size: 25px;
+  line-height: 1.22;
+  font-weight: 680;
+  -webkit-line-clamp: unset;
+}
+.auri-takeover-verdict {
+  min-height: 96px;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(126, 183, 255, 0.2);
+  border-radius: 16px;
+  background: linear-gradient(120deg, rgba(47, 107, 255, 0.14), rgba(245, 242, 236, 0.035));
+  box-shadow: inset 0 1px rgba(245, 242, 236, 0.04), 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+.auri-takeover-verdict[data-tone="warning"] { border-color: rgba(230, 167, 0, 0.28); background: linear-gradient(120deg, rgba(230, 167, 0, 0.13), rgba(245, 242, 236, 0.025)); }
+.auri-takeover-verdict[data-tone="success"] { border-color: rgba(46, 157, 111, 0.3); background: linear-gradient(120deg, rgba(46, 157, 111, 0.14), rgba(245, 242, 236, 0.025)); }
+.auri-takeover-verdict-icon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  color: #a9c7ff;
+  background: rgba(47, 107, 255, 0.14);
+}
+.auri-takeover-verdict[data-tone="warning"] .auri-takeover-verdict-icon { color: #ffd36c; background: rgba(230, 167, 0, 0.14); }
+.auri-takeover-verdict[data-tone="success"] .auri-takeover-verdict-icon { color: #7ddbb6; background: rgba(46, 157, 111, 0.14); }
+.auri-takeover-verdict-icon .auri-icon { width: 25px; height: 25px; }
+.auri-takeover-verdict-copy { min-width: 0; }
+.auri-takeover-verdict-copy > small { color: rgba(245, 242, 236, 0.48); font-size: 12px; font-weight: 700; }
+.auri-takeover-verdict > em {
+  align-self: start;
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: #a9c7ff;
+  background: rgba(47, 107, 255, 0.12);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.auri-takeover-verdict[data-tone="warning"] > em { color: #ffd36c; background: rgba(230, 167, 0, 0.12); }
+.auri-takeover-verdict[data-tone="success"] > em { color: #7ddbb6; background: rgba(46, 157, 111, 0.12); }
+.auri-driver-panel .auri-takeover-actions { max-height: 230px; gap: 7px; }
+.auri-driver-panel .auri-takeover-action { min-height: 55px; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 10px; padding: 8px 10px; }
+.auri-driver-panel .auri-takeover-action > span { width: 36px; height: 36px; }
+.auri-driver-panel .auri-takeover-action > span .auri-icon { width: 20px; height: 20px; }
+.auri-driver-panel .auri-takeover-action b { font-size: 15px; line-height: 1.35; }
+.auri-driver-panel .auri-takeover-action small { max-width: 72px; font-size: 11px; }
+.auri-driver-panel .auri-takeover-devices { min-height: 42px; }
+.auri-driver-panel .auri-takeover-devices b { font-size: 12px; }
+.auri-driver-panel .auri-takeover-devices small { font-size: 10px; }
+.auri-takeover-next {
+  margin-top: auto;
+  min-height: 48px;
+  padding: 9px 12px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(212, 175, 122, 0.18);
+  border-radius: 13px;
+  background: rgba(212, 175, 122, 0.07);
+}
+.auri-takeover-next small { color: var(--auri-gold); font-size: 12px; font-weight: 700; }
+.auri-takeover-next b { color: var(--auri-ivory); font-size: 14px; font-weight: 620; }
+.auri-driver-panel .auri-takeover-confirm,
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-confirm { min-height: 62px; }
+.auri-driver-panel.is-auri-takeover .auri-driver-glance { display: none; }
+
+.hmi.is-ultrawide .hmi-body {
+  grid-template-columns: 680px minmax(0, 1fr) 680px !important;
+}
+.hmi.is-ultrawide .vd-half-top,
+.hmi.is-ultrawide .vd-panel:has(.vd-half-bot.is-auri-takeover) .vd-half-top {
+  flex-basis: 300px !important;
+}
+.hmi.is-ultrawide .auri-car-mark--badge { top: 160px; transform: translateX(-50%); }
+.hmi.is-ultrawide .auri-car-mark--plate { top: 174px; transform: translateX(-50%); }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-conclusion {
+  min-height: 114px;
+  margin-bottom: 0;
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  font-size: 48px;
+  line-height: 1.08;
+}
+.hmi.is-ultrawide .auri-takeover-verdict { min-height: 144px; padding: 16px 20px; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 18px; }
+.hmi.is-ultrawide .auri-takeover-verdict-icon { width: 64px; height: 64px; border-radius: 18px; }
+.hmi.is-ultrawide .auri-takeover-verdict-icon .auri-icon { width: 34px; height: 34px; }
+.hmi.is-ultrawide .auri-takeover-verdict-copy > small { font-size: 18px; }
+.hmi.is-ultrawide .auri-takeover-verdict > em { padding: 7px 11px; font-size: 17px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-card { gap: 0; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-actions { max-height: 240px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-action { min-height: 68px; }
+.hmi.is-ultrawide .auri-takeover-label,
+.hmi.is-ultrawide .auri-takeover-section-head { font-size: 20px; }
+.hmi.is-ultrawide .auri-takeover-next { min-height: 62px; }
+.hmi.is-ultrawide .auri-takeover-next small { font-size: 20px; }
+.hmi.is-ultrawide .auri-takeover-next b { font-size: 27px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-confirm { min-height: 84px; }
+.hmi.is-ultrawide .auri-driver-detail-head { min-height: 86px; }
+.hmi.is-ultrawide .auri-driver-detail-head small { font-size: 21px; }
+.hmi.is-ultrawide .auri-driver-detail-head h2 { font-size: 36px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-shell-lead { font-size: 42px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-shell-copy { font-size: 27px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-shell-row { min-height: 92px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-shell-row-copy strong { font-size: 29px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-shell-row-copy span { font-size: 23px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-shell-row-state { font-size: 21px; }
+.hmi.is-ultrawide .auri-driver-brand b { font-size: 32px; }
+.hmi.is-ultrawide .auri-driver-brand small { font-size: 20px; }
+.hmi.is-ultrawide .auri-driver-risk { font-size: 21px; }
+.hmi.is-ultrawide .auri-driver-summary > small { font-size: 20px; }
+.hmi.is-ultrawide .auri-driver-summary h2 { font-size: 46px; }
+.hmi.is-ultrawide .auri-driver-summary p { font-size: 27px; }
+.hmi.is-ultrawide .auri-driver-context { min-height: 88px; }
+.hmi.is-ultrawide .auri-driver-context small { font-size: 20px; }
+.hmi.is-ultrawide .auri-driver-context b { font-size: 27px; }
+.hmi.is-ultrawide .auri-driver-context em { font-size: 20px; }
+.hmi.is-ultrawide .auri-driver-section-head,
+.hmi.is-ultrawide .auri-driver-section-head button { font-size: 21px; }
+.hmi.is-ultrawide .auri-driver-task { min-height: 80px; }
+.hmi.is-ultrawide .auri-driver-task b { font-size: 27px; }
+.hmi.is-ultrawide .auri-driver-task small { font-size: 21px; }
+.hmi.is-ultrawide .auri-driver-task em,
+.hmi.is-ultrawide .auri-driver-task-more { font-size: 20px; }
+.hmi.is-ultrawide .auri-driver-glance button { min-height: 76px; }
+.hmi.is-ultrawide .auri-driver-glance small { font-size: 19px; }
+.hmi.is-ultrawide .auri-driver-glance b { font-size: 27px; }
+.hmi.is-ultrawide .auri-driver-glance em { font-size: 20px; }
+.hmi.is-ultrawide .auri-driver-devices button { min-height: 72px; }
+.hmi.is-ultrawide .auri-driver-devices b { font-size: 27px; }
+.hmi.is-ultrawide .auri-driver-devices small { font-size: 21px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-head small { font-size: 20px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-action small { font-size: 20px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-devices b { font-size: 24px; }
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-devices small { font-size: 20px; }
+
+@media (max-width: 1500px) and (max-height: 760px) {
+  .hmi-body { grid-template-columns: 540px minmax(0, 1fr) 500px !important; }
+  .auri-driver-panel { padding: 18px 20px; gap: 13px; }
+  .auri-driver-brand b { font-size: 25px; }
+  .auri-driver-brand small { display: block; font-size: 14px; }
+  .auri-driver-risk { font-size: 15px; }
+  .auri-driver-summary { padding: 19px 20px; }
+  .auri-driver-summary > small { font-size: 14px; }
+  .auri-driver-summary h2 { font-size: 34px; }
+  .auri-driver-summary p { font-size: 17px; }
+  .auri-driver-context { min-height: 72px; }
+  .auri-driver-context small { font-size: 13px; }
+  .auri-driver-context b { font-size: 18px; }
+  .auri-driver-context em { font-size: 14px; }
+  .auri-driver-section-head { height: 38px; font-size: 15px; }
+  .auri-driver-task { min-height: 62px; }
+  .auri-driver-task b { font-size: 18px; }
+  .auri-driver-task small,
+  .auri-driver-task em { font-size: 14px; }
+  .auri-driver-glance button { min-height: 62px; }
+  .auri-driver-glance small { font-size: 13px; }
+  .auri-driver-glance b { font-size: 17px; }
+  .auri-driver-glance em { font-size: 13px; }
+  .auri-driver-devices button { min-height: 58px; }
+  .auri-driver-devices b { font-size: 15px; }
+  .auri-driver-devices small { font-size: 13px; }
+  .auri-driver-panel .auri-takeover-head b { font-size: 23px; }
+  .auri-driver-panel .auri-takeover-head small { font-size: 14px; }
+  .auri-driver-panel .auri-takeover-conclusion { font-size: 31px; }
+  .auri-takeover-verdict { min-height: 90px; padding: 12px; grid-template-columns: 42px minmax(0, 1fr) auto; gap: 10px; }
+  .auri-takeover-verdict-icon { width: 42px; height: 42px; }
+  .auri-driver-panel .auri-takeover-conclusion { font-size: 24px; }
+  .auri-driver-panel .auri-takeover-actions { max-height: 220px; }
+  .auri-driver-panel .auri-takeover-action { min-height: 55px; }
+  .auri-driver-panel .auri-takeover-action b { font-size: 17px; }
+  .auri-driver-panel .auri-takeover-action small { font-size: 13px; }
+  .auri-driver-panel .auri-takeover-devices { display: grid; }
+  .auri-driver-panel .auri-takeover-confirm { min-height: 62px; }
+}
+
+/* Final layout authority: keep the navigation canvas dominant. */
+.hmi-body { grid-template-columns: 460px minmax(0, 1fr) 400px !important; }
+.hmi.is-ultrawide .hmi-body { grid-template-columns: 680px minmax(0, 1fr) 520px !important; }
+@media (max-width: 1500px) and (max-height: 760px) {
+  .hmi-body { grid-template-columns: 500px minmax(0, 1fr) 420px !important; }
+}
+
+/* Final component authority for the structured takeover rows. */
+.auri-driver-panel .auri-takeover-action > .auri-takeover-action-copy {
+  width: auto;
+  height: auto;
+  min-width: 0;
+  display: grid;
+  place-items: initial;
+  gap: 3px;
+  color: inherit;
+  background: transparent;
+}
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-action > .auri-takeover-action-copy {
+  width: auto;
+  height: auto;
+  min-width: 0;
+}
+.auri-driver-panel .auri-takeover-action > .auri-takeover-action-copy .auri-icon { display: none; }
+.auri-driver-panel .auri-takeover-devices {
+  position: relative;
+  min-height: 76px;
+  gap: 9px;
+}
+.auri-driver-panel .auri-takeover-devices::before {
+  content: "";
+  position: absolute;
+  top: 37px;
+  left: 14%;
+  right: 14%;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(47, 107, 255, 0.18), rgba(46, 157, 111, 0.55), rgba(47, 107, 255, 0.18));
+}
+.auri-driver-panel .auri-takeover-devices > span {
+  z-index: 1;
+  min-height: 76px;
+  padding: 10px 9px;
+  grid-template-columns: 34px minmax(0, 1fr);
+  column-gap: 9px;
+  border-color: rgba(245, 242, 236, 0.11);
+  background: rgba(11, 27, 51, 0.94);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+}
+.auri-driver-panel .auri-takeover-devices > span > i {
+  width: 34px;
+  height: 34px;
+}
+.auri-driver-panel .auri-takeover-devices > span > i .auri-icon { width: 20px; height: 20px; }
+.auri-driver-panel .auri-takeover-devices > span > span b {
+  padding-right: 18px;
+  font-size: 16px;
+  line-height: 1.2;
+}
+.auri-driver-panel .auri-takeover-devices > span > span small {
+  margin-top: 4px;
+  color: rgba(245, 242, 236, 0.64);
+  font-size: 13px;
+  line-height: 1.2;
+}
+.auri-driver-panel .auri-takeover-devices > span > em {
+  top: 7px;
+  right: 7px;
+  padding: 3px 6px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+/* Phase 13: glanceable AURI task, action and device pages. */
+.auri-task-group {
+  gap: 10px;
+  padding: 4px 0 12px;
+}
+.auri-task-group + .auri-task-group {
+  margin-top: 4px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(245, 242, 236, 0.08);
+}
+.auri-task-group > header {
+  min-height: 58px;
+  grid-template-columns: 42px minmax(0, 1fr) 32px;
+}
+.auri-task-group > header > span { border-radius: 14px; }
+.auri-task-group header b { font-size: 20px; }
+.auri-task-group header small { font-size: 14px; }
+.auri-task-group > div { display: grid; gap: 9px; }
+.auri-task-card {
+  min-height: 86px;
+  padding: 12px;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 11px;
+  border-left-width: 1px !important;
+  border-radius: 16px;
+  background: linear-gradient(120deg, rgba(245, 242, 236, 0.055), rgba(245, 242, 236, 0.025));
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+.auri-task-card:hover,
+.auri-task-card:focus-visible { border-color: rgba(212, 175, 122, 0.38); background: rgba(245, 242, 236, 0.07); outline: none; }
+.auri-task-card-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  color: #a9c7ff;
+  background: rgba(47, 107, 255, 0.12);
+}
+.auri-task-group.is-rigid .auri-task-card-icon { color: #ffd36c; background: rgba(230, 167, 0, 0.12); }
+.auri-task-card-icon .auri-icon { width: 22px; height: 22px; }
+.auri-task-card-copy { min-width: 0; }
+.auri-task-card-copy small,
+.auri-task-card-copy b,
+.auri-task-card-copy em { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.auri-task-card-copy small { color: rgba(245, 242, 236, 0.46); font-size: 12px; }
+.auri-task-card-copy b { margin-top: 3px; font-size: 19px; line-height: 1.2; }
+.auri-task-card-copy em { margin-top: 4px; color: rgba(245, 242, 236, 0.56); font-size: 13px; font-style: normal; }
+.auri-task-card-state {
+  padding: 6px 9px;
+  border-radius: 999px;
+  color: #9ebdff;
+  background: rgba(47, 107, 255, 0.11);
+  font-size: 12px;
+  font-weight: 680;
+  white-space: nowrap;
+}
+.auri-task-group.is-rigid .auri-task-card-state { color: #ffd36c; background: rgba(230, 167, 0, 0.11); }
+
+.auri-action-board { display: grid; gap: 10px; }
+.auri-action-board > header {
+  min-height: 70px;
+  padding: 13px 15px;
+  border: 1px solid rgba(126, 183, 255, 0.14);
+  border-radius: 16px;
+  background: linear-gradient(120deg, rgba(47, 107, 255, 0.11), rgba(245, 242, 236, 0.035));
+}
+.auri-action-board > header > span small,
+.auri-action-board > header > span b { display: block; }
+.auri-action-board > header > span small { color: rgba(245, 242, 236, 0.62); font-size: 27px; }
+.auri-action-board > header > span b { margin-top: 5px; font-size: 30px; }
+.auri-action-board > header > em { color: #a9c7ff; font-size: 30px; font-style: normal; font-weight: 720; }
+.auri-action-progress { height: 5px; overflow: hidden; border-radius: 99px; background: rgba(245, 242, 236, 0.08); }
+.auri-action-progress > i { height: 100%; display: block; border-radius: inherit; background: linear-gradient(90deg, var(--state-processing), var(--state-success)); transition: width 240ms ease; }
+.auri-action-list { display: grid; gap: 8px; }
+.auri-action-step {
+  min-height: 132px;
+  padding: 16px;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  border: 1px solid rgba(245, 242, 236, 0.09);
+  border-radius: 16px;
+  background: rgba(245, 242, 236, 0.035);
+}
+.auri-action-step:hover,
+.auri-action-step:focus-visible { border-color: rgba(212, 175, 122, 0.38); background: rgba(245, 242, 236, 0.065); outline: none; }
+.auri-action-index { border-radius: 14px; }
+.auri-action-index .auri-icon { width: 21px; height: 21px; }
+.auri-action-step-copy { min-width: 0; }
+.auri-action-step-copy small,
+.auri-action-step-copy b,
+.auri-action-step-copy em { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.auri-action-step-copy small { color: #a9c7ff; font-size: 27px; }
+.auri-action-step-copy b { margin-top: 4px; font-size: 29px; }
+.auri-action-step-copy em { margin-top: 7px; color: rgba(245, 242, 236, 0.68); font-size: 27px; font-style: normal; }
+.auri-action-step-copy em {
+  display: -webkit-box;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.25;
+}
+.auri-action-step-state { padding: 8px 10px; border-radius: 999px; color: var(--auri-gold); background: rgba(212, 175, 122, 0.08); font-size: 27px; white-space: nowrap; }
+.auri-action-step.is-completed .auri-action-step-state { color: #79d9b3; background: rgba(46, 157, 111, 0.1); }
+
+.auri-task-detail,
+.auri-action-detail { display: grid; gap: 15px; }
+.auri-task-detail > header,
+.auri-action-detail > header {
+  min-height: 84px;
+  padding: 13px 14px;
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 13px;
+  border: 1px solid rgba(126, 183, 255, 0.14);
+  border-radius: 17px;
+  background: rgba(245, 242, 236, 0.04);
+}
+.auri-task-detail > header > span,
+.auri-action-detail > header > span { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 15px; color: #a9c7ff; background: rgba(47, 107, 255, 0.12); }
+.auri-task-detail.is-rigid > header > span { color: #ffd36c; background: rgba(230, 167, 0, 0.13); }
+.auri-task-detail header small,
+.auri-task-detail header h3,
+.auri-action-detail header small,
+.auri-action-detail header h3 { display: block; margin: 0; }
+.auri-task-detail header small,
+.auri-action-detail header small { color: rgba(245, 242, 236, 0.48); font-size: 13px; }
+.auri-task-detail header h3,
+.auri-action-detail header h3 { margin-top: 4px; font-size: 21px; line-height: 1.22; }
+.auri-task-detail header em,
+.auri-action-detail header em { padding: 6px 9px; border-radius: 999px; color: var(--auri-gold); background: rgba(212, 175, 122, 0.09); font-size: 12px; font-style: normal; }
+.auri-task-time {
+  min-height: 128px;
+  padding: 18px;
+  display: grid;
+  align-content: center;
+  border-radius: 18px;
+  background: radial-gradient(circle at 85% 20%, rgba(47, 107, 255, 0.15), transparent 48%), rgba(245, 242, 236, 0.035);
+}
+.auri-task-time small { color: rgba(245, 242, 236, 0.48); font-size: 14px; }
+.auri-task-time b { margin-top: 4px; font-size: 42px; line-height: 1; }
+.auri-task-time span { margin-top: 10px; color: #9ebdff; font-size: 15px; }
+.auri-task-detail.is-rigid .auri-task-time span { color: #ffd36c; }
+.auri-task-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.auri-task-facts article { min-height: 106px; padding: 13px; display: grid; grid-template-columns: 30px minmax(0, 1fr); align-content: center; gap: 4px 8px; border: 1px solid rgba(245, 242, 236, 0.09); border-radius: 15px; background: rgba(245, 242, 236, 0.03); }
+.auri-task-facts article > span { grid-row: 1 / 3; color: #9ebdff; }
+.auri-task-facts article small { color: rgba(245, 242, 236, 0.44); font-size: 12px; }
+.auri-task-facts article b { overflow: hidden; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+.auri-detail-primary { min-height: 58px; display: flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid rgba(47, 107, 255, 0.32); border-radius: 15px; color: #d7e4ff; background: rgba(47, 107, 255, 0.13); font: 680 17px/1 inherit; cursor: pointer; }
+.auri-detail-primary .auri-icon { width: 21px; height: 21px; }
+.auri-action-preview { padding: 18px; border: 1px solid rgba(245, 242, 236, 0.09); border-radius: 18px; background: rgba(245, 242, 236, 0.04); }
+.auri-action-preview > small { color: #9ebdff; font-size: 13px; font-weight: 680; }
+.auri-action-preview > p { margin: 10px 0 0; color: var(--auri-ivory); font-size: 19px; line-height: 1.55; }
+.auri-action-preview > p { overflow-wrap: anywhere; white-space: pre-wrap; }
+.auri-takeover-action-empty { min-height: 54px; display: grid; place-items: center; padding: 8px 12px; border: 1px dashed rgba(245, 242, 236, 0.18); border-radius: 12px; color: rgba(245, 242, 236, 0.58); font-size: 13px; text-align: center; }
+.auri-action-preview-meta { margin-top: 15px; padding-top: 13px; display: flex; flex-wrap: wrap; gap: 8px 14px; border-top: 1px solid rgba(245, 242, 236, 0.08); }
+.auri-action-preview-meta span { display: flex; align-items: center; gap: 6px; color: rgba(245, 242, 236, 0.58); font-size: 14px; }
+.auri-action-preview-meta .auri-icon { width: 17px; height: 17px; color: var(--auri-gold); }
+.auri-action-assurance { min-height: 76px; padding: 12px 14px; display: grid; grid-template-columns: 38px minmax(0, 1fr); align-items: center; gap: 11px; border: 1px solid rgba(46, 157, 111, 0.18); border-radius: 16px; background: rgba(46, 157, 111, 0.07); }
+.auri-action-assurance > .auri-icon { color: #79d9b3; }
+.auri-action-assurance b,
+.auri-action-assurance small { display: block; }
+.auri-action-assurance b { font-size: 17px; }
+.auri-action-assurance small { margin-top: 4px; color: rgba(245, 242, 236, 0.5); font-size: 13px; }
+
+.auri-sync-board { gap: 10px; }
+.auri-sync-line { left: 41px; top: 66px; bottom: 112px; width: 3px; background: linear-gradient(var(--state-success), var(--state-processing), rgba(212, 175, 122, 0.35)); }
+.auri-sync-board article { min-height: 96px; border-radius: 17px; background: linear-gradient(120deg, rgba(245, 242, 236, 0.055), rgba(245, 242, 236, 0.025)); }
+.auri-sync-board article > span { width: 52px; height: 52px; box-shadow: 0 0 0 5px var(--auri-navy); }
+.auri-sync-board article b { font-size: 21px; }
+.auri-sync-board article small { font-size: 15px; }
+.auri-sync-board article em { padding: 6px 9px; border-radius: 999px; background: rgba(245, 242, 236, 0.055); font-size: 12px; }
+.auri-sync-board article.is-online em { background: rgba(46, 157, 111, 0.1); }
+
+.auri-driver-panel .auri-takeover-devices > button {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  min-height: 76px;
+  padding: 10px 9px;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-content: center;
+  column-gap: 9px;
+  border: 1px solid rgba(245, 242, 236, 0.11);
+  border-radius: 13px;
+  color: var(--auri-ivory);
+  background: rgba(11, 27, 51, 0.94);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.auri-driver-panel .auri-takeover-devices > button:hover,
+.auri-driver-panel .auri-takeover-devices > button:focus-visible { border-color: rgba(212, 175, 122, 0.4); background: #102541; outline: none; }
+.auri-driver-panel .auri-takeover-devices > button > i {
+  grid-row: 1 / 3;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  align-self: center;
+  border-radius: 10px;
+  color: rgba(245, 242, 236, 0.46);
+  background: rgba(245, 242, 236, 0.06);
+  font-style: normal;
+}
+.auri-driver-panel .auri-takeover-devices > button > i .auri-icon { width: 20px; height: 20px; }
+.auri-driver-panel .auri-takeover-devices > button.is-active { border-color: rgba(46, 157, 111, 0.22); background: #10283a; }
+.auri-driver-panel .auri-takeover-devices > button.is-active > i { color: #7ddbb6; background: rgba(46, 157, 111, 0.14); }
+.auri-driver-panel .auri-takeover-devices > button > span { min-width: 0; align-self: center; }
+.auri-driver-panel .auri-takeover-devices > button > span b,
+.auri-driver-panel .auri-takeover-devices > button > span small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.auri-driver-panel .auri-takeover-devices > button > span b { padding-right: 18px; font-size: 16px; line-height: 1.2; }
+.auri-driver-panel .auri-takeover-devices > button > span small { margin-top: 4px; color: rgba(245, 242, 236, 0.64); font-size: 13px; line-height: 1.2; }
+.auri-driver-panel .auri-takeover-devices > button > em {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  color: rgba(245, 242, 236, 0.45);
+  background: rgba(245, 242, 236, 0.07);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+}
+.auri-driver-panel .auri-takeover-devices > button.is-active > em { color: #7ddbb6; background: rgba(46, 157, 111, 0.11); }
+
+/* Preserve a 44px effective touch target after the compact HMI scale applies. */
+.auri-power-toggle { min-height: 64px; }
+.auri-temperature-control > button { width: 64px; height: 64px; }
+.auri-segmented { min-height: 72px; }
+.auri-segmented button { min-height: 64px; }
+.auri-detail-primary { min-height: 64px; }
+
+.auri-public-connection {
+  min-height: 360px;
+  padding: 28px 22px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 14px;
+  border: 1px solid rgba(126, 183, 255, 0.14);
+  border-radius: 20px;
+  background: radial-gradient(circle at 50% 28%, rgba(47, 107, 255, 0.14), transparent 44%), rgba(245, 242, 236, 0.035);
+  text-align: center;
+}
+.auri-public-connection > span { width: 64px; height: 64px; display: grid; place-items: center; border-radius: 20px; color: #ffd36c; background: rgba(230, 167, 0, 0.12); }
+.auri-public-connection.is-online > span { color: #79d9b3; background: rgba(46, 157, 111, 0.12); }
+.auri-public-connection > span .auri-icon { width: 31px; height: 31px; }
+.auri-public-connection h3 { margin: 2px 0 0; font-size: 25px; }
+.auri-public-connection p { max-width: 330px; margin: 0; color: rgba(245, 242, 236, 0.58); font-size: 16px; line-height: 1.5; }
+.auri-public-connection button { min-width: 180px; min-height: 64px; margin-top: 8px; border: 1px solid rgba(47, 107, 255, 0.32); border-radius: 15px; color: #d7e4ff; background: rgba(47, 107, 255, 0.13); font: 680 17px/1 inherit; cursor: pointer; }
+
+.auri-map-controls button { min-width: 72px; height: 64px; padding-inline: 13px; }
+.auri-map-controls button span { font-size: 15px; }
+.auri-map-zoom button { min-width: 64px; width: 64px; height: 64px; font-size: 26px; }
+
+.map-route-traffic {
+  display: none;
+  fill: none;
+  stroke-width: 15;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 5px rgba(11, 27, 51, 0.36));
+}
+.hmi[data-auri-motion="stopped"] .map-route-traffic { display: block; }
+.map-route-traffic.is-slow { stroke: #e6a700; stroke-dasharray: 12 88; stroke-dashoffset: -34; }
+.map-route-traffic.is-congested { stroke: #d1495b; stroke-dasharray: 13 87; stroke-dashoffset: -47; }
+.map-route-traffic.is-severe { stroke: #8f2032; stroke-dasharray: 12 88; stroke-dashoffset: -61; }
+article.auri-action-step { cursor: default; }
+
+.auri-amap-poi-label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+  color: #26364a;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 5px;
+  font: 650 13px/1.2 Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+  text-shadow:
+    -1px -1px 0 rgba(255, 255, 255, 0.98),
+    1px -1px 0 rgba(255, 255, 255, 0.98),
+    -1px 1px 0 rgba(255, 255, 255, 0.98),
+    1px 1px 0 rgba(255, 255, 255, 0.98),
+    0 1px 3px rgba(255, 255, 255, 0.92);
+  white-space: nowrap;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(11, 27, 51, 0.12));
+}
+.auri-amap-poi-label::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border: 2px solid rgba(255, 255, 255, 0.96);
+  border-radius: 50%;
+  background: #6d91b4;
+  box-shadow: 0 0 0 1px rgba(11, 27, 51, 0.1);
+}
+
+/* Phase 16: keep Agent proposals glanceable without treating risk as a frame. */
+.auri-takeover-card[data-stage="service_prepared"],
+.auri-takeover-card[data-stage="waiting_confirmation"] {
+  border-color: rgba(126, 183, 255, 0.18);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28), inset 0 1px rgba(245, 242, 236, 0.04);
+  animation: auriPlanReadyReveal 420ms cubic-bezier(.2, .8, .2, 1) both !important;
+}
+
+.auri-driver-panel .auri-takeover-card[data-stage="service_prepared"],
+.auri-driver-panel .auri-takeover-card[data-stage="waiting_confirmation"] {
+  border: 0;
+  box-shadow: none;
+}
+
+.auri-takeover-section-head {
+  min-height: 38px;
+  padding: 0 8px;
+  border: 1px solid rgba(245, 242, 236, 0.09);
+  border-radius: 12px;
+  color: rgba(245, 242, 236, 0.82);
+  background: rgba(245, 242, 236, 0.035);
+  font-size: 14px;
+}
+.auri-takeover-section-head > span:first-child { font-weight: 720; }
+.auri-takeover-section-head em {
+  padding: 0;
+  color: #a9c7ff;
+  background: transparent;
+  font-size: 12px;
+}
+.auri-takeover-section-head:hover,
+.auri-takeover-section-head:focus-visible {
+  border-color: rgba(126, 183, 255, 0.38);
+  background: rgba(47, 107, 255, 0.1);
+}
+
+.auri-driver-panel .auri-takeover-actions {
+  max-height: 252px;
+  gap: 9px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.auri-driver-panel .auri-takeover-action {
+  min-height: 64px;
+  padding: 8px 10px;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  gap: 10px;
+  border-color: rgba(126, 183, 255, 0.16);
+  border-radius: 16px;
+  background: rgba(245, 242, 236, 0.045);
+}
+.auri-driver-panel .auri-takeover-action > span:first-child {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+}
+.auri-driver-panel .auri-takeover-action > span:first-child .auri-icon { width: 22px; height: 22px; }
+.auri-driver-panel .auri-takeover-action b {
+  font-size: 20px;
+  line-height: 1.22;
+  font-weight: 680;
+}
+.auri-takeover-action-copy > em {
+  color: rgba(245, 242, 236, 0.62);
+  font-size: 13px;
+  line-height: 1.28;
+}
+.auri-driver-panel .auri-takeover-action > small {
+  max-width: none;
+  padding: 0;
+  color: rgba(245, 242, 236, 0.54);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 700;
+}
+.auri-driver-panel .auri-takeover-action.is-completed > small {
+  color: #79d9b3;
+  background: rgba(46, 157, 111, 0.11);
+}
+.auri-order-meta i { font-size: 12px; }
+.auri-driver-panel .auri-takeover-confirm,
+.hmi.is-ultrawide .auri-driver-panel .auri-takeover-confirm { min-height: 84px; }
+.auri-takeover-confirm > span { font-size: 21px; }
+.auri-takeover-card[data-stage="service_prepared"] .auri-takeover-next,
+.auri-takeover-card[data-stage="waiting_confirmation"] .auri-takeover-next {
+  min-height: 42px;
+  padding-block: 5px;
+}
+
+.auri-stage-notice.is-plan-ready {
+  width: min(400px, calc(100% - 36px));
+  min-height: 88px;
+  padding: 12px 14px;
+  grid-template-columns: 46px minmax(0, 1fr) 34px;
+  border-color: rgba(126, 183, 255, 0.22);
+  background: rgba(11, 27, 51, 0.96);
+  box-shadow: 0 18px 46px rgba(3, 9, 24, 0.34), inset 0 1px rgba(245, 242, 236, 0.04);
+}
+.auri-stage-notice.is-plan-ready .auri-stage-notice-icon { width: 44px; height: 44px; }
+.auri-stage-notice.is-plan-ready small { font-size: 13px; }
+.auri-stage-notice.is-plan-ready b { margin-top: 4px; font-size: 18px; }
+.auri-stage-notice.is-plan-ready em { margin-top: 5px; font-size: 13px; line-height: 1.35; white-space: normal; }
+
+@keyframes auriPlanReadyReveal {
+  from { opacity: 0.55; transform: translateX(-10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 1500px) and (max-height: 760px) {
+  .auri-driver-panel .auri-takeover-head b { font-size: 19px; }
+  .auri-driver-panel .auri-takeover-head small { font-size: 12px; }
+  .auri-takeover-section-head { min-height: 34px; font-size: 13px; }
+  .auri-takeover-section-head em { font-size: 11px; }
+  .auri-driver-panel .auri-takeover-actions { max-height: 164px; gap: 6px; }
+  .auri-driver-panel .auri-takeover-action { min-height: 52px; }
+  .auri-driver-panel .auri-takeover-action b { font-size: 18px; }
+  .auri-takeover-action-copy > em { font-size: 12px; }
+  .auri-driver-panel .auri-takeover-action > small { font-size: 11px; }
+  .auri-order-meta i { font-size: 11px; }
+  .auri-driver-panel .auri-takeover-confirm { min-height: 56px; }
+  .auri-takeover-confirm > span { font-size: 18px; }
+  .auri-stage-notice.is-plan-ready b { font-size: 17px; }
+  .auri-stage-notice.is-plan-ready em { font-size: 12px; }
+}
+
+/* Phase 17: shared cockpit surfaces for navigation, task and action detail. */
+.vd-nav-card[data-risk="warning"],
+.vd-nav-card[data-risk="critical"] {
+  border-color: rgba(126, 183, 255, 0.2) !important;
+}
+
+.auri-driver-risk[data-tone="warning"],
+.auri-driver-risk[data-tone="critical"] {
+  border-color: transparent;
+  background: rgba(245, 242, 236, 0.055);
+}
+.auri-driver-risk[data-tone="warning"] { color: #ffd36c; }
+.auri-driver-risk[data-tone="critical"] { color: #ff9aa6; }
+
+.auri-nav-hud {
+  border-color: rgba(126, 183, 255, 0.2);
+  border-radius: 16px;
+  color: var(--auri-ivory);
+  background: rgba(7, 19, 38, 0.94);
+  box-shadow: 0 14px 34px rgba(0, 4, 13, 0.28), inset 0 1px rgba(245, 242, 236, 0.04);
+}
+.auri-nav-next small,
+.auri-nav-remaining small { color: rgba(245, 242, 236, 0.58); }
+.auri-nav-next em {
+  border-color: rgba(245, 242, 236, 0.12);
+  color: rgba(245, 242, 236, 0.66);
+  background: rgba(245, 242, 236, 0.055);
+}
+.auri-nav-remaining { border-left-color: rgba(245, 242, 236, 0.12); }
+
+.auri-takeover-verdict {
+  border-color: rgba(126, 183, 255, 0.18);
+  border-radius: 16px;
+  background: rgba(245, 242, 236, 0.045);
+}
+.auri-takeover-verdict[data-tone="warning"] {
+  border-color: rgba(126, 183, 255, 0.18);
+  background: rgba(245, 242, 236, 0.045);
+}
+.auri-takeover-verdict[data-tone="warning"] > em {
+  padding: 0;
+  color: #ffd36c;
+  background: transparent;
+}
+
+.auri-task-card,
+.auri-action-step,
+.auri-task-detail > header,
+.auri-action-detail > header,
+.auri-action-preview,
+.auri-task-facts article {
+  border-color: rgba(126, 183, 255, 0.14);
+  border-radius: 16px;
+  background: rgba(245, 242, 236, 0.04);
+}
+.auri-task-card {
+  min-height: 80px;
+  padding: 12px;
+  box-shadow: none;
+}
+.auri-task-card:hover,
+.auri-task-card:focus-visible,
+.auri-driver-glance button:hover,
+.auri-driver-glance button:focus-visible {
+  border-color: rgba(126, 183, 255, 0.42);
+  background: rgba(47, 107, 255, 0.11);
+  outline: none;
+}
+.auri-task-card:active,
+.auri-driver-glance button:active { transform: translateY(1px); }
+.auri-task-group.is-rigid .auri-task-card-icon,
+.auri-task-group.is-rigid .auri-task-card-state,
+.auri-task-detail.is-rigid > header > span,
+.auri-task-detail.is-rigid .auri-task-time span {
+  color: #ffd36c;
+  background: rgba(230, 167, 0, 0.09);
+}
+.auri-task-group.is-rigid .auri-task-card-state {
+  padding: 0;
+  background: transparent;
+}
+
+.auri-action-board { gap: 8px; }
+.auri-action-board > header {
+  min-height: 64px;
+  padding: 12px 14px;
+  border-color: rgba(126, 183, 255, 0.16);
+  border-radius: 16px;
+  background: rgba(47, 107, 255, 0.09);
+}
+.auri-action-board > header > span small { color: rgba(245, 242, 236, 0.56); font-size: 26px; }
+.auri-action-board > header > span b { margin-top: 3px; font-size: 30px; }
+.auri-action-board > header > em { color: #a9c7ff; font-size: 27px; }
+.auri-action-list { gap: 8px; }
+.auri-action-step {
+  min-height: 96px;
+  padding: 12px;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 10px;
+}
+.auri-action-step-copy small { color: #a9c7ff; font-size: 26px; }
+.auri-action-step-copy b { margin-top: 3px; font-size: 29px; }
+.auri-action-step-copy em { margin-top: 5px; color: rgba(245, 242, 236, 0.62); font-size: 26px; }
+.auri-action-step-state {
+  padding: 0;
+  color: rgba(245, 242, 236, 0.58);
+  background: transparent;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.auri-task-detail,
+.auri-action-detail { gap: 12px; }
+.auri-task-detail > header,
+.auri-action-detail > header { min-height: 76px; padding: 12px; gap: 12px; }
+.auri-task-time { min-height: 112px; padding: 16px; border-radius: 16px; }
+.auri-task-time b { font-size: 36px; }
+.auri-task-facts { gap: 8px; }
+.auri-task-facts article { min-height: 88px; padding: 12px; }
+.auri-action-preview { padding: 16px; }
+.auri-action-preview > p { font-size: 17px; line-height: 1.5; }
+.auri-detail-primary {
+  min-height: 64px;
+  border-color: rgba(212, 175, 122, 0.46);
+  border-radius: 16px;
+  color: var(--auri-navy);
+  background: linear-gradient(135deg, var(--auri-ivory), var(--auri-gold));
+  box-shadow: 0 9px 22px rgba(0, 0, 0, 0.2), inset 0 1px rgba(255, 255, 255, 0.62);
+}
+
+/* Action detail is a second-level cockpit surface: keep the page heading primary,
+   then use a compact progress summary and tappable action rows. */
+.auri-action-board {
+  gap: 7px;
+}
+.auri-action-board > header {
+  min-height: 52px;
+  padding: 9px 12px;
+  border-color: rgba(126, 183, 255, 0.14);
+  border-radius: 14px;
+  background: linear-gradient(100deg, rgba(47, 107, 255, 0.1), rgba(245, 242, 236, 0.035));
+}
+.auri-action-board > header > span small {
+  display: none;
+}
+.auri-action-board > header > span b {
+  margin: 0;
+  color: var(--auri-ivory);
+  font-size: 20px;
+  line-height: 1.15;
+}
+.auri-action-board > header > em {
+  min-width: 42px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: #a9c7ff;
+  background: rgba(47, 107, 255, 0.13);
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 720;
+  text-align: center;
+}
+.auri-action-progress {
+  height: 4px;
+}
+.auri-action-list {
+  gap: 7px;
+}
+.auri-action-step {
+  min-height: 76px;
+  padding: 10px 12px;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  gap: 10px;
+  border-color: rgba(126, 183, 255, 0.14);
+  border-radius: 14px;
+  background: linear-gradient(100deg, rgba(245, 242, 236, 0.05), rgba(245, 242, 236, 0.025));
+  box-shadow: inset 0 1px rgba(245, 242, 236, 0.025);
+}
+.auri-action-index {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+}
+.auri-action-index .auri-icon {
+  width: 19px;
+  height: 19px;
+}
+.auri-action-step-copy small {
+  color: #9ebdff;
+  font-size: 13px;
+  font-weight: 680;
+  line-height: 1.2;
+}
+.auri-action-step-copy b {
+  margin-top: 2px;
+  color: var(--auri-ivory);
+  font-size: 19px;
+  line-height: 1.25;
+}
+.auri-action-step-copy em {
+  margin-top: 3px;
+  color: rgba(245, 242, 236, 0.58);
+  font-size: 14px;
+  line-height: 1.3;
+  -webkit-line-clamp: 1;
+}
+.auri-action-step-state {
+  margin-right: 0;
+  padding: 4px 7px;
+  border-radius: 999px;
+  color: rgba(245, 242, 236, 0.72);
+  background: rgba(245, 242, 236, 0.06);
+  font-size: 13px;
+  font-weight: 720;
+}
+.auri-action-step.is-completed .auri-action-step-state {
+  color: #79d9b3;
+  background: rgba(46, 157, 111, 0.12);
+}
+button.auri-action-step {
+  grid-template-columns: 40px minmax(0, 1fr) auto 18px;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+.auri-action-disclosure {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  align-self: center;
+  color: rgba(245, 242, 236, 0.5);
+  transition: color 160ms ease, transform 160ms ease;
+}
+.auri-action-disclosure .auri-icon {
+  width: 16px;
+  height: 16px;
+  transform: rotate(180deg);
+}
+button.auri-action-step:hover,
+button.auri-action-step:focus-visible {
+  border-color: rgba(126, 183, 255, 0.42);
+  background: rgba(47, 107, 255, 0.11);
+  outline: none;
+}
+button.auri-action-step:active {
+  transform: translateY(1px);
+}
+button.auri-action-step:hover .auri-action-disclosure,
+button.auri-action-step:focus-visible .auri-action-disclosure {
+  color: var(--auri-gold);
+  transform: translateX(2px);
+}
+article.auri-action-step {
+  cursor: default;
+}
+
+/* The left-side proposal list uses the same disclosure language as the detail page. */
+.auri-driver-panel .auri-takeover-action {
+  grid-template-columns: 40px minmax(0, 1fr) auto 18px;
+}
+.auri-driver-panel .auri-takeover-action > .auri-action-disclosure {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.auri-driver-panel .auri-takeover-action:hover .auri-action-disclosure,
+.auri-driver-panel .auri-takeover-action:focus-visible .auri-action-disclosure {
+  color: var(--auri-gold);
+  transform: translateX(2px);
+}
+
+@media (min-width: 1700px) and (min-height: 900px) {
+  .auri-action-board > header {
+    min-height: 58px;
+    padding: 10px 14px;
+  }
+  .auri-action-board > header > span b { font-size: 21px; }
+  .auri-action-step {
+    min-height: 82px;
+    padding: 11px 14px;
+  }
+  button.auri-action-step { grid-template-columns: 40px minmax(0, 1fr) auto 18px; }
+  .auri-action-step-copy b { font-size: 20px; }
+  .auri-action-step-copy em { font-size: 15px; }
+  .auri-driver-panel .auri-takeover-action { grid-template-columns: 40px minmax(0, 1fr) auto 18px; }
+}
+.auri-detail-primary:hover,
+.auri-detail-primary:focus-visible,
+.auri-takeover-confirm:hover,
+.auri-takeover-confirm:focus-visible {
+  filter: brightness(1.04);
+  outline: 3px solid rgba(212, 175, 122, 0.22);
+  outline-offset: 3px;
+}
+
+@media (max-height: 760px) {
+  .hmi.is-ultrawide .auri-driver-panel .auri-takeover-card { padding-top: 8px; gap: 6px; }
+  .hmi.is-ultrawide .auri-driver-panel .auri-takeover-head b { font-size: 27px; }
+  .hmi.is-ultrawide .auri-driver-panel .auri-takeover-head small { font-size: 16px; }
+  .hmi.is-ultrawide .auri-driver-panel .auri-takeover-conclusion { min-height: 114px; font-size: 48px; line-height: 1.08; }
+  .hmi.is-ultrawide .auri-takeover-verdict { min-height: 136px; padding: 10px 20px; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 18px; }
+  .hmi.is-ultrawide .auri-takeover-verdict-icon { width: 64px; height: 64px; border-radius: 18px; }
+  .hmi.is-ultrawide .auri-driver-panel .auri-takeover-actions { max-height: 240px; gap: 8px; }
+  .hmi.is-ultrawide .auri-driver-panel .auri-takeover-action { min-height: 68px; grid-template-columns: 44px minmax(0, 1fr) auto; padding: 8px 10px; }
+  .hmi.is-ultrawide .auri-driver-panel .auri-takeover-action > span { width: 42px; height: 42px; }
+  .hmi.is-ultrawide .auri-driver-panel .auri-takeover-action b { font-size: 27px; }
+  .hmi.is-ultrawide .auri-driver-panel .auri-takeover-action small { font-size: 16px; }
+  .hmi.is-ultrawide .auri-driver-panel .auri-takeover-confirm { min-height: 84px; }
+  .hmi.is-ultrawide .auri-takeover-confirm > span { font-size: 21px; }
+}
+
+/* Physical readability for 1366x768 displays that scale the 1920x1080 canvas. */
+@media (max-width: 1500px) and (max-height: 800px) {
+  .auri-driver-back { width: 64px; height: 64px; }
+  .auri-driver-detail-head { grid-template-columns: 64px minmax(0, 1fr); }
+  .auri-driver-detail-head small { font-size: 26px; }
+  .auri-driver-detail-head h2 { font-size: 34px; }
+
+  .auri-task-group header b,
+  .auri-task-group header small,
+  .auri-task-group header em,
+  .auri-task-card-copy small,
+  .auri-task-card-copy em,
+  .auri-task-card-state { font-size: 26px; }
+  .auri-task-card-copy b { font-size: 29px; }
+  .auri-task-card { min-height: 112px; }
+
+  .auri-route-board header small,
+  .auri-route-metrics small,
+  .auri-route-next small,
+  .auri-route-next em,
+  .auri-route-board > p { font-size: 26px; }
+  .auri-route-board h3 { font-size: 32px; }
+  .auri-route-metrics b,
+  .auri-route-next b { font-size: 29px; }
+
+  .auri-task-detail header small,
+  .auri-task-detail header em,
+  .auri-action-detail header small,
+  .auri-action-detail header em,
+  .auri-task-time small,
+  .auri-task-time span,
+  .auri-task-facts article small,
+  .auri-action-preview > small,
+  .auri-action-preview-meta span,
+  .auri-action-assurance b,
+  .auri-action-assurance small { font-size: 26px; }
+  .auri-task-detail header h3,
+  .auri-action-detail header h3,
+  .auri-task-facts article b { font-size: 29px; }
+  .auri-action-preview > p { font-size: 28px; }
+  .auri-task-time b { font-size: 46px; }
+
+  .auri-climate-board header small,
+  .auri-climate-setting > label,
+  .auri-temperature-control small,
+  .auri-climate-sync b,
+  .auri-climate-sync small { font-size: 26px; }
+  .auri-climate-board header b { font-size: 30px; }
+  .auri-power-toggle,
+  .auri-segmented button { font-size: 26px; }
+  .auri-climate-apply { font-size: 28px; }
+
+  .auri-stage-notice.is-plan-ready {
+    width: min(380px, calc(100% - 28px));
+    min-height: 84px;
+  }
+}
+
+/* Final authority for the action detail page.  Keep these after the legacy
+   scaled-canvas rules so a 1366x768 vehicle display does not inflate rows. */
+@media (max-width: 1500px) and (max-height: 800px) {
+  .auri-action-board > header { min-height: 52px; padding: 9px 12px; }
+  .auri-action-board > header > span small { display: none; }
+  .auri-action-board > header > span b { margin: 0; font-size: 28px; line-height: 1.15; }
+  .auri-action-board > header > em { min-width: 42px; padding: 5px 8px; font-size: 24px; }
+  .auri-action-progress { height: 4px; }
+  .auri-action-list { gap: 7px; }
+  .auri-action-step { min-height: 76px; padding: 10px 12px; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; }
+  button.auri-action-step { grid-template-columns: 40px minmax(0, 1fr) auto 18px; }
+  .auri-action-step-copy small { font-size: 24px; }
+  .auri-action-step-copy b { margin-top: 2px; font-size: 28px; }
+  .auri-action-step-copy em { margin-top: 3px; font-size: 24px; -webkit-line-clamp: 1; }
+  .auri-action-step-state { padding: 4px 7px; font-size: 23px; }
+  .auri-driver-panel .auri-takeover-action { grid-template-columns: 40px minmax(0, 1fr) auto 18px; }
+}
+
+@media (max-height: 760px) {
+  .hmi.is-ultrawide .auri-driver-panel .auri-takeover-action {
+    grid-template-columns: 44px minmax(0, 1fr) auto 18px;
+  }
+}
